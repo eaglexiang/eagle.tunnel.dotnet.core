@@ -19,20 +19,6 @@ namespace eagle.tunnel.dotnet.core
         {
             try
             {
-                // string host = Dns.GetHostName();
-                // IPAddress[] ipas = Dns.GetHostAddresses(host);
-                // foreach (IPAddress ipa in ipas)
-                // {
-                //     if(ipa.AddressFamily == AddressFamily.InterNetwork)
-                //     {
-                //         Console.WriteLine("found new local ip: " + ipa.ToString());
-                //         TcpListener server = new TcpListener(ipa, port);
-                //         server.Start();
-                //         Thread handleServerThread = new Thread(HandleServer);
-                //         handleServerThread.IsBackground = true;
-                //         handleServerThread.Start(server);
-                //     }
-                // }
                 IPAddress ipa = IPAddress.Parse(ip);
                 TcpListener server = new TcpListener(ipa, port);
                 server.Start();
@@ -76,15 +62,16 @@ namespace eagle.tunnel.dotnet.core
             {
                 int count = stream2client.Read(buffer, 0, buffer.Length);
                 string request = Encoding.UTF8.GetString(buffer, 0, count);
-                string url = GetURL(request);
+                Console.WriteLine("Request: " + request);
+                string host = GetHost(request);
                 int port = GetPort(request);
-                if(url == "")
+                if(host == "")
                 {
                     return ;
                 }
-                IPAddress[] ipas = Dns.GetHostAddresses(url);
+                IPAddress[] ipas = Dns.GetHostAddresses(host);
                 string ip = ipas[0].ToString();
-                Console.WriteLine("connect to " + url + ":" + port);
+                Console.WriteLine("connect to " + host + ":" + port);
                 
                 TcpClient client2Server = new TcpClient(ip, port);
                 NetworkStream stream2server = client2Server.GetStream();
@@ -92,7 +79,16 @@ namespace eagle.tunnel.dotnet.core
                 Pipe pipe0 = new Pipe(stream2client, stream2server);
                 Pipe pipe1 = new Pipe(stream2server, stream2client);
 
-                pipe0.Write(buffer, 0, count);
+                if(port == 443)
+                {
+                    string re443 = "HTTP/1.1 OK\r\n\r\n";
+                    buffer = Encoding.UTF8.GetBytes(re443);
+                    pipe1.Write(buffer, 0, buffer.Length);
+                }
+                else
+                {
+                    pipe0.Write(buffer, 0, count);
+                }
 
                 pipe0.Flow();
                 pipe1.Flow();
@@ -103,89 +99,62 @@ namespace eagle.tunnel.dotnet.core
             }
         }
 
-        private string GetURL(string request)
+        private string GetURI(string request)
         {
             StringReader reader = new StringReader(request);
             string line = reader.ReadLine();
             int ind0 = line.IndexOf(' ');
             int ind1 = line.LastIndexOf(' ');
-            string url = request.Substring(ind0 + 1, ind1 - ind0);
-            Uri uri = new Uri(url);
-            url = uri.Host;
-            Console.WriteLine("URL: " + url);
-            // while(line != null)
-            // {
-            //     if(line.Contains("Host:"))
-            //     {
-            //         int ind = request.IndexOf(":");
-            //         string url = line.Substring(6, ind);
-            //         Console.WriteLine("URL found: " + url);
-            //         return url;
-            //     }
-            //     else
-            //     {
-            //         line = reader.ReadLine();
-            //     }
-            // }
-            // Console.WriteLine("URL not found");
-            return url;
+            if(ind0 == ind1)
+            {
+                ind1 = line.Length;
+            }
+            string uri = request.Substring(ind0 + 1, ind1 - ind0 -1);
+            return uri;
+        }
+
+        private bool IsNum(char c)
+        {
+            return '0' <= c && c <= '9';
+        }
+
+        private string GetHost(string request)
+        {
+            string uristr = GetURI(request);
+            string host;
+            if(
+                uristr.Contains(":") &&
+                IsNum(uristr[uristr.IndexOf(":") + 1]))
+            {
+                int ind = uristr.LastIndexOf(":");
+                host = uristr.Substring(0, ind);
+            }
+            else
+            {
+                Uri uri = new Uri(uristr);
+                host = uri.Host;
+            }
+            return host;
         }
 
         private int GetPort(string request)
         {
-            StringReader reader = new StringReader(request);
-            string line = reader.ReadLine();
-            int ind0 = line.IndexOf(' ');
-            int ind1 = line.LastIndexOf(' ');
-            string url = request.Substring(ind0 + 1, ind1 - ind0);
-            Uri uri = new Uri(url);
-            int port = uri.Port;
+            string uristr = GetURI(request);
+            int port;
+            if(
+                uristr.Contains(":") &&
+                IsNum(uristr[uristr.IndexOf(":") + 1]))
+            {
+                int ind = uristr.IndexOf(":");
+                string _port = uristr.Substring(ind + 1);
+                port = int.Parse(_port);
+            }
+            else
+            {
+                Uri uri = new Uri(uristr);
+                port = uri.Port;
+            }
             return port;
-            // if(line.Contains(":"))
-            // {
-            //     int ind = line.IndexOf(':');
-            //     string _port = "";
-            //     while(true)
-            //     {
-            //         if('0' <= line[ind] && line[ind] <= '9')
-            //         {
-            //             _port += line[ind];
-            //         }
-            //         else
-            //         {
-            //             break;
-            //         }
-            //     }
-            //     int port = int.Parse(_port);
-            //     return port;
-            // }
-            // else
-            // {
-            //     if(line.Contains("https"))
-            //     {
-            //         return 443;
-            //     }
-            //     else
-            //     {
-            //         return 80;
-            //     }
-            // }
-            // // while(line != null)
-            // // {
-            // //     if(line.Contains("Host:"))
-            // //     {
-            // //         int ind = request.IndexOf(":");
-            // //         string port = line.Substring(ind);
-            // //         Console.WriteLine("Port found: " + port);
-            // //         return int.Parse(port);
-            // //     }
-            // //     else
-            // //     {
-            // //         line = reader.ReadLine();
-            // //     }
-            // // }
-            // // Console.WriteLine("Port not found");
-            // // return 80;
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Threading;
 
@@ -29,17 +30,19 @@ namespace eagle.tunnel.dotnet.core
         {
             try
             {
-                byte[] buffer = new byte[1024];
+                byte[] buffer = new byte[102400];
                 int count;
                 while(true)
                 {
-                    count = From.Read(buffer, 0, 1024);
+                    count = From.Read(buffer, 0, 102400);
                     To.Write(buffer, 0, count);
                 }
             }
             catch
             {
-                
+                From.Close();
+                To.Close();
+                return;
             }
         }
     }
