@@ -9,7 +9,7 @@ namespace eagle.tunnel.dotnet.core
         {
             Console.WriteLine("Eagle Tunnel");
             Server server = new Server();
-            Console.WriteLine("Server Port: ");
+            Console.Write("Server Port: ");
             string _port = Console.ReadLine();
             int port = int.Parse(_port);
             server.Start(port);
