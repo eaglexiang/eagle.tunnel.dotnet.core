@@ -20,9 +20,9 @@ namespace eagle.tunnel.dotnet.core
             thread.Start();
         }
 
-        public void Write(byte[] buffer)
+        public void Write(byte[] buffer, int offset, int count)
         {
-            To.Write(buffer, 0, buffer.Length);
+            To.Write(buffer, 0, count);
         }
 
         private void _Flow()

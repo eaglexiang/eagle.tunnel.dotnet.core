@@ -1,0 +1,10 @@
+/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/bin/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.deps.json
+/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/bin/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.runtimeconfig.json
+/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/bin/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.runtimeconfig.dev.json
+/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/bin/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.dll
+/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/bin/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.pdb
+/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/obj/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.csproj.CoreCompileInputs.cache
+/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/obj/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.AssemblyInfoInputs.cache
+/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/obj/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.AssemblyInfo.cs
+/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/obj/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.dll
+/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/obj/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.pdb
