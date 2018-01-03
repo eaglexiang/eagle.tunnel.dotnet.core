@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace eagle.tunnel.dotnet.core
 {
@@ -6,7 +7,16 @@ namespace eagle.tunnel.dotnet.core
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Eagle Tunnel");
+            Server server = new Server();
+            Console.WriteLine("Server Port: ");
+            string _port = Console.ReadLine();
+            int port = int.Parse(_port);
+            server.Start(port);
+            while(true)
+            {
+                Thread.Sleep(10000);
+            }
         }
     }
 }
