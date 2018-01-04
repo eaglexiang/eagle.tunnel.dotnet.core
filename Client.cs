@@ -69,7 +69,7 @@ namespace eagle.tunnel.dotnet.core
             return sslStream;
         }
 
-        public bool Start(
+        public void Start(
             string serverhost,int serverport, string certhost,
             string localhost, int localport, int localbacklog
         )

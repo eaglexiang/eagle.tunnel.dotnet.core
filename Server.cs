@@ -19,30 +19,23 @@ namespace eagle.tunnel.dotnet.core
             ;
         }
 
-        public bool Start(string ip, int port, string cert)
+        public void Start(string ip, int port, string cert)
         {
+            TcpListener server;
             try
             {
                 IPAddress ipa = IPAddress.Parse(ip);
-                TcpListener server = new TcpListener(ipa, port);
+                server = new TcpListener(ipa, port);
                 server.Start();
-                Thread handleServerThread = new Thread(HandleServer);
-                handleServerThread.IsBackground = true;
-                handleServerThread.Start(server);
                 Console.WriteLine("server started: " + ip + ":" + port);
                 serverCertificate = X509Certificate.CreateFromCertFile(cert);
-                return true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return false;
+                return;
             }
-        }
 
-        private void HandleServer(object serverObj)
-        {
-            TcpListener server = serverObj as TcpListener;
             while(true)
             {
                 TcpClient client = server.AcceptTcpClient();
