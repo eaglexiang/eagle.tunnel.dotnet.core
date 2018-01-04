@@ -83,6 +83,13 @@ namespace eagle.tunnel.dotnet.core
                 sslStream2Client.Close();
                 return;
             }
+            finally
+            {
+                // The client stream will be closed with the sslStream
+                // because we specified this behavior when creating
+                // the sslStream.
+                sslStream2Client.Close();
+            }
         }
 
         private void HandleSocket2Client(SslStream stream2client)
