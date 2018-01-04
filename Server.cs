@@ -1,6 +1,9 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Net.Security;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
 using System.Collections.Generic;
 using System.Threading;
 using System.Text;
@@ -10,12 +13,13 @@ namespace eagle.tunnel.dotnet.core
 {
     public class Server
     {
+        public X509Certificate serverCertificate;
         public Server()
         {
             ;
         }
 
-        public bool Start(string ip, int port)
+        public bool Start(string ip, int port, string cert)
         {
             try
             {
@@ -26,6 +30,7 @@ namespace eagle.tunnel.dotnet.core
                 handleServerThread.IsBackground = true;
                 handleServerThread.Start(server);
                 Console.WriteLine("server started: " + ip + ":" + port);
+                serverCertificate = X509Certificate.CreateFromCertFile(cert);
                 return true;
             }
             catch (Exception ex)
@@ -52,10 +57,35 @@ namespace eagle.tunnel.dotnet.core
         {
             TcpClient socket2Client = clientObj as TcpClient;
             NetworkStream stream2client = socket2Client.GetStream();
-            HandleSocket2Client(stream2client);
+            SslStream sslStream2Client = new SslStream(
+                stream2client, false);
+            try
+            {
+                sslStream2Client.AuthenticateAsServer(
+                    serverCertificate,
+                    false,
+                    SslProtocols.Tls,
+                    true
+                );
+
+                sslStream2Client.ReadTimeout = 5000;
+                sslStream2Client.ReadTimeout = 5000;
+                HandleSocket2Client(sslStream2Client);
+            }
+            catch (AuthenticationException e)
+            {
+                Console.WriteLine("Exception: {0}", e.Message);
+                if (e.InnerException != null)
+                {
+                    Console.WriteLine("Inner exception: {0}", e.InnerException.Message);
+                }
+                Console.WriteLine ("Authentication failed - closing the connection.");
+                sslStream2Client.Close();
+                return;
+            }
         }
 
-        private void HandleSocket2Client(NetworkStream stream2client)
+        private void HandleSocket2Client(SslStream stream2client)
         {
             byte[] buffer = new byte[102400];
             try
