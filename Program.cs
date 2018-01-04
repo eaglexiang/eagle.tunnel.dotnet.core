@@ -14,7 +14,7 @@ namespace eagle.tunnel.dotnet.core
             Console.Write("Server Port: ");
             string _port = Console.ReadLine();
             int port = int.Parse(_port);
-            server.Start(ip, port);
+            server.Start(ip, port, "/mnt/sdb1/home/eagle/Projects/test/ssl/cert/ssl.key");
             while(true)
             {
                 Thread.Sleep(10000);
