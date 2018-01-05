@@ -1,0 +1,19 @@
+digraph startgame {
+    label="基本结构"
+    rankdir = LR
+
+    app[label="浏览器" shape=box, height=1]
+    local[label="本地服务" shape=box, height=1]
+    remote[label="远端服务" shape=box, height=1]
+    server[label="网站服务器" shape=box, height=1]
+
+
+    app -> local [label="网络请求"]
+    local -> app [label="解密后的请求反馈"]
+
+    local -> remote [label="加密后的网络请求"]
+    remote -> local [label="加密后的请求反馈"]
+
+    remote -> server [label="解密后的网络请求"]
+    server -> remote [label="请求反馈"]
+}
