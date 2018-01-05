@@ -7,22 +7,31 @@ namespace eagle.tunnel.dotnet.core
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Eagle Tunnel");
-            Console.WriteLine("");
-            Console.WriteLine("1. Server");
-            Console.WriteLine("2. Client");
-            Console.WriteLine("0. quit");
-            Console.WriteLine("");
+            
             while(true)
             {
-                int choice = ReadNum();
+                int choice;
+                if(args.Length == 0)
+                {
+                    Console.WriteLine("Eagle Tunnel");
+                    Console.WriteLine("");
+                    Console.WriteLine("1. Server");
+                    Console.WriteLine("2. Client");
+                    Console.WriteLine("0. quit");
+                    Console.WriteLine("");
+                    choice = ReadNum();
+                }
+                else
+                {
+                    choice = 1;
+                }
 
                 switch (choice)
                 {
                     case 0:
                         return;
                     case 1:
-                        StartServer();
+                        StartServer(args[0], args[1]);
                         break;
                     case 2:
                         StartClient();
@@ -33,14 +42,15 @@ namespace eagle.tunnel.dotnet.core
             }
         }
 
-        static void StartServer()
+        static void StartServer(string ip, string _port)
         {
-            Console.Write("IP: ");
-            string ip = Console.ReadLine();
-            Console.Write("Port: ");
-            int port = ReadNum();
+            int port = int.Parse(_port);
             Server server = new Server();
-            server.Start(ip, port, "./ssl.key");
+            server.Start(
+                ip,
+                port,
+                100
+            );
         }
 
         static void StartClient()
@@ -55,7 +65,7 @@ namespace eagle.tunnel.dotnet.core
             int localPort = ReadNum();
             Client client = new Client();
             client.Start(
-                serverIP, serverPort, "./ssl.csr",
+                serverIP, serverPort,
                 localIP, localPort, 100
             );
         }
