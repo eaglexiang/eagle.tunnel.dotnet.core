@@ -24,7 +24,6 @@ namespace eagle.tunnel.dotnet.core
                 server = new TcpListener(ipa, port);
                 server.Start(backlog);
                 Console.WriteLine("server started: " + ip + ":" + port);
-                // serverCertificate = X509Certificate.CreateFromCertFile(cert);
             }
             catch (Exception ex)
             {
@@ -46,28 +45,6 @@ namespace eagle.tunnel.dotnet.core
         {
             TcpClient socket2Client = clientObj as TcpClient;
             NetworkStream stream2client = socket2Client.GetStream();
-            // SslStream sslStream2Client = new SslStream(
-            //     stream2client, false);
-            // try
-            // {
-            //     sslStream2Client.AuthenticateAsServer(
-            //         serverCertificate,
-            //         false,
-            //         SslProtocols.Tls,
-            //         true
-            //     );
-            //     Console.WriteLine("SSL connected");
-
-            //     sslStream2Client.ReadTimeout = 5000;
-            //     sslStream2Client.ReadTimeout = 5000;
-            //     HandleSocket2Client(sslStream2Client);
-            // }
-            // catch (Exception e)
-            // {
-            //     Console.WriteLine(e.Message);
-            //     sslStream2Client.Close();
-            //     return;
-            // }
             HandleSocket2Client(stream2client);
         }
 
