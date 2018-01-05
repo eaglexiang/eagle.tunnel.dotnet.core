@@ -2,6 +2,8 @@
 
 代理工具，SSR的替代品
 
+[主页](https://www.eaglexiang.org/eagle-tunnel)
+
 ## 基本原理
 
 ![基本原理](./doc/arch.png)
@@ -35,3 +37,7 @@ dotnet eagle.tunnel.dotnet.core.dll
 ```
 
 将手机或电脑的代理地址设置为本地服务的IP和Port
+
+## 开源协议
+
+[MIT](./LICENSE)
