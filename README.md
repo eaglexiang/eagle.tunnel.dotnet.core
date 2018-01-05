@@ -1,4 +1,4 @@
-# eagle.tunnel.dotnet.core
+# Eagle Tunnel
 
 代理工具，SSR的替代品
 
