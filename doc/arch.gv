@@ -3,8 +3,8 @@ digraph startgame {
     rankdir = LR
 
     app[label="浏览器" shape=box, height=1]
-    local[label="本地服务" shape=box, height=1]
-    remote[label="远端服务" shape=box, height=1]
+    local[label="本地服务" shape=box, height=1, color=blue]
+    remote[label="远端服务" shape=box, height=1, color=blue]
     server[label="网站服务器" shape=box, height=1]
 
 
