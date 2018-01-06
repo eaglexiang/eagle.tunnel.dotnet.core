@@ -50,13 +50,14 @@ namespace eagle.tunnel.dotnet.core
 
         private void HandleSocket2Client(NetworkStream stream2client)
         {
+            Pipe pipe0;
+            Pipe pipe1;
+            pipe0 = new Pipe(stream2client, null);
+            pipe0.EncryptFrom = true;
+            pipe1 = new Pipe(null, stream2client);
+            pipe1.EncryptTo = true;
             try
             {
-                Pipe pipe0 = new Pipe(stream2client, null);
-                pipe0.EncryptFrom = true;
-                Pipe pipe1 = new Pipe(null, stream2client);
-                pipe1.EncryptTo = true;
-
                 byte[] buffer = pipe0.Read();
                 string request = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
                 Console.WriteLine("Request: " + request);
@@ -93,6 +94,8 @@ namespace eagle.tunnel.dotnet.core
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                pipe0.Close();
+                pipe1.Close();
             }
         }
 

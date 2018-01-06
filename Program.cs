@@ -75,6 +75,7 @@ namespace eagle.tunnel.dotnet.core
             string input = "";
             do
             {
+                Console.WriteLine("Tunnel Number: " + Pipe.ThreadNum);
                 Console.Write("input q to quit: ");
                 input = Console.ReadLine();
             }while(input != "q");

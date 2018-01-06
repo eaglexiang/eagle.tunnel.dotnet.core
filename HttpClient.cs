@@ -84,6 +84,10 @@ namespace eagle.tunnel.dotnet.core
                 {
                     client.Close();
                 }
+                if(localServer != null)
+                {
+                    localServer.Stop();
+                }
             }
         }
 
