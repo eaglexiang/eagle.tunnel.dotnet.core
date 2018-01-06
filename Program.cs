@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Text;
 
 namespace eagle.tunnel.dotnet.core
 {
@@ -30,7 +31,7 @@ namespace eagle.tunnel.dotnet.core
                     break;
                 default:
                     Console.WriteLine("no specific mode (server/client ?)");
-                    break;
+                    return;
             }
 
             string input = "";
@@ -98,7 +99,7 @@ namespace eagle.tunnel.dotnet.core
                 return false;
             }
 
-            string conf = File.ReadAllText(confPath);
+            string conf = File.ReadAllText(confPath, Encoding.UTF8);
             bool result = true;
 
             string type = "server ip";
