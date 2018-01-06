@@ -10,20 +10,32 @@ namespace eagle.tunnel.dotnet.core
 {
     public class HttpServer
     {
-        public HttpServer()
+        private string ServerIP { get; set;}
+        private int ServerHttpPort { get; set;}
+        public bool Running { get; set;}
+
+        public HttpServer(string serverIP, int serverHttpPort)
         {
-            ;
+            ServerIP = serverIP;
+            ServerHttpPort = serverHttpPort;
         }
 
-        public void Start(string ip, int port, int backlog)
+        public void Start()
+        {
+            Thread startThread = new Thread(_Start);
+            startThread.IsBackground = true;
+            startThread.Start();
+        }
+
+        private void _Start()
         {
             TcpListener server;
             try
             {
-                IPAddress ipa = IPAddress.Parse(ip);
-                server = new TcpListener(ipa, port);
-                server.Start(backlog);
-                Console.WriteLine("server started: " + ip + ":" + port);
+                IPAddress ipa = IPAddress.Parse(ServerIP);
+                server = new TcpListener(ipa, ServerHttpPort);
+                server.Start(100);
+                Console.WriteLine("server started: " + ServerIP + ":" + ServerHttpPort);
             }
             catch (Exception ex)
             {
@@ -31,7 +43,8 @@ namespace eagle.tunnel.dotnet.core
                 return;
             }
 
-            while(true)
+            Running = true;
+            while(Running)
             {
                 TcpClient client = server.AcceptTcpClient();
                 Console.WriteLine("new client connected");
@@ -39,6 +52,9 @@ namespace eagle.tunnel.dotnet.core
                 handleClientThread.IsBackground = true;
                 handleClientThread.Start(client);
             }
+            Console.WriteLine("Server Stopped");
+            Thread.Sleep(2000);
+            Environment.Exit(0);
         }
 
         private void HandleClient(object clientObj)
@@ -155,6 +171,12 @@ namespace eagle.tunnel.dotnet.core
                 port = uri.Port;
             }
             return port;
+        }
+
+        public void Stop()
+        {
+            Console.WriteLine("quiting...");
+            Running = false;
         }
     }
 }

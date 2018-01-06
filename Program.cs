@@ -15,6 +15,7 @@ namespace eagle.tunnel.dotnet.core
         static int localHttpPort;
         static int localSocketPort;
         static HttpClient httpClient;
+        static HttpServer httpServer;
 
         static void Main(string[] args)
         {
@@ -41,12 +42,14 @@ namespace eagle.tunnel.dotnet.core
                 input = Console.ReadLine();
             }while(input != "q");
 
-            try
+            if(httpClient != null)
             {
                 httpClient.Stop();
             }
-            catch
-            {}
+            if(httpServer != null)
+            {
+                httpServer.Stop();
+            }
         }
 
         static void StartServer()
@@ -57,12 +60,8 @@ namespace eagle.tunnel.dotnet.core
             Console.WriteLine("Server Http Port: " + serverHttpPort);
             Console.WriteLine("Server Socket Port: " + serverSocketPort);
             
-            HttpServer server = new HttpServer();
-            server.Start(
-                serverIP,
-                serverHttpPort,
-                100
-            );
+            httpServer = new HttpServer(serverIP, serverHttpPort);
+            httpServer.Start();
         }
 
         static void StartClient()
