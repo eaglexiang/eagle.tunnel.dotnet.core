@@ -9,11 +9,11 @@ digraph startgame {
 
 
     app -> local [label="网络请求"]
-    local -> app [label="解密后的请求反馈"]
+    local -> app [label="解密后的请求反馈", color=green]
 
-    local -> remote [label="加密后的网络请求"]
-    remote -> local [label="加密后的请求反馈"]
+    local -> remote [label="加密后的网络请求", color=red]
+    remote -> local [label="加密后的请求反馈", color=red]
 
-    remote -> server [label="解密后的网络请求"]
+    remote -> server [label="解密后的网络请求", color=green]
     server -> remote [label="请求反馈"]
 }
