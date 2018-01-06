@@ -17,3 +17,13 @@ bin/Release/netcoreapp2.0/publish/eagle.tunnel.dotnet.core.dll
 bin/Release/netcoreapp2.0/publish/eagle.tunnel.dotnet.core.pdb
 bin/Release/netcoreapp2.0/publish/eagle.tunnel.dotnet.core.deps.json
 bin/Release/netcoreapp2.0/publish/eagle.tunnel.dotnet.core.runtimeconfig.json
+obj/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.csproj.CoreCompileInputs.cache
+obj/eagle.tunnel.dotnet.core.csproj.nuget.cache
+obj/eagle.tunnel.dotnet.core.csproj.nuget.g.props
+obj/eagle.tunnel.dotnet.core.csproj.nuget.g.targets
+obj/project.assets.json
+obj/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.dll
+obj/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.pdb
+obj/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.AssemblyInfo.cs
+obj/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.AssemblyInfoInputs.cache
+obj/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.csproj.FileListAbsolute.txt
