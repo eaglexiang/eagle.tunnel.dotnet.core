@@ -8,3 +8,12 @@ obj/Debug/netcoreapp2.0/eagle.tunnel.dotnet.core.pdb
 obj/Debug/netcoreapp2.0/eagle.tunnel.dotnet.core.csproj.CoreCompileInputs.cache
 obj/Debug/netcoreapp2.0/eagle.tunnel.dotnet.core.csproj.FileListAbsolute.txt
 obj/Debug/netcoreapp2.0/eagle.tunnel.dotnet.core.csproj.CoreCompileInputs.cache
+bin/Release/netcoreapp2.0/publish/eagle.tunnel.dotnet.core.dll
+bin/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.dll
+bin/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.pdb
+bin/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.deps.json
+bin/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.runtimeconfig.json
+bin/Release/netcoreapp2.0/eagle.tunnel.dotnet.core.runtimeconfig.dev.json
+bin/Release/netcoreapp2.0/publish/eagle.tunnel.dotnet.core.pdb
+bin/Release/netcoreapp2.0/publish/eagle.tunnel.dotnet.core.deps.json
+bin/Release/netcoreapp2.0/publish/eagle.tunnel.dotnet.core.runtimeconfig.json
