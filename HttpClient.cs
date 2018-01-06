@@ -73,14 +73,6 @@ namespace eagle.tunnel.dotnet.core
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                if(stream2Client != null)
-                {
-                    stream2Client.Close();
-                }
-                if(client != null)
-                {
-                    client.Close();
-                }
                 if(localServer != null)
                 {
                     localServer.Stop();
@@ -98,6 +90,7 @@ namespace eagle.tunnel.dotnet.core
                     handleClientThread.IsBackground = true;
                     handleClientThread.Start(stream2Client);
                 }
+                Thread.Sleep(1000);
                 Console.WriteLine("Local Server stopped.");
             }
             catch
