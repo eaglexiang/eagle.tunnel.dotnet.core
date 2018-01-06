@@ -23,7 +23,7 @@ namespace eagle.tunnel.dotnet.core
             EncryptFrom = false;
             EncryptTo = false;
 
-            bufferRead = new byte[102400];
+            bufferRead = new byte[204800];
 
             flowThread = new Thread(_Flow);
             flowThread.IsBackground = true;

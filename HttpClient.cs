@@ -14,6 +14,7 @@ namespace eagle.tunnel.dotnet.core
         public int ServerPort { get; set;}
         public string LocalHost { get; set;}
         public int LocalPort { get; set;}
+        private bool Running { get; set;}
 
         public HttpClient(
             string serverhost,
@@ -50,6 +51,7 @@ namespace eagle.tunnel.dotnet.core
         {
             Thread startThread = new Thread(_Start);
             startThread.IsBackground = true;
+            Running = true;
             startThread.Start();
         }
 
@@ -60,7 +62,11 @@ namespace eagle.tunnel.dotnet.core
 
             try
             {
-                IPAddress ipa = IPAddress.Parse(LocalHost);
+                if(!IPAddress.TryParse(LocalHost, out IPAddress ipa))
+                {
+                    Console.WriteLine("invalid local ip: " + LocalHost);
+                    return;
+                }
                 localServer = new TcpListener(ipa, LocalPort);
                 localServer.Start(100);
             }
@@ -84,7 +90,7 @@ namespace eagle.tunnel.dotnet.core
 
             try
             {
-                while(true)
+                while(Running)
                 {
                     client = localServer.AcceptTcpClient();
                     stream2Client = client.GetStream();
@@ -92,11 +98,14 @@ namespace eagle.tunnel.dotnet.core
                     handleClientThread.IsBackground = true;
                     handleClientThread.Start(stream2Client);
                 }
+                Console.WriteLine("Local Server stopped.");
             }
             catch
             {
-                return;
+                ;
             }
+            localServer.Stop();
+            Environment.Exit(0);
         }
 
         private void HandleClient(object streamObj)
@@ -119,7 +128,8 @@ namespace eagle.tunnel.dotnet.core
 
         public void Stop()
         {
-            localServer.Stop();
+            Running = false;
+            Console.WriteLine("quitting...");
         }
     }
 }

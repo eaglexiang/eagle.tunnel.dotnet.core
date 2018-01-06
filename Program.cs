@@ -41,10 +41,12 @@ namespace eagle.tunnel.dotnet.core
                 input = Console.ReadLine();
             }while(input != "q");
 
-            if(httpClient != null)
+            try
             {
                 httpClient.Stop();
             }
+            catch
+            {}
         }
 
         static void StartServer(string ip, string _port)
