@@ -95,6 +95,8 @@ namespace eagle.tunnel.dotnet.core
                 return;
             }
 
+            
+            Console.WriteLine("Local Server Started.");
             try
             {
                 while(Running)

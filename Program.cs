@@ -23,7 +23,7 @@ namespace eagle.tunnel.dotnet.core
             {
                 case "server":
                 case "s":
-                    StartServer(args[0], args[1]);
+                    StartServer();
                     break;
                 case "client":
                 case "c":
@@ -49,13 +49,18 @@ namespace eagle.tunnel.dotnet.core
             {}
         }
 
-        static void StartServer(string ip, string _port)
+        static void StartServer()
         {
-            int port = int.Parse(_port);
+            ReadConfiguration();
+            
+            Console.WriteLine("Server IP: " + serverIP);
+            Console.WriteLine("Server Http Port: " + serverHttpPort);
+            Console.WriteLine("Server Socket Port: " + serverSocketPort);
+            
             HttpServer server = new HttpServer();
             server.Start(
-                ip,
-                port,
+                serverIP,
+                serverHttpPort,
                 100
             );
         }
@@ -79,9 +84,6 @@ namespace eagle.tunnel.dotnet.core
             try
             {
                 httpClient.Start();
-                
-                Console.WriteLine();
-                Console.WriteLine("Local Server Started.");
             }
             catch (Exception e)
             {
