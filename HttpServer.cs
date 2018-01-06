@@ -8,9 +8,9 @@ using System.IO;
 
 namespace eagle.tunnel.dotnet.core
 {
-    public class Server
+    public class HttpServer
     {
-        public Server()
+        public HttpServer()
         {
             ;
         }
