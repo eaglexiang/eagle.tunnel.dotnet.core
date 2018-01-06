@@ -48,6 +48,8 @@ namespace eagle.tunnel.dotnet.core
             localServer = new TcpListener(ipa, localport);
             localServer.Start(localbacklog);
 
+            Console.WriteLine("local server started");
+
             while(true)
             {
                 TcpClient client = localServer.AcceptTcpClient();
