@@ -30,42 +30,70 @@ namespace eagle.tunnel.dotnet.core
 
         public void Write(byte[] buffer, int offset, int count)
         {
-            byte[] buffer1 = new byte[count];
-            Array.Copy(buffer, buffer1, count);
-            if(EncryptTo)
+            if(buffer == null)
             {
-                buffer1 = Encryption(buffer1);
+                return;
             }
-            To.Write(buffer1, 0, count);
+            try
+            {
+                byte[] buffer1 = new byte[count];
+                Array.Copy(buffer, buffer1, count);
+                if(EncryptTo)
+                {
+                    buffer1 = Encryption(buffer1);
+                }
+                To.Write(buffer1, 0, count);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         public void Write(byte[] buffer)
         {
-            byte[] buffer1;
-            if(EncryptTo)
+            if(buffer == null)
             {
-                buffer1 = Encryption(buffer);
+                return;
             }
-            else
+            try
             {
-                buffer1 = buffer;
+                byte[] buffer1;
+                if(EncryptTo)
+                {
+                    buffer1 = Encryption(buffer);
+                }
+                else
+                {
+                    buffer1 = buffer;
+                }
+                To.Write(buffer1, 0, buffer1.Length);
             }
-            To.Write(buffer1, 0, buffer1.Length);
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         public byte[] Read()
         {
-            byte[] buffer0 = new byte[102400];
-            int count = From.Read(buffer0, 0, 102400);
-            byte[] buffer1 = new byte[count];
-            Array.Copy(buffer0, buffer1, count);
-            
-            if(EncryptFrom)
+            try
             {
-                buffer1 = Decrypt(buffer1);
+                byte[] buffer0 = new byte[102400];
+                int count = From.Read(buffer0, 0, 102400);
+                byte[] buffer1 = new byte[count];
+                Array.Copy(buffer0, buffer1, count);
+                if(EncryptFrom)
+                {
+                    buffer1 = Decrypt(buffer1);
+                }
+                return buffer1;
             }
-
-            return buffer1;
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
         }
 
         private void _Flow()
@@ -77,7 +105,10 @@ namespace eagle.tunnel.dotnet.core
                 {
                     buffer = Read();
                     Write(buffer);
-                }while(buffer.Length > 0);
+                }while(
+                    (buffer != null) &&
+                    (buffer.Length > 0)
+                );
             }
             catch
             {

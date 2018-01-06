@@ -27,6 +27,7 @@ namespace eagle.tunnel.dotnet.core
             }
             catch (Exception ex)
             {
+                Console.WriteLine("error:\tfail to connect to server");
                 Console.WriteLine(ex.Message);
                 return null;
             }
