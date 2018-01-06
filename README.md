@@ -4,6 +4,12 @@
 
 [主页](https://www.eaglexiang.org/eagle-tunnel)
 
+## 基本功能
+
+- [x] HTTP代理
+- [x] HTTPS代理
+- [ ] SOCKET5代理
+
 ## 基本原理
 
 ![基本原理](./doc/arch.png)
@@ -16,24 +22,22 @@
 
 ### 使用
 
-远端服务
+远端服务（服务器端）
 
 ```shell
 git clone -b bin https://github.com/eaglexiang/eagle.tunnel.dotnet.core.git
 cd ./eagle.tunnel.dotnet.core/eagle.tunnel
-dotnet eagle.tunnel.dotnet.core.dll [IP] [Port]
-# 例如 dotnet eagle.tunnel.dotnet.core.dll 127.0.0.1 8080
+# 用文本编辑器编辑同目录下的config.cfg
+dotnet eagle.tunnel.dotnet.core.dll s
 ```
 
-本地服务
+本地服务（客户端）
 
 ```shell
 git clone -b bin https://github.com/eaglexiang/eagle.tunnel.dotnet.core.git
 cd ./eagle.tunnel.dotnet.core/eagle.tunnel
-dotnet eagle.tunnel.dotnet.core.dll
-# 进入菜单，选择 2.Client
-# 填入上文远端服务的IP和Port（例如127.0.0.1 8080）
-# 填入你喜欢的本地服务IP和Port（例如127.0.0.1 10000）
+# 用文本编辑器编辑同目录下的config.cfg
+dotnet eagle.tunnel.dotnet.core.dll c
 ```
 
 将手机或电脑的代理地址设置为本地服务的IP和Port
