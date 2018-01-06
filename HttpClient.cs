@@ -62,13 +62,28 @@ namespace eagle.tunnel.dotnet.core
 
             try
             {
-                if(!IPAddress.TryParse(LocalHost, out IPAddress ipa))
+                while(true)
                 {
-                    Console.WriteLine("invalid local ip: " + LocalHost);
-                    return;
+                    try
+                    {
+                        if(!IPAddress.TryParse(LocalHost, out IPAddress ipa))
+                        {
+                            Console.WriteLine("invalid local ip: " + LocalHost);
+                            return;
+                        }
+                        localServer = new TcpListener(ipa, LocalPort);
+                        localServer.Start(100);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                        Console.WriteLine("Retrying...");
+                        Thread.Sleep(5000);
+                        continue;
+                    }
+                    break;
                 }
-                localServer = new TcpListener(ipa, LocalPort);
-                localServer.Start(100);
+                
             }
             catch (Exception e)
             {
