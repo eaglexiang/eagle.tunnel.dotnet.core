@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Text;
+using System.Collections.Generic;
 
 namespace eagle.tunnel.dotnet.core
 {
@@ -13,7 +14,7 @@ namespace eagle.tunnel.dotnet.core
         public bool EncryptTo { get; set;}
         private Thread flowThread;
         private static byte EncryptionKey = 0x22;
-        public static int ThreadNum = 0;
+
         public Pipe(Stream from, Stream to)
         {
             From = from;
@@ -57,49 +58,51 @@ namespace eagle.tunnel.dotnet.core
 
         public byte[] Read()
         {
+            byte[] buffer1;
             try
             {
                 byte[] buffer0 = new byte[102400];
                 int count = From.Read(buffer0, 0, 102400);
-                byte[] buffer1 = new byte[count];
+                if(count == 0)
+                {
+                    return null;
+                }
+                buffer1 = new byte[count];
                 Array.Copy(buffer0, buffer1, count);
                 if(EncryptFrom)
                 {
                     buffer1 = Decrypt(buffer1);
                 }
-                return buffer1;
             }
             catch
             {
                 return null;
             }
+            return buffer1;
         }
 
         private void _Flow()
         {
             try
             {
-                ThreadNum += 1;
-                byte[] buffer;
                 do
                 {
-                    buffer = Read();
+                    byte[] buffer = Read();
+                    if(buffer == null)
+                    {
+                        break;
+                    }
                     Write(buffer);
-                }while(
-                    (buffer != null) &&
-                    (buffer.Length > 0)
-                );
+                }while(true);
             }
             catch
             {
                 From.Close();
                 To.Close();
-                ThreadNum -= 1;
                 return;
             }
             From.Close();
             To.Close();
-            ThreadNum -= 1;
         }
 
         public static byte[] Encryption(byte[] src)

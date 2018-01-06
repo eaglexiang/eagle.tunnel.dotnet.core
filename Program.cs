@@ -13,6 +13,7 @@ namespace eagle.tunnel.dotnet.core
         static int serverSocketPort;
         static int localHttpPort;
         static int localSocketPort;
+        static HttpClient httpClient;
 
         static void Main(string[] args)
         {
@@ -30,6 +31,18 @@ namespace eagle.tunnel.dotnet.core
                 default:
                     Console.WriteLine("no specific mode (server/client ?)");
                     break;
+            }
+
+            string input = "";
+            do
+            {
+                Console.Write("input q to quit: ");
+                input = Console.ReadLine();
+            }while(input != "q");
+
+            if(httpClient != null)
+            {
+                httpClient.Stop();
             }
         }
 
@@ -55,7 +68,7 @@ namespace eagle.tunnel.dotnet.core
             Console.WriteLine("Local Http Port: " + localHttpPort);
             Console.WriteLine("Local Socekt Port: " + localSocketPort);
 
-            HttpClient httpClient = new HttpClient(
+            httpClient = new HttpClient(
                 serverIP, serverHttpPort,
                 localIP, localHttpPort
             );
@@ -71,14 +84,6 @@ namespace eagle.tunnel.dotnet.core
             {
                 Console.WriteLine(e.Message);
             }
-
-            string input = "";
-            do
-            {
-                Console.WriteLine("Tunnel Number: " + Pipe.ThreadNum);
-                Console.Write("input q to quit: ");
-                input = Console.ReadLine();
-            }while(input != "q");
         }
 
         /// <summary>

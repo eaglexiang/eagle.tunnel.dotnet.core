@@ -63,15 +63,6 @@ namespace eagle.tunnel.dotnet.core
                 IPAddress ipa = IPAddress.Parse(LocalHost);
                 localServer = new TcpListener(ipa, LocalPort);
                 localServer.Start(100);
-
-                while(true)
-                {
-                    client = localServer.AcceptTcpClient();
-                    stream2Client = client.GetStream();
-                    Thread handleClientThread = new Thread(HandleClient);
-                    handleClientThread.IsBackground = true;
-                    handleClientThread.Start(stream2Client);
-                }
             }
             catch (Exception e)
             {
@@ -88,6 +79,23 @@ namespace eagle.tunnel.dotnet.core
                 {
                     localServer.Stop();
                 }
+                return;
+            }
+
+            try
+            {
+                while(true)
+                {
+                    client = localServer.AcceptTcpClient();
+                    stream2Client = client.GetStream();
+                    Thread handleClientThread = new Thread(HandleClient);
+                    handleClientThread.IsBackground = true;
+                    handleClientThread.Start(stream2Client);
+                }
+            }
+            catch
+            {
+                return;
             }
         }
 
@@ -107,6 +115,11 @@ namespace eagle.tunnel.dotnet.core
 
             pipe0.Flow();
             pipe1.Flow();
+        }
+
+        public void Stop()
+        {
+            localServer.Stop();
         }
     }
 }
