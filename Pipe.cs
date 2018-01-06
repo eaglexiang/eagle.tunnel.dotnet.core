@@ -14,6 +14,7 @@ namespace eagle.tunnel.dotnet.core
         public bool EncryptTo { get; set;}
         private Thread flowThread;
         private static byte EncryptionKey = 0x22;
+        private byte[] bufferRead;
 
         public Pipe(Stream from, Stream to)
         {
@@ -21,6 +22,8 @@ namespace eagle.tunnel.dotnet.core
             To = to;
             EncryptFrom = false;
             EncryptTo = false;
+
+            bufferRead = new byte[102400];
 
             flowThread = new Thread(_Flow);
             flowThread.IsBackground = true;
@@ -58,27 +61,26 @@ namespace eagle.tunnel.dotnet.core
 
         public byte[] Read()
         {
-            byte[] buffer1;
+            byte[] buffer;
             try
             {
-                byte[] buffer0 = new byte[102400];
-                int count = From.Read(buffer0, 0, 102400);
+                int count = From.Read(bufferRead, 0, bufferRead.Length);
                 if(count == 0)
                 {
                     return null;
                 }
-                buffer1 = new byte[count];
-                Array.Copy(buffer0, buffer1, count);
+                buffer = new byte[count];
+                Array.Copy(bufferRead, buffer, count);
                 if(EncryptFrom)
                 {
-                    buffer1 = Decrypt(buffer1);
+                    buffer = Decrypt(buffer);
                 }
             }
             catch
             {
                 return null;
             }
-            return buffer1;
+            return buffer;
         }
 
         private void _Flow()
