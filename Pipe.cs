@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Text;
+using System.Collections.Generic;
 
 namespace eagle.tunnel.dotnet.core
 {
@@ -13,12 +14,17 @@ namespace eagle.tunnel.dotnet.core
         public bool EncryptTo { get; set;}
         private Thread flowThread;
         private static byte EncryptionKey = 0x22;
+        private byte[] bufferRead;
+
         public Pipe(Stream from, Stream to)
         {
             From = from;
             To = to;
             EncryptFrom = false;
             EncryptTo = false;
+
+            bufferRead = new byte[204800];
+
             flowThread = new Thread(_Flow);
             flowThread.IsBackground = true;
         }
@@ -30,82 +36,66 @@ namespace eagle.tunnel.dotnet.core
 
         public void Write(byte[] buffer, int offset, int count)
         {
-            if(buffer == null)
+            byte[] buffer1 = new byte[count];
+            Array.Copy(buffer, buffer1, count);
+            if(EncryptTo)
             {
-                return;
+                buffer1 = Encryption(buffer1);
             }
-            try
-            {
-                byte[] buffer1 = new byte[count];
-                Array.Copy(buffer, buffer1, count);
-                if(EncryptTo)
-                {
-                    buffer1 = Encryption(buffer1);
-                }
-                To.Write(buffer1, 0, count);
-            }
-            catch
-            {
-            }
+            To.Write(buffer1, 0, count);
         }
 
         public void Write(byte[] buffer)
         {
-            if(buffer == null)
+            byte[] buffer1;
+            if(EncryptTo)
             {
-                return;
+                buffer1 = Encryption(buffer);
             }
-            try
+            else
             {
-                byte[] buffer1;
-                if(EncryptTo)
-                {
-                    buffer1 = Encryption(buffer);
-                }
-                else
-                {
-                    buffer1 = buffer;
-                }
-                To.Write(buffer1, 0, buffer1.Length);
+                buffer1 = buffer;
             }
-            catch
-            {
-            }
+            To.Write(buffer1, 0, buffer1.Length);
         }
 
         public byte[] Read()
         {
+            byte[] buffer;
             try
             {
-                byte[] buffer0 = new byte[102400];
-                int count = From.Read(buffer0, 0, 102400);
-                byte[] buffer1 = new byte[count];
-                Array.Copy(buffer0, buffer1, count);
+                int count = From.Read(bufferRead, 0, bufferRead.Length);
+                if(count == 0)
+                {
+                    return null;
+                }
+                buffer = new byte[count];
+                Array.Copy(bufferRead, buffer, count);
                 if(EncryptFrom)
                 {
-                    buffer1 = Decrypt(buffer1);
+                    buffer = Decrypt(buffer);
                 }
-                return buffer1;
             }
             catch
             {
                 return null;
             }
+            return buffer;
         }
 
         private void _Flow()
         {
             try
             {
-                byte[] buffer;
                 do
                 {
-                    buffer = Read();
+                    byte[] buffer = Read();
+                    if(buffer == null)
+                    {
+                        break;
+                    }
                     Write(buffer);
-                }while(
-                    (buffer != null) &&
-                    (buffer.Length > 0)
-                );
+                }while(true);
             }
             catch
             {
@@ -113,11 +103,8 @@ namespace eagle.tunnel.dotnet.core
                 To.Close();
                 return;
             }
-            finally
-            {
-                From.Close();
-                To.Close();
-            }
+            From.Close();
+            To.Close();
         }
 
         public static byte[] Encryption(byte[] src)
@@ -138,6 +125,18 @@ namespace eagle.tunnel.dotnet.core
                 des[i] = (byte)(src[i] ^ EncryptionKey);
             }
             return des;
+        }
+
+        public void Close()
+        {
+            if(From != null)
+            {
+                From.Close();
+            }
+            if(To != null)
+            {
+                To.Close();
+            }
         }
     }
 }
