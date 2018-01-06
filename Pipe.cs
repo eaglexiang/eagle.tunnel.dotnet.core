@@ -44,9 +44,8 @@ namespace eagle.tunnel.dotnet.core
                 }
                 To.Write(buffer1, 0, count);
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine(ex.Message);
             }
         }
 
@@ -69,9 +68,8 @@ namespace eagle.tunnel.dotnet.core
                 }
                 To.Write(buffer1, 0, buffer1.Length);
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine(ex.Message);
             }
         }
 
@@ -89,9 +87,8 @@ namespace eagle.tunnel.dotnet.core
                 }
                 return buffer1;
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine(ex.Message);
                 return null;
             }
         }
