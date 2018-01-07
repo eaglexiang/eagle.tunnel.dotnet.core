@@ -30,16 +30,24 @@ namespace eagle.tunnel.dotnet.core
         /// <param name="conf">all confs</param>
         /// <param name="key">key of single conf</param>
         /// <returns>value of specific conf</returns>
-        static string ReadConf(string conf, string key)
+        static string ReadConf(ref string conf, string key)
         {
-            string value;
+            string value = "";
             try
             {
-                int ind = conf.IndexOf(key) + key.Length + 1;
-                value = conf.Substring(
-                    ind,
-                    conf.IndexOf('\n', ind) - ind
-                );
+                int ind0 = conf.IndexOf(key);
+                if(ind0 == -1)
+                {
+                    conf += (key + ":\n");
+                }
+                else
+                {
+                    int ind1 = ind0 + key.Length + 1;
+                    value = conf.Substring(
+                        ind1,
+                        conf.IndexOf('\n', ind1) - ind1
+                    );
+                }
             }
             catch
             {
@@ -60,21 +68,6 @@ namespace eagle.tunnel.dotnet.core
             {
                 return;
             }
-        }
-
-        /// <summary>
-        /// If key is false, output "invalid " + msg
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="msg"></param>
-        /// <returns>unchanged value of key</returns>
-        static bool CheckType(bool key, string msg)
-        {
-            if(!key)
-            {
-                Console.WriteLine("invalid " + msg);
-            }
-            return key;
         }
 
         public static void ReadConfiguration(UpType uptype)
@@ -105,36 +98,36 @@ namespace eagle.tunnel.dotnet.core
             }
 
             // read ip
-            result &= FixReadIP(out RemoteIP);
-            result &= FixReadIP(out LocalIP);
+            result &= FixReadString("remote ip", out RemoteIP);
+            result &= FixReadString("local ip", out LocalIP);
 
             // read port
-            result &= FixReadInt(out RemoteHttpPort);
+            result &= FixReadInt("remote http port", out RemoteHttpPort);
             if(uptype == UpType.HttpClient)
             {
-                result &= FixReadInt(out LocalHttpPort);
+                result &= FixReadInt("local http port", out LocalHttpPort);
             }
 
-            result &= FixReadInt(out RemoteSocketPort);
+            result &= FixReadInt("remote socket port", out RemoteSocketPort);
             if(uptype == UpType.SocketClient)
             {
-                result &= FixReadInt(out LocalSocketPort);
+                result &= FixReadInt("local socket port", out LocalSocketPort);
             }
 
             return result;
         }
 
-        static bool FixReadIP(out string value)
+        static bool FixReadString(string key, out string value)
         {
             bool need2fix;
-            string key = nameof(value);
-            need2fix = CheckType(
-                IPAddress.TryParse(
-                    value = ReadConf(conf, key),
-                    out IPAddress ipa
-                ),
-                key
+            need2fix = !IPAddress.TryParse(
+                value = ReadConf(ref conf, key),
+                out IPAddress ipa
             );
+            if(need2fix)
+            {
+                Console.WriteLine("invalid " + key);
+            }
             
             if(need2fix)
             {
@@ -142,20 +135,20 @@ namespace eagle.tunnel.dotnet.core
                 value = Console.ReadLine();
                 WriteConf(ref conf, key, value);
             }
-            return need2fix;
+            return !need2fix;
         }
 
-        static bool FixReadInt(out int value)
+        static bool FixReadInt(string key, out int value)
         {
             bool need2fix;
-            string key = nameof(value);
-            need2fix = CheckType(
-                int.TryParse(
-                    ReadConf(conf, key),
-                    out value
-                ),
-                key
+            need2fix = !int.TryParse(
+                ReadConf(ref conf, key),
+                out value
             );
+            if(need2fix)
+            {
+                Console.WriteLine("invalid " + key);
+            }
             
             if(need2fix)
             {
@@ -164,7 +157,7 @@ namespace eagle.tunnel.dotnet.core
                 int.TryParse(newValue, out value);
                 WriteConf(ref conf, key, newValue);
             }
-            return need2fix;
+            return !need2fix;
         }
     }
 }

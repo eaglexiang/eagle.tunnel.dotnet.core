@@ -65,7 +65,7 @@ namespace eagle.tunnel.dotnet.core
             Console.WriteLine("Server Http Port: " + Conf.RemoteHttpPort);
             Console.WriteLine("Server Socket Port: " + Conf.RemoteSocketPort);
             Console.WriteLine("Local IP: " + Conf.LocalIP);
-            Console.WriteLine("Local Http Port: " + Conf.LocalIP);
+            Console.WriteLine("Local Http Port: " + Conf.LocalHttpPort);
             Console.WriteLine("Local Socekt Port: " + Conf.LocalSocketPort);
 
             httpClient = new HttpClient(
