@@ -11,6 +11,7 @@
 - [x] HTTP代理
 - [x] HTTPS代理
 - [ ] SOCKET5代理
+- [ ] GUI
 
 ### 支持平台
 
@@ -19,6 +20,8 @@
 - [x] macOS
 
 = =反正就是.NET Core支持的平台。
+
+- [ ] Android
 
 ## 基本原理
 
