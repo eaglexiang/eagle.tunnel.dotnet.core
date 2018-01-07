@@ -28,7 +28,9 @@ Linux x86_64
 git clone -b bin-linux64 https://github.com/eaglexiang/eagle.tunnel.dotnet.core.git
 ```
 
-通用版（需要安装[.NET Core](https://www.microsoft.com/net/learn/get-started)）
+通用版
+
+需要安装[.NET Core Runtime](https://www.microsoft.com/net/download/)
 
 ```shell
 git clone -b bin https://github.com/eaglexiang/eagle.tunnel.dotnet.core.git
