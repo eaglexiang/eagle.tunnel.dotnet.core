@@ -31,3 +31,18 @@ obj/Debug/netcoreapp2.0/eagle.tunnel.dotnet.core.AssemblyInfoInputs.cache
 obj/Debug/netcoreapp2.0/eagle.tunnel.dotnet.core.AssemblyInfo.cs
 bin/Release/netcoreapp2.0/publish/config.cfg
 bin/Release/netcoreapp2.0/eagle tunnel.zip
+bin/Release/netcoreapp2.0/win-x64/eagle.tunnel.dotnet.core.deps.json
+bin/Release/netcoreapp2.0/win-x64/eagle.tunnel.dotnet.core.dll
+bin/Release/netcoreapp2.0/win-x64/eagle.tunnel.dotnet.core.exe
+bin/Release/netcoreapp2.0/win-x64/eagle.tunnel.dotnet.core.pdb
+bin/Release/netcoreapp2.0/win-x64/eagle.tunnel.dotnet.core.runtimeconfig.json
+bin/Release/netcoreapp2.0/win-x64/eagle.tunnel.dotnet.core.runtimeconfig.dev.json
+bin/Release/netcoreapp2.0/win-x64/hostfxr.dll
+bin/Release/netcoreapp2.0/win-x64/hostpolicy.dll
+obj/netcoreapp2.0/win-x64/host/eagle.tunnel.dotnet.core.exe
+obj/Release/netcoreapp2.0/win-x64/eagle.tunnel.dotnet.core.dll
+obj/Release/netcoreapp2.0/win-x64/eagle.tunnel.dotnet.core.pdb
+obj/Release/netcoreapp2.0/win-x64/eagle.tunnel.dotnet.core.AssemblyInfo.cs
+obj/Release/netcoreapp2.0/win-x64/eagle.tunnel.dotnet.core.AssemblyInfoInputs.cache
+obj/Release/netcoreapp2.0/win-x64/eagle.tunnel.dotnet.core.csproj.CoreCompileInputs.cache
+obj/Release/netcoreapp2.0/win-x64/eagle.tunnel.dotnet.core.csproj.FileListAbsolute.txt
