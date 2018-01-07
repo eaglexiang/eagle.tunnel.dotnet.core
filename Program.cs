@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
 
 namespace eagle.tunnel.dotnet.core
 {
@@ -28,20 +29,21 @@ namespace eagle.tunnel.dotnet.core
                     return;
             }
 
-            string input = "";
-            do
+            if (
+                choice == "clinet" ||
+                choice == "c"
+            )
             {
-                Console.Write("input q to quit: ");
-                input = Console.ReadLine();
-            }while(input != "q");
-
-            if(httpClient != null)
-            {
-                httpClient.Stop();
-            }
-            if(httpServer != null)
-            {
-                httpServer.Stop();
+                string input = "";
+                do
+                {
+                    Console.Write("input q to quit: ");
+                    input = Console.ReadLine();
+                }while(input != "q");
+                if(httpClient != null)
+                {
+                    httpClient.Stop();
+                }
             }
         }
 
