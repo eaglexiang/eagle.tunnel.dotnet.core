@@ -22,9 +22,7 @@ namespace eagle.tunnel.dotnet.core
 
         public void Start()
         {
-            Thread startThread = new Thread(_Start);
-            startThread.IsBackground = true;
-            startThread.Start();
+            _Start();
         }
 
         private void _Start()
