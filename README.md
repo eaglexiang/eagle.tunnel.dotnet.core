@@ -16,31 +16,30 @@
 
 ## 使用方法
 
-### 环境准备
-
-需要安装[.NET Core](https://www.microsoft.com/net/learn/get-started)
-
-### 使用
-
-远端服务（服务器端）
+Windows x86_64
 
 ```shell
-git clone -b bin https://github.com/eaglexiang/eagle.tunnel.dotnet.core.git
-cd ./eagle.tunnel.dotnet.core/eagle.tunnel
-# 用文本编辑器编辑同目录下的config.cfg
-dotnet eagle.tunnel.dotnet.core.dll s
+git clone -b bin-win64 https://github.com/eaglexiang/eagle.tunnel.dotnet.core.git
 ```
 
-本地服务（客户端）
+Linux x86_64
+
+```shell
+git clone -b bin-linux64 https://github.com/eaglexiang/eagle.tunnel.dotnet.core.git
+```
+
+通用版（需要安装[.NET Core](https://www.microsoft.com/net/learn/get-started)）
 
 ```shell
 git clone -b bin https://github.com/eaglexiang/eagle.tunnel.dotnet.core.git
-cd ./eagle.tunnel.dotnet.core/eagle.tunnel
-# 用文本编辑器编辑同目录下的config.cfg
+# 解压文件
+# 以服务端方式启动
+dotnet eagle.tunnel.dotnet.core.dll s
+# 以客户端方式启动
 dotnet eagle.tunnel.dotnet.core.dll c
 ```
 
-将手机或电脑的代理地址设置为本地服务的IP和Port
+将手机或电脑的代理地址设置为本地服务的LocalIP和LocalHttpPort
 
 ## 开源协议
 
