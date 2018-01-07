@@ -72,7 +72,7 @@ namespace eagle.tunnel.dotnet.core
         {
             if(!key)
             {
-                Console.WriteLine("invalid " + key);
+                Console.WriteLine("invalid " + msg);
             }
             return key;
         }
