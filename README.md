@@ -1,10 +1,10 @@
 # Eagle Tunnel
 
+[![eagle.tunnel.dotnet.core](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core.svg?branch=dev-socks5)](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core)
+
 代理工具，SSR的替代品。基于.NET Core。
 
 [主页](https://www.eaglexiang.org/eagle-tunnel)
-
-[![](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core.svg?branch=dev-socks5)](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core)
 
 ## 支持
 
