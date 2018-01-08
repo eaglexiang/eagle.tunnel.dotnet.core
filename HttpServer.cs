@@ -45,7 +45,8 @@ namespace eagle.tunnel.dotnet.core
             while(Running)
             {
                 TcpClient client = server.AcceptTcpClient();
-                Console.WriteLine("new client connected");
+                string ip =client.Client.RemoteEndPoint.ToString().Split(':')[0];
+                Console.WriteLine("new client connected: from " + ip);
                 Thread handleClientThread = new Thread(HandleClient);
                 handleClientThread.IsBackground = true;
                 handleClientThread.Start(client);
@@ -58,23 +59,18 @@ namespace eagle.tunnel.dotnet.core
         private void HandleClient(object clientObj)
         {
             TcpClient socket2Client = clientObj as TcpClient;
-            NetworkStream stream2client = socket2Client.GetStream();
-            HandleSocket2Client(stream2client);
-        }
 
-        private void HandleSocket2Client(NetworkStream stream2client)
-        {
             Pipe pipe0;
-            Pipe pipe1;
-            pipe0 = new Pipe(stream2client, null);
+            Pipe pipe1 = null;
+            pipe0 = new Pipe(
+                socket2Client,
+                null
+            );
             pipe0.EncryptFrom = true;
-            pipe1 = new Pipe(null, stream2client);
-            pipe1.EncryptTo = true;
             try
             {
                 byte[] buffer = pipe0.Read();
                 string request = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
-                Console.WriteLine("Request: " + request);
                 string host = GetHost(request);
                 int port = GetPort(request);
                 if(host == "")
@@ -86,10 +82,14 @@ namespace eagle.tunnel.dotnet.core
                 Console.WriteLine("connect to " + host + ":" + port);
                 
                 TcpClient client2Server = new TcpClient(ip, port);
-                NetworkStream stream2server = client2Server.GetStream();
 
-                pipe0.To = stream2server;
-                pipe1.From = stream2server;
+                pipe1 = new Pipe(
+                    client2Server,
+                    socket2Client
+                );
+                pipe1.EncryptTo = true;
+
+                pipe0.ClientTo = client2Server;
 
                 if(port == 443)
                 {
@@ -109,7 +109,11 @@ namespace eagle.tunnel.dotnet.core
             {
                 Console.WriteLine(ex.Message);
                 pipe0.Close();
-                pipe1.Close();
+                if(pipe1 != null)
+                {
+                    pipe1.Close();
+                }
+                return;
             }
         }
 

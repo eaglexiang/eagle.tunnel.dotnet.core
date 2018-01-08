@@ -29,7 +29,7 @@ namespace eagle.tunnel.dotnet.core
             LocalPort = localport;
         }
 
-        private NetworkStream Connect2Server(string serverhost, int port)
+        private TcpClient Connect2Server(string serverhost, int port)
         {
             TcpClient client;
             try
@@ -42,9 +42,7 @@ namespace eagle.tunnel.dotnet.core
                 Console.WriteLine(ex.Message);
                 return null;
             }
-
-            NetworkStream stream2Server = client.GetStream();
-            return stream2Server;
+            return client;
         }
 
         public void Start()
@@ -58,7 +56,6 @@ namespace eagle.tunnel.dotnet.core
         public void _Start()
         {
             TcpClient client = null;
-            NetworkStream stream2Client = null;
 
             try
             {
@@ -102,10 +99,9 @@ namespace eagle.tunnel.dotnet.core
                 while(Running)
                 {
                     client = localServer.AcceptTcpClient();
-                    stream2Client = client.GetStream();
                     Thread handleClientThread = new Thread(HandleClient);
                     handleClientThread.IsBackground = true;
-                    handleClientThread.Start(stream2Client);
+                    handleClientThread.Start(client);
                 }
                 Thread.Sleep(1000);
                 Console.WriteLine("Local Server stopped.");
@@ -115,21 +111,28 @@ namespace eagle.tunnel.dotnet.core
                 ;
             }
             localServer.Stop();
+            Thread.Sleep(1000);
             Environment.Exit(0);
         }
 
-        private void HandleClient(object streamObj)
+        private void HandleClient(object clientObj)
         {
-            NetworkStream stream2Server = Connect2Server(ServerHost, ServerPort);
-            if(stream2Server == null)
+            TcpClient client2Client = clientObj as TcpClient;
+            TcpClient client2Server = Connect2Server(ServerHost, ServerPort);
+            if(client2Server == null)
             {
                 return;
             }
-            NetworkStream stream2Client = streamObj as NetworkStream;
 
-            Pipe pipe0 = new Pipe(stream2Client, stream2Server);
+            Pipe pipe0 = new Pipe(
+                client2Client,
+                client2Server
+            );
             pipe0.EncryptTo = true;
-            Pipe pipe1 = new Pipe(stream2Server, stream2Client);
+            Pipe pipe1 = new Pipe(
+                client2Server,
+                client2Client
+                );
             pipe1.EncryptFrom = true;
 
             pipe0.Flow();

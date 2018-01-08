@@ -3,27 +3,61 @@ using System.IO;
 using System.Threading;
 using System.Text;
 using System.Collections.Generic;
+using System.Net.Sockets;
 
 namespace eagle.tunnel.dotnet.core
 {
     public class Pipe
     {
-        public Stream From { get; set;}
-        public Stream To { get; set;}
+        private TcpClient clientFrom;
+        private TcpClient clientTo;
+        public TcpClient ClientFrom
+        {
+            set
+            {
+                clientFrom = value;
+                if(clientFrom != null)
+                {
+                    StreamFrom = clientFrom.GetStream();
+                    BufferSize = clientFrom.ReceiveBufferSize;
+                    bufferRead = new byte[BufferSize];
+                }
+            }
+            get
+            {
+                return clientFrom;
+            }
+        }
+        public TcpClient ClientTo
+        {
+            set
+            {
+                clientTo = value;
+                if(clientTo != null)
+                {
+                    StreamTo = clientTo.GetStream();
+                }
+            }
+            get
+            {
+                return clientTo;
+            }
+        }
+        private Stream StreamFrom { get; set;}
+        private Stream StreamTo { get; set;}
         public bool EncryptFrom { get; set;}
         public bool EncryptTo { get; set;}
         private Thread flowThread;
         private static byte EncryptionKey = 0x22;
         private byte[] bufferRead;
+        private int BufferSize { get; set;}
 
-        public Pipe(Stream from, Stream to)
+        public Pipe(TcpClient from, TcpClient to)
         {
-            From = from;
-            To = to;
+            ClientFrom = from;
+            ClientTo = to;
             EncryptFrom = false;
             EncryptTo = false;
-
-            bufferRead = new byte[204800];
 
             flowThread = new Thread(_Flow);
             flowThread.IsBackground = true;
@@ -42,7 +76,7 @@ namespace eagle.tunnel.dotnet.core
             {
                 buffer1 = Encryption(buffer1);
             }
-            To.Write(buffer1, 0, count);
+            StreamTo.Write(buffer1, 0, count);
         }
 
         public void Write(byte[] buffer)
@@ -56,7 +90,7 @@ namespace eagle.tunnel.dotnet.core
             {
                 buffer1 = buffer;
             }
-            To.Write(buffer1, 0, buffer1.Length);
+            StreamTo.Write(buffer1, 0, buffer1.Length);
         }
 
         public byte[] Read()
@@ -64,7 +98,7 @@ namespace eagle.tunnel.dotnet.core
             byte[] buffer;
             try
             {
-                int count = From.Read(bufferRead, 0, bufferRead.Length);
+                int count = StreamFrom.Read(bufferRead, 0, bufferRead.Length);
                 if(count == 0)
                 {
                     return null;
@@ -99,12 +133,14 @@ namespace eagle.tunnel.dotnet.core
             }
             catch
             {
-                From.Close();
-                To.Close();
+                StreamFrom.Close();
+                StreamTo.Close();
                 return;
             }
-            From.Close();
-            To.Close();
+            StreamFrom.Close();
+            StreamTo.Close();
+            clientFrom.Close();
+            clientTo.Close();
         }
 
         public static byte[] Encryption(byte[] src)
@@ -129,13 +165,13 @@ namespace eagle.tunnel.dotnet.core
 
         public void Close()
         {
-            if(From != null)
+            if(StreamFrom != null)
             {
-                From.Close();
+                StreamFrom.Close();
             }
-            if(To != null)
+            if(StreamTo != null)
             {
-                To.Close();
+                StreamTo.Close();
             }
         }
     }
