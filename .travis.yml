@@ -1,0 +1,3 @@
+language: csharp
+solution: eagle.tunnel.dotnet.core.csproj
+script: ./build.sh
