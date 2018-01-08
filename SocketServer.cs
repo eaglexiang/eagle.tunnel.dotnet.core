@@ -86,7 +86,7 @@ namespace eagle.tunnel.dotnet.core
                     return;
                 }
                 // not socket 5 request
-                string version = request.Substring(0,3);
+                string version = request.Substring(0,4);
                 if(version != "\\x05")
                 {
                     return;
@@ -100,9 +100,18 @@ namespace eagle.tunnel.dotnet.core
                 {
                     return;
                 }
+                if(request.Substring(4, 4) != "\\x01")
+                {
+                    return;
+                }
                 string ip = GetIP(request);
                 int port = GetPort(request);
+                if(ip == null || port == 0)
+                {
+                    return;
+                }
 
+                TcpClient client2Server = new TcpClient(ip, port);
 
                 pipe0.Flow();
                 pipe1.Flow();
@@ -117,28 +126,49 @@ namespace eagle.tunnel.dotnet.core
 
         private string GetIP(string request)
         {
-            string destype = request.Substring(9, 3);
-            string ip = null;
-            int ind = request.IndexOf("\\x", 12);
-            switch (destype)
+            try
             {
-            case "\\x01":
-                ip = request.Substring(12, ind - 12);
-                break;
-            case "\\x3":
-                string host = request.Substring(12, ind - 12);
-                IPHostEntry iphe = Dns.GetHostEntry(host);
-                ip = iphe.AddressList[0].ToString();
-                break;
-            default:
-                break;
+                string destype = request.Substring(9, 3);
+                string ip;
+                int ind = request.IndexOf("\\x", 16);
+                switch (destype)
+                {
+                case "\\x01":
+                    ip = request.Substring(16, ind - 16);
+                    break;
+                case "\\x3":
+                    string host = request.Substring(16, ind - 16);
+                    IPHostEntry iphe = Dns.GetHostEntry(host);
+                    ip = iphe.AddressList[0].ToString();
+                    break;
+                default:
+                    ip = null;
+                    break;
+                }
+                return ip;
             }
-            return ip;
+            catch
+            {
+                return null;
+            }
         }
 
         private int GetPort(string request)
         {
-            int ind = request.IndexOf("\\x", 12);
+            try
+            {
+                int ind = request.IndexOf("\\x", 16);
+                string _high = request.Substring(ind + 2, 2);
+                string _low = request.Substring(ind + 6, 2);
+                int high = Convert.ToInt32(_high, 16);
+                int low = Convert.ToInt32(_low, 16);
+                int port = high * 0xFF + low;
+                return port;
+            }
+            catch
+            {
+                return 0;
+            }
         }
     }
 }
