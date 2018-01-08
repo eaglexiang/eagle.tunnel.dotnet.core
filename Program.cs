@@ -18,11 +18,11 @@ namespace eagle.tunnel.dotnet.core
             {
                 case "server":
                 case "s":
-                    StartServer();
+                    StartHttpServer();
                     break;
                 case "client":
                 case "c":
-                    StartClient();
+                    StartHttpClient();
                     break;
                 default:
                     Console.WriteLine("no specific mode (server/client ?)");
@@ -47,28 +47,25 @@ namespace eagle.tunnel.dotnet.core
             }
         }
 
-        static void StartServer()
+        static void StartHttpServer()
         {
             Conf.ReadConfiguration(Conf.UpType.HttpServer);
             
             Console.WriteLine("Server IP: " + Conf.RemoteIP);
             Console.WriteLine("Server Http Port: " + Conf.RemoteHttpPort);
-            Console.WriteLine("Server Socket Port: " + Conf.RemoteSocketPort);
             
             httpServer = new HttpServer(Conf.RemoteIP, Conf.RemoteHttpPort);
             httpServer.Start();
         }
 
-        static void StartClient()
+        static void StartHttpClient()
         {
             Conf.ReadConfiguration(Conf.UpType.HttpClient);
             
             Console.WriteLine("Server IP: " + Conf.RemoteIP);
             Console.WriteLine("Server Http Port: " + Conf.RemoteHttpPort);
-            Console.WriteLine("Server Socket Port: " + Conf.RemoteSocketPort);
             Console.WriteLine("Local IP: " + Conf.LocalIP);
             Console.WriteLine("Local Http Port: " + Conf.LocalHttpPort);
-            Console.WriteLine("Local Socekt Port: " + Conf.LocalSocketPort);
 
             httpClient = new HttpClient(
                 Conf.RemoteIP, Conf.RemoteHttpPort,

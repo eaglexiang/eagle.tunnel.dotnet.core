@@ -100,7 +100,13 @@ namespace eagle.tunnel.dotnet.core
 
             // read ip
             result &= FixReadString("remote ip", out RemoteIP);
-            result &= FixReadString("local ip", out LocalIP);
+            if(
+                uptype == UpType.SocketClient ||
+                uptype == UpType.HttpClient
+            )
+            {
+                result &= FixReadString("local ip", out LocalIP);
+            }
 
             // read port
             result &= FixReadInt("remote http port", out RemoteHttpPort);
