@@ -129,12 +129,12 @@ namespace eagle.tunnel.dotnet.core
                 Console.WriteLine("invalid " + key);
             }
             
-            if(need2fix)
-            {
-                Console.WriteLine("please input new " + key + ":");
-                value = Console.ReadLine();
-                WriteConf(ref conf, key, value);
-            }
+            // if(need2fix)
+            // {
+            //     Console.WriteLine("please input new " + key + ":");
+            //     value = Console.ReadLine();
+            //     WriteConf(ref conf, key, value);
+            // }
             return !need2fix;
         }
 
