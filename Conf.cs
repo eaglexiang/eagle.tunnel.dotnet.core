@@ -15,7 +15,7 @@ namespace eagle.tunnel.dotnet.core
             SocketServer,
             SocketClient
         }
-        private static string confPath = "./config.cfg";
+        private static string confPath = "./config.txt";
         private static string conf;
         public static string RemoteIP;
         public static string LocalIP;
