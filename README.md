@@ -36,6 +36,8 @@ git clone -b bin https://github.com/eaglexiang/eagle.tunnel.dotnet.core.git
 dotnet eagle.tunnel.dotnet.core.dll s
 # 以客户端方式启动
 dotnet eagle.tunnel.dotnet.core.dll c
+# 第一次启动会自动生成配置文件config.txt
+# 配置后再次执行上述指令即可
 ```
 
 将手机或电脑的代理地址设置为本地服务的LocalIP和LocalHttpPort
