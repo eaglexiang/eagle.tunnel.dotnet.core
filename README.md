@@ -4,13 +4,15 @@
 
 [主页](https://www.eaglexiang.org/eagle-tunnel)
 
+[![](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core.svg?branch=dev-socks5)](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core)
+
 ## 支持
 
 ### 基本功能
 
 - [x] HTTP代理
 - [x] HTTPS代理
-- [ ] SOCKET5代理
+- [ ] SOCKS5代理
 - [ ] GUI
 
 ### 支持平台
