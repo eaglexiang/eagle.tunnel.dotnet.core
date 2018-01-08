@@ -33,7 +33,7 @@ namespace eagle.tunnel.dotnet.core
                 IPAddress ipa = IPAddress.Parse(ServerIP);
                 server = new TcpListener(ipa, ServerHttpPort);
                 server.Start(100);
-                Console.WriteLine("server started: " + ServerIP + ":" + ServerHttpPort);
+                Console.WriteLine("http server started: " + ServerIP + ":" + ServerHttpPort);
             }
             catch (Exception ex)
             {

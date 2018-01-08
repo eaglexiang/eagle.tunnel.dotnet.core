@@ -109,13 +109,18 @@ namespace eagle.tunnel.dotnet.core
             }
 
             // read port
-            result &= FixReadInt("remote http port", out RemoteHttpPort);
+            if(uptype == UpType.HttpServer)
+            {
+                result &= FixReadInt("remote http port", out RemoteHttpPort);
+            }
             if(uptype == UpType.HttpClient)
             {
                 result &= FixReadInt("local http port", out LocalHttpPort);
             }
-
-            result &= FixReadInt("remote socket port", out RemoteSocketPort);
+            if(uptype == UpType.SocketServer)
+            {
+                result &= FixReadInt("remote socket port", out RemoteSocketPort);
+            }
             if(uptype == UpType.SocketClient)
             {
                 result &= FixReadInt("local socket port", out LocalSocketPort);
@@ -134,6 +139,7 @@ namespace eagle.tunnel.dotnet.core
             if(need2fix)
             {
                 Console.WriteLine("invalid " + key);
+                WriteConf(ref conf, key, "127.0.0.1");
             }
             
             // if(need2fix)
@@ -155,15 +161,16 @@ namespace eagle.tunnel.dotnet.core
             if(need2fix)
             {
                 Console.WriteLine("invalid " + key);
+                WriteConf(ref conf, key, "8080");
             }
             
-            if(need2fix)
-            {
-                Console.WriteLine("please input new " + key + ":");
-                string newValue = Console.ReadLine();
-                int.TryParse(newValue, out value);
-                WriteConf(ref conf, key, newValue);
-            }
+            // if(need2fix)
+            // {
+            //     Console.WriteLine("please input new " + key + ":");
+            //     string newValue = Console.ReadLine();
+            //     int.TryParse(newValue, out value);
+            //     WriteConf(ref conf, key, newValue);
+            // }
             return !need2fix;
         }
     }
