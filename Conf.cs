@@ -95,6 +95,7 @@ namespace eagle.tunnel.dotnet.core
             else
             {
                 conf = File.ReadAllText(confPath, Encoding.UTF8);
+                conf = conf.Replace("\r", "");
             }
 
             // read ip
