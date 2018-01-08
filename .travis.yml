@@ -4,4 +4,6 @@ dist: trusty
 sudo: required
 dotnet: 2.0.2
 mono: none
-script: ./build.sh
+script:
+ - ./build.sh
+ - cat codecov.yml | curl --data-binary @- https://codecov.io/validate

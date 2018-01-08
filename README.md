@@ -2,7 +2,7 @@
 
 ![](https://img.shields.io/badge/language-csharp-green.svg) [![eagle.tunnel.dotnet.core](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core.svg?branch=dev-socks5)](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core) [![codecov](https://codecov.io/gh/eaglexiang/eagle.tunnel.dotnet.core/branch/dev-socks5/graph/badge.svg)](https://codecov.io/gh/eaglexiang/eagle.tunnel.dotnet.core)
 
-代理工具，SSR的替代品。基于.NET Core。
+代理工具，SSR的替代品。
 
 [主页](https://www.eaglexiang.org/eagle-tunnel)
 
