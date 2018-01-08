@@ -22,23 +22,33 @@ namespace eagle.tunnel.dotnet.core
 
         public void Start()
         {
-            _Start();
+            Thread startThread = new Thread(_Start);
+            startThread.IsBackground = true;
+            startThread.Start();
         }
 
         private void _Start()
         {
             TcpListener server;
-            try
+            while(true)
             {
-                IPAddress ipa = IPAddress.Parse(ServerIP);
-                server = new TcpListener(ipa, ServerHttpPort);
-                server.Start(100);
+                try
+                {
+                    if(!IPAddress.TryParse(ServerIP, out IPAddress ipa))
+                    {
+                        return;
+                    }
+                    server = new TcpListener(ipa, ServerHttpPort);
+                    server.Start(100);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    Thread.Sleep(5000);
+                    continue;
+                }
                 Console.WriteLine("http server started: " + ServerIP + ":" + ServerHttpPort);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return;
+                break;
             }
 
             Running = true;
@@ -70,12 +80,16 @@ namespace eagle.tunnel.dotnet.core
             try
             {
                 byte[] buffer = pipe0.Read();
+                if(buffer == null)
+                {
+                    return;
+                }
                 string request = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
                 string host = GetHost(request);
                 int port = GetPort(request);
-                if(host == "")
+                if(host == "" || port == 0)
                 {
-                    return ;
+                    return;
                 }
                 IPAddress[] ipas = Dns.GetHostAddresses(host);
                 string ip = ipas[0].ToString();
@@ -113,7 +127,6 @@ namespace eagle.tunnel.dotnet.core
                 {
                     pipe1.Close();
                 }
-                return;
             }
         }
 

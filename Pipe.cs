@@ -15,13 +15,22 @@ namespace eagle.tunnel.dotnet.core
         {
             set
             {
-                clientFrom = value;
-                if(clientFrom != null)
+                try
                 {
-                    StreamFrom = clientFrom.GetStream();
-                    BufferSize = clientFrom.ReceiveBufferSize;
-                    bufferRead = new byte[BufferSize];
+                    clientFrom = value;
+                    if(StreamFrom != null)
+                    {
+                        StreamFrom.Close();
+                        StreamFrom = null;
+                    }
+                    if(clientFrom != null)
+                    {
+                        StreamFrom = clientFrom.GetStream();
+                        BufferSize = clientFrom.ReceiveBufferSize;
+                        bufferRead = new byte[BufferSize];
+                    }
                 }
+                catch {}
             }
             get
             {
@@ -32,11 +41,20 @@ namespace eagle.tunnel.dotnet.core
         {
             set
             {
-                clientTo = value;
-                if(clientTo != null)
+                try
                 {
-                    StreamTo = clientTo.GetStream();
+                    clientTo = value;
+                    if(StreamTo != null)
+                    {
+                        StreamTo.Close();
+                        StreamTo = null;
+                    }
+                    if(clientTo != null)
+                    {
+                        StreamTo = clientTo.GetStream();
+                    }
                 }
+                catch {}
             }
             get
             {
@@ -70,27 +88,27 @@ namespace eagle.tunnel.dotnet.core
 
         public void Write(byte[] buffer, int offset, int count)
         {
-            byte[] buffer1 = new byte[count];
-            Array.Copy(buffer, buffer1, count);
-            if(EncryptTo)
+            if(ClientTo != null)
             {
-                buffer1 = Encryption(buffer1);
+                byte[] buffer1 = new byte[count];
+                Array.Copy(buffer, buffer1, count);
+                if(EncryptTo)
+                {
+                    buffer1 = Encryption(buffer1);
+                }
+                StreamTo.Write(buffer1, 0, count);
             }
-            StreamTo.Write(buffer1, 0, count);
         }
 
         public void Write(byte[] buffer)
         {
-            byte[] buffer1;
-            if(EncryptTo)
-            {
-                buffer1 = Encryption(buffer);
-            }
-            else
-            {
-                buffer1 = buffer;
-            }
-            StreamTo.Write(buffer1, 0, buffer1.Length);
+            Write(buffer, 0, buffer.Length);
+        }
+
+        public void Write(string msg)
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes(msg);
+            Write(buffer);
         }
 
         public byte[] Read()
@@ -135,12 +153,14 @@ namespace eagle.tunnel.dotnet.core
             {
                 StreamFrom.Close();
                 StreamTo.Close();
+                ClientFrom.Close();
+                ClientTo.Close();
                 return;
             }
             StreamFrom.Close();
             StreamTo.Close();
-            clientFrom.Close();
-            clientTo.Close();
+            ClientFrom.Close();
+            ClientTo.Close();
         }
 
         public static byte[] Encryption(byte[] src)
@@ -165,14 +185,19 @@ namespace eagle.tunnel.dotnet.core
 
         public void Close()
         {
-            if(StreamFrom != null)
+            ClientFrom = null;
+            ClientTo = null;
+        }
+
+        public string ReadString()
+        {
+            byte[] buffer = Read();
+            if(buffer == null)
             {
-                StreamFrom.Close();
+                return null;
             }
-            if(StreamTo != null)
-            {
-                StreamTo.Close();
-            }
+            string str = Encoding.UTF8.GetString(buffer);
+            return str;
         }
     }
 }

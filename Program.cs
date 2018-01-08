@@ -45,6 +45,16 @@ namespace eagle.tunnel.dotnet.core
                     httpClient.Stop();
                 }
             }
+            else if(
+                choice == "server" ||
+                choice == "s"
+            )
+            {
+                while(true)
+                {
+                    Thread.Sleep(10000);
+                }
+            }
         }
 
         static void StartHttpServer()
