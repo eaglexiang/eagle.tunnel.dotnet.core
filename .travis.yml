@@ -2,6 +2,6 @@ language: csharp
 solution: eagle.tunnel.dotnet.core.csproj
 dist: trusty
 sudo: required
-dotnet: 2.0.4
+dotnet: 2.0.2
 mono: none
 script: ./build.sh
