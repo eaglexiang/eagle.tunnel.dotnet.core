@@ -1,3 +1,5 @@
 language: csharp
 solution: eagle.tunnel.dotnet.core.csproj
+dist: trusty
+dotnet: 2.0.0
 script: ./build.sh
