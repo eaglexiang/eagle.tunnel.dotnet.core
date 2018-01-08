@@ -1,6 +1,6 @@
 # Eagle Tunnel
 
-代理工具，SSR的替代品。基于.NET Core。
+代理工具，SSR的替代品。
 
 [主页](https://www.eaglexiang.org/eagle-tunnel)
 
@@ -10,7 +10,7 @@
 
 - [x] HTTP代理
 - [x] HTTPS代理
-- [ ] SOCKET5代理
+- [ ] SOCKS5代理
 - [ ] GUI
 
 ### 支持平台
