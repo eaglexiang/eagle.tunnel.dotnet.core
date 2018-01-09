@@ -152,16 +152,12 @@ namespace eagle.tunnel.dotnet.core
             }
             catch
             {
-                StreamFrom.Close();
-                StreamTo.Close();
-                ClientFrom.Close();
-                ClientTo.Close();
+                ClientFrom = null;
+                ClientTo = null;
                 return;
             }
-            StreamFrom.Close();
-            StreamTo.Close();
-            ClientFrom.Close();
-            ClientTo.Close();
+            ClientFrom = null;
+            ClientTo = null;
         }
 
         public static byte[] Encryption(byte[] src)

@@ -6,16 +6,16 @@ using System.Text;
 
 namespace eagle.tunnel.dotnet.core
 {
-    public class SocketServer
+    public class SocksServer
     {
         private string ServerIP { get; set;}
-        private int ServerSocketPort { get; set;}
+        private int ServerSocksPort { get; set;}
         public bool Running { get; set;}
 
-        public SocketServer(string serverIP, int serverSocketPort)
+        public SocksServer(string serverIP, int serverSocksPort)
         {
             ServerIP = serverIP;
-            ServerSocketPort = serverSocketPort;
+            ServerSocksPort = serverSocksPort;
         }
 
         public void Start()
@@ -36,16 +36,20 @@ namespace eagle.tunnel.dotnet.core
                     {
                         return;
                     }
-                    server = new TcpListener(ipa, ServerSocketPort);
+                    server = new TcpListener(ipa, ServerSocksPort);
                     server.Start(100);
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
+                    Console.WriteLine("Retrying...");
                     Thread.Sleep(5000);
                     continue;
                 }
-                Console.WriteLine("http server started: " + ServerIP + ":" + ServerSocketPort);
+                Console.WriteLine(
+                    "socks5 server started: " +
+                    ServerIP + ":" + ServerSocksPort
+                );
                 break;
             }
 
@@ -68,39 +72,39 @@ namespace eagle.tunnel.dotnet.core
         {
             TcpClient socket2Client = clientObj as TcpClient;
 
-            Pipe pipe0 = new Pipe(
+            Pipe client2Server = new Pipe(
                 socket2Client,
                 null
             );
-            Pipe pipe1 = new Pipe(
+            Pipe server2Client = new Pipe(
                 null,
                 socket2Client
             );
-            pipe0.EncryptFrom = true;
-            pipe1.EncryptTo = true;
+            // pipe0.EncryptFrom = true;
+            // pipe1.EncryptTo = true;
             try
             {
-                string request = pipe0.ReadString();
+                string request = client2Server.ReadString();
                 if(request == null)
                 {
                     return;
                 }
                 // not socket 5 request
-                string version = request.Substring(0,4);
-                if(version != "\\x05")
+                int version = request[0];
+                if(version != '\u0005')
                 {
                     return;
                 }
 
-                string reply = "\\x05\\x00";
-                pipe1.Write(reply);
+                string reply = "\u0005\u0000";
+                server2Client.Write(reply);
 
-                request = pipe0.ReadString();
+                request = client2Server.ReadString();
                 if(request == null)
                 {
                     return;
                 }
-                if(request.Substring(4, 4) != "\\x01")
+                if(request[1] != '\u0001')
                 {
                     return;
                 }
@@ -111,16 +115,30 @@ namespace eagle.tunnel.dotnet.core
                     return;
                 }
 
-                TcpClient client2Server = new TcpClient(ip, port);
+                TcpClient tcpClient2Server;
+                try
+                {
+                    tcpClient2Server = new TcpClient(ip, port);
+                    reply = "\u0005\u0000\u0000\u0001" + (char)127 + (char)0 + (char)0 + (char)1 + (char)0 + (char)8080;
+                    server2Client.Write(reply);
+                }
+                catch
+                {
+                    reply = "\u0005\u0001\u0000\u0001" + (char)127 + (char)0 + (char)0 + (char)1 + (char)0 + (char)8080;
+                    server2Client.Write(reply);
+                    return;
+                }
+                client2Server.ClientTo = tcpClient2Server;
+                server2Client.ClientFrom = tcpClient2Server;
 
-                pipe0.Flow();
-                pipe1.Flow();
+                client2Server.Flow();
+                server2Client.Flow();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                pipe0.Close();
-                pipe1.Close();
+                client2Server.Close();
+                server2Client.Close();
             }
         }
 
@@ -128,15 +146,18 @@ namespace eagle.tunnel.dotnet.core
         {
             try
             {
-                string destype = request.Substring(9, 3);
+                int destype = request[3];
                 string ip;
-                int ind = request.IndexOf("\\x", 16);
                 switch (destype)
                 {
-                case "\\x01":
-                    ip = request.Substring(16, ind - 16);
+                case 1:
+                    ip = ((int)request[4]).ToString();
+                    ip += '.' + ((int)request[5]).ToString();
+                    ip += '.' + ((int)request[6]).ToString();
+                    ip += '.' + ((int)request[7]).ToString();
                     break;
-                case "\\x3":
+                case 3:
+                    int ind = request.IndexOf('\0');
                     string host = request.Substring(16, ind - 16);
                     IPHostEntry iphe = Dns.GetHostEntry(host);
                     ip = iphe.AddressList[0].ToString();
@@ -157,12 +178,13 @@ namespace eagle.tunnel.dotnet.core
         {
             try
             {
-                int ind = request.IndexOf("\\x", 16);
-                string _high = request.Substring(ind + 2, 2);
-                string _low = request.Substring(ind + 6, 2);
-                int high = Convert.ToInt32(_high, 16);
-                int low = Convert.ToInt32(_low, 16);
-                int port = high * 0xFF + low;
+                int ind = request.IndexOf('\0', 3);
+                // string _high = request.Substring(ind + 2, 2);
+                // string _low = request.Substring(ind + 6, 2);
+                // int high = Convert.ToInt32(_high, 16);
+                // int low = Convert.ToInt32(_low, 16);
+                // int port = high * 0xFF + low;
+                int port = request[ind + 1];
                 return port;
             }
             catch

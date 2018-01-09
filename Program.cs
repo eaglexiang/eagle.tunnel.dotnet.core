@@ -10,50 +10,56 @@ namespace eagle.tunnel.dotnet.core
     {
         static HttpClient httpClient;
         static HttpServer httpServer;
+        static SocksServer socksServer;
 
         static void Main(string[] args)
         {
-            string choice = args[0];
-            switch (choice)
-            {
-                case "server":
-                case "s":
-                    StartHttpServer();
-                    break;
-                case "client":
-                case "c":
-                    StartHttpClient();
-                    break;
-                default:
-                    Console.WriteLine("no specific mode (server/client ?)");
-                    return;
-            }
+            // string choice = args[0];
+            // switch (choice)
+            // {
+            //     case "server":
+            //     case "s":
+            //         StartHttpServer();
+            //         break;
+            //     case "client":
+            //     case "c":
+            //         StartHttpClient();
+            //         break;
+            //     default:
+            //         Console.WriteLine("no specific mode (server/client ?)");
+            //         return;
+            // }
 
-            if (
-                choice == "clinet" ||
-                choice == "c"
-            )
+            // if (
+            //     choice == "clinet" ||
+            //     choice == "c"
+            // )
+            // {
+            //     string input = "";
+            //     do
+            //     {
+            //         Console.Write("input q to quit: ");
+            //         input = Console.ReadLine();
+            //     }while(input != "q");
+            //     if(httpClient != null)
+            //     {
+            //         httpClient.Stop();
+            //     }
+            // }
+            // else if(
+            //     choice == "server" ||
+            //     choice == "s"
+            // )
+            // {
+            //     while(true)
+            //     {
+            //         Thread.Sleep(10000);
+            //     }
+            // }
+            StartSocksServer();
+            while(true)
             {
-                string input = "";
-                do
-                {
-                    Console.Write("input q to quit: ");
-                    input = Console.ReadLine();
-                }while(input != "q");
-                if(httpClient != null)
-                {
-                    httpClient.Stop();
-                }
-            }
-            else if(
-                choice == "server" ||
-                choice == "s"
-            )
-            {
-                while(true)
-                {
-                    Thread.Sleep(10000);
-                }
+                Thread.Sleep(10000);
             }
         }
 
@@ -85,6 +91,25 @@ namespace eagle.tunnel.dotnet.core
             try
             {
                 httpClient.Start();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
+        static void StartSocksServer()
+        {
+            Conf.ReadConfiguration(Conf.UpType.SocksServer);
+
+            Console.WriteLine("Remote IP: " + Conf.RemoteIP);
+            Console.WriteLine("Remote Socks Port: " + Conf.RemoteSocketPort);
+
+            socksServer = new SocksServer(Conf.RemoteIP, Conf.RemoteSocketPort);
+
+            try
+            {
+                socksServer.Start();
             }
             catch (Exception e)
             {

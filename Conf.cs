@@ -12,8 +12,8 @@ namespace eagle.tunnel.dotnet.core
         {
             HttpServer,
             HttpClient,
-            SocketServer,
-            SocketClient
+            SocksServer,
+            SocksClient
         }
         private static string confPath = "./config.txt";
         private static string conf;
@@ -101,7 +101,7 @@ namespace eagle.tunnel.dotnet.core
             // read ip
             result &= FixReadString("remote ip", out RemoteIP);
             if(
-                uptype == UpType.SocketClient ||
+                uptype == UpType.SocksClient ||
                 uptype == UpType.HttpClient
             )
             {
@@ -117,11 +117,11 @@ namespace eagle.tunnel.dotnet.core
             {
                 result &= FixReadInt("local http port", out LocalHttpPort);
             }
-            if(uptype == UpType.SocketServer)
+            if(uptype == UpType.SocksServer)
             {
                 result &= FixReadInt("remote socket port", out RemoteSocketPort);
             }
-            if(uptype == UpType.SocketClient)
+            if(uptype == UpType.SocksClient)
             {
                 result &= FixReadInt("local socket port", out LocalSocketPort);
             }
