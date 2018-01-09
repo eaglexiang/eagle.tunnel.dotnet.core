@@ -26,7 +26,8 @@ namespace eagle.tunnel.dotnet.core
                     if(clientFrom != null)
                     {
                         StreamFrom = clientFrom.GetStream();
-                        BufferSize = clientFrom.ReceiveBufferSize;
+                        // BufferSize = clientFrom.ReceiveBufferSize;
+                        BufferSize = 204800;
                         bufferRead = new byte[BufferSize];
                     }
                 }
