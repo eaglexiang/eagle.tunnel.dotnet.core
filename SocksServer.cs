@@ -157,7 +157,7 @@ namespace eagle.tunnel.dotnet.core
                     ip += '.' + ((int)request[7]).ToString();
                     break;
                 case 3:
-                    int ind = request.IndexOf('\0');
+                    int ind = request.IndexOf('\0', 3);
                     string host = request.Substring(16, ind - 16);
                     IPHostEntry iphe = Dns.GetHostEntry(host);
                     ip = iphe.AddressList[0].ToString();
