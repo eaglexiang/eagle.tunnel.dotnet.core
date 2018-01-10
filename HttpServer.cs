@@ -61,8 +61,10 @@ namespace eagle.tunnel.dotnet.core
                 handleClientThread.IsBackground = true;
                 handleClientThread.Start(client);
             }
+            Thread.Sleep(1000);
+            server.Stop();
             Console.WriteLine("Server Stopped");
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
             Environment.Exit(0);
         }
 
