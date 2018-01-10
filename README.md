@@ -29,8 +29,9 @@
 
 需要先安装[.NET Core Runtime](https://www.microsoft.com/net/download/)。
 
+[点击下载](https://github.com/eaglexiang/eagle.tunnel.dotnet.core/raw/bin/eagle-tunnel.zip)
+
 ```shell
-git clone -b bin https://github.com/eaglexiang/eagle.tunnel.dotnet.core.git
 # 解压文件
 # 以服务端方式启动
 dotnet eagle.tunnel.dotnet.core.dll s
