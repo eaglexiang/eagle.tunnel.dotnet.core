@@ -1,6 +1,6 @@
 # Eagle Tunnel
 
-![](https://img.shields.io/badge/language-csharp-green.svg) [![eagle.tunnel.dotnet.core](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core.svg?branch=dev-socks5)](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core)
+![](https://img.shields.io/badge/language-csharp-green.svg) [![eagle.tunnel.dotnet.core](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core.svg?branch=dev)](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core)
 
 代理工具，SSR的替代品。
 
@@ -12,7 +12,7 @@
 
 - [x] HTTP代理
 - [x] HTTPS代理
-- [ ] SOCKS5代理
+- [x] SOCKS5代理（暂只支持TCP）
 - [ ] GUI
 
 ### 支持平台
