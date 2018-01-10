@@ -32,7 +32,7 @@ namespace eagle.tunnel.dotnet.core
             {
                 try
                 {
-                    if(!IPAddress.TryParse("192.168.123.4", out IPAddress ipa))
+                    if(!IPAddress.TryParse(ServerIP, out IPAddress ipa))
                     {
                         return;
                     }
