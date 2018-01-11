@@ -35,13 +35,13 @@
 --- | ---
 httpserver | 启动HTTP远端服务
 hs | 启动HTTP远端服务（同httpserver）
- |
+ | 
 socksserver | 启动Socks5远端服务
 ss | 启动Socks5远端服务（同socksserver）
- |
+ | 
 httpclient | 启动HTTP本地服务
 hc | 启动HTTP本地服务（同httpclient）
- |
+ | 
 socksclient | 启动Socks5本地服务
 sc | 启动Socks5本地服务（同socksclient）
 
