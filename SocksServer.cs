@@ -90,8 +90,8 @@ namespace eagle.tunnel.dotnet.core
                 null,
                 socket2Client
             );
-            // pipe0.EncryptFrom = true;
-            // pipe1.EncryptTo = true;
+            client2Server.EncryptFrom = true;
+            server2Client.EncryptTo = true;
             try
             {
                 byte[] request = client2Server.Read();

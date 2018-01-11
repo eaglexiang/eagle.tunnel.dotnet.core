@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace eagle.tunnel.dotnet.core
 {
-    public class HttpClient
+    public class Client
     {
         private TcpListener localServer;
         public string ServerHost { get; set;}
@@ -16,7 +16,7 @@ namespace eagle.tunnel.dotnet.core
         public int LocalPort { get; set;}
         private bool Running { get; set;}
 
-        public HttpClient(
+        public Client(
             string serverhost,
             int serverport,
             string localhost,
