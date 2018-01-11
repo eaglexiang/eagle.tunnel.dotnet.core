@@ -98,31 +98,28 @@ namespace eagle.tunnel.dotnet.core
                 conf = conf.Replace("\r", "");
             }
 
-            // read ip
-            result &= FixReadString("remote ip", out RemoteIP);
-            if(
-                uptype == UpType.SocketClient ||
-                uptype == UpType.HttpClient
-            )
-            {
-                result &= FixReadString("local ip", out LocalIP);
-            }
-
-            // read port
             if(uptype == UpType.HttpServer)
             {
+                result &= FixReadString("remote ip", out RemoteIP);
                 result &= FixReadInt("remote http port", out RemoteHttpPort);
-            }
-            if(uptype == UpType.HttpClient)
-            {
-                result &= FixReadInt("local http port", out LocalHttpPort);
             }
             if(uptype == UpType.SocketServer)
             {
+                result &= FixReadString("remote ip", out RemoteIP);
                 result &= FixReadInt("remote socket port", out RemoteSocketPort);
+            }
+            if(uptype == UpType.HttpClient)
+            {
+                result &= FixReadString("remote ip", out RemoteIP);
+                result &= FixReadString("local ip", out LocalIP);
+                result &= FixReadInt("remote http port", out RemoteHttpPort);
+                result &= FixReadInt("local http port", out LocalHttpPort);
             }
             if(uptype == UpType.SocketClient)
             {
+                result &= FixReadString("remote ip", out RemoteIP);
+                result &= FixReadString("local ip", out LocalIP);
+                result &= FixReadInt("remote socket port", out RemoteSocketPort);
                 result &= FixReadInt("local socket port", out LocalSocketPort);
             }
 
