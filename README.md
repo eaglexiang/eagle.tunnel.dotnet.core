@@ -50,7 +50,7 @@ sc | 启动Socks5本地服务（同socksclient）
 1. 远端服务请运行于网络通畅的计算机上，本地服务运行于需要使用代理服务的计算机上，若将`Local IP`填为局域网IP，则可为局域网计算机（包括手机）提供服务。启动命令见下一小节。
 1. 将手机或电脑的代理地址设置为本地服务的LocalIP和LocalHttpPort
 
-#### 启动明林
+#### 启动命令
 
 ```shell
 dotnet eagle.tunnel.dotnet.core.dll [参数]
