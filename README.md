@@ -1,6 +1,6 @@
 # Eagle Tunnel
 
-![](https://img.shields.io/badge/language-csharp-blue.svg) [![](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core.svg?branch=dev)](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core)
+![](https://img.shields.io/badge/language-csharp-blue.svg) [![](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core.svg?branch=master)](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core)
 
 代理工具，SSR的替代品。
 
