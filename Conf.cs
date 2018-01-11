@@ -119,11 +119,11 @@ namespace eagle.tunnel.dotnet.core
             }
             if(uptype == UpType.SocksServer)
             {
-                result &= FixReadInt("remote socket port", out RemoteSocketPort);
+                result &= FixReadInt("remote socks port", out RemoteSocketPort);
             }
             if(uptype == UpType.SocksClient)
             {
-                result &= FixReadInt("local socket port", out LocalSocketPort);
+                result &= FixReadInt("local socks port", out LocalSocketPort);
             }
 
             return result;
