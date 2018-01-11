@@ -11,6 +11,7 @@ namespace eagle.tunnel.dotnet.core
         private string ServerIP { get; set;}
         private int ServerSocksPort { get; set;}
         public bool Running { get; set;}
+        private static Random rand = new Random();
 
         public SocksServer(string serverIP, int serverSocksPort)
         {
@@ -32,7 +33,7 @@ namespace eagle.tunnel.dotnet.core
             {
                 try
                 {
-                    if(!IPAddress.TryParse("192.168.123.4", out IPAddress ipa))
+                    if(!IPAddress.TryParse(ServerIP, out IPAddress ipa))
                     {
                         return;
                     }
@@ -113,75 +114,16 @@ namespace eagle.tunnel.dotnet.core
                 {
                     return;
                 }
-                string ip = GetIP(request);
-                int port = GetPort(request);
-                if(ip == null)
-                {
-                    string str = Encoding.UTF8.GetString(request);
-                    return;
-                }
 
                 CMDType cmdType = (CMDType)request[1];
 
                 if(cmdType == CMDType.Connect)
                 {
-                    TcpClient tcpClient2Server;
-                    try
-                    {
-                        tcpClient2Server = new TcpClient(ip, port);
-                        reply = "\u0005\u0000\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0000";
-                        server2Client.Write(reply);
-                    }
-                    catch
-                    {
-                        reply = "\u0005\u0001\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0000";
-                        server2Client.Write(reply);
-                        return;
-                    }
-                    client2Server.ClientTo = tcpClient2Server;
-                    server2Client.ClientFrom = tcpClient2Server;
-                    client2Server.Flow();
-                    server2Client.Flow();
+                    HandleTCPReq(request, server2Client, client2Server);
                 }
                 else if(cmdType == CMDType.Udp)
                 {
-                    bool reachable;
-                    if(ip == "0.0.0.0")
-                    {
-                        reachable = true;
-                    }
-                    else
-                    {
-                        byte[] data = GetUDPData(request);
-                        if(data == null)
-                        {
-                            reachable = false;
-                        }
-                        else
-                        {
-                            try
-                            {
-                                UdpClient udpClient2Server = new UdpClient(ip, port);
-                                udpClient2Server.Send(data, data.Length);
-                                reachable = true;
-                            }
-                            catch
-                            {
-                                reachable = false;
-                            }
-                        }
-                    }
-                    if(reachable)
-                    {
-                        reply = "\u0005\u0000\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0000";
-                        server2Client.Write(reply);
-                    }
-                    else
-                    {
-                        reply = "\u0005\u0001\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0000";
-                        server2Client.Write(reply);
-                        return;
-                    }
+                    HandleUDPReq(request, server2Client);
                 }
             }
             catch (Exception ex)
@@ -192,7 +134,69 @@ namespace eagle.tunnel.dotnet.core
             }
         }
 
-        private string GetIP(byte[] request)
+        private void HandleTCPReq(byte[] request, Pipe server2Client, Pipe client2Server)
+        {
+            string ip = GetIP(request);
+            int port = GetPort(request);
+            string reply;
+            if(ip == null)
+            {
+                string str = Encoding.UTF8.GetString(request);
+                return;
+            }
+            TcpClient tcpClient2Server;
+            try
+            {
+                tcpClient2Server = new TcpClient(ip, port);
+                reply = "\u0005\u0000\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0000";
+                server2Client.Write(reply);
+                client2Server.ClientTo = tcpClient2Server;
+                server2Client.ClientFrom = tcpClient2Server;
+                client2Server.Flow();
+                server2Client.Flow();
+            }
+            catch
+            {
+                CloseRequest(server2Client);
+            }
+        }
+
+        private void HandleUDPReq(byte[] request, Pipe server2Client)
+        {
+            string clientIp = server2Client.ClientTo.Client.RemoteEndPoint.ToString().Split(':')[0];
+            int clientPort = GetPort(request);
+            byte[] data = GetUDPData(request);
+            if(data == null)
+            {
+                CloseRequest(server2Client);
+            }
+            else
+            {
+                try
+                {
+                    int bondPort = rand.Next(5000, 10000);
+                    UdpPipe pipeFromClient = new UdpPipe(clientIp, clientPort, ServerIP, bondPort);
+                    pipeFromClient.Flow();
+                    IPAddress.TryParse(ServerIP, out IPAddress ipa);
+                    int high = bondPort / 0x100;
+                    int low = bondPort % 0x100;
+                    string reply = "\x05\x01\x00\x01" + ipa.GetAddressBytes() + high + low;
+                    server2Client.Write(reply);
+                }
+                catch
+                {
+                    CloseRequest(server2Client);
+                }
+            }
+        }
+
+        private void CloseRequest(Pipe server2Client)
+        {
+            string reply = "\u0005\u0001\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0000";
+            server2Client.Write(reply);
+        }
+
+        public static string GetIP(byte[] request)
         {
             try
             {
@@ -237,7 +241,7 @@ namespace eagle.tunnel.dotnet.core
             }
         }
 
-        private int GetPort(byte[] request)
+        public static int GetPort(byte[] request)
         {
             try
             {
@@ -270,7 +274,7 @@ namespace eagle.tunnel.dotnet.core
             }
         }
 
-        private byte[] GetUDPData(byte[] request)
+        public static byte[] GetUDPData(byte[] request)
         {
             try
             {
