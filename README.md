@@ -11,7 +11,6 @@
 - [x] HTTP代理
 - [x] HTTPS代理
 - [x] SOCKS5代理（暂只支持TCP）
-
 - [ ] GUI
 
 ### 支持平台
