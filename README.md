@@ -70,6 +70,8 @@ dotnet eagle.tunnel.dotnet.core.dll hs ss
 
 [eagle.tunnel.dotnet](https://github.com/eaglexiang/eagle.tunnel.dotnet)（只支持HTTP(S)代理）
 
+[下载](https://github.com/eaglexiang/eagle.tunnel.dotnet/raw/bin/Eagle%20Tunnel.exe)
+
 ## 开源协议
 
 [MIT](./LICENSE)
