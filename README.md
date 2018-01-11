@@ -10,20 +10,14 @@
 
 ### 基本功能
 
-- [x] HTTP代理
-- [x] HTTPS代理
+- [x] HTTP(S)代理
 - [x] SOCKS5代理
-- [ ] GUI
 
 ### 支持平台
 
 - [x] Windows
 - [x] Linux
 - [x] macOS
-
-= =反正就是.NET Core支持的平台。
-
-- [ ] Android
 
 ## 使用方法
 
@@ -71,6 +65,10 @@ dotnet eagle.tunnel.dotnet.core.dll hs ss
 #### 守护进程
 
 对于CentOS、Archlinux等使用systemd的Linux发行版，可使用[supervisor](http://supervisord.org/)实现守护进程。
+
+### Windows版（图形界面）
+
+[eagle.tunnel.dotnet](https://github.com/eaglexiang/eagle.tunnel.dotnet)（只支持HTTP(S)代理）
 
 ## 开源协议
 
