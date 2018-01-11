@@ -106,7 +106,7 @@ namespace eagle.tunnel.dotnet.core
             if(uptype == UpType.SocksServer)
             {
                 result &= FixReadString("remote ip", out RemoteIP);
-                result &= FixReadInt("remote socket port", out RemoteSocksPort);
+                result &= FixReadInt("remote socks port", out RemoteSocksPort);
             }
             if(uptype == UpType.HttpClient)
             {
@@ -119,8 +119,8 @@ namespace eagle.tunnel.dotnet.core
             {
                 result &= FixReadString("remote ip", out RemoteIP);
                 result &= FixReadString("local ip", out LocalIP);
-                result &= FixReadInt("remote socket port", out RemoteSocksPort);
-                result &= FixReadInt("local socket port", out LocalSocksPort);
+                result &= FixReadInt("remote socks port", out RemoteSocksPort);
+                result &= FixReadInt("local socks port", out LocalSocksPort);
             }
 
             return result;

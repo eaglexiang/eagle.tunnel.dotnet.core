@@ -218,7 +218,7 @@ namespace eagle.tunnel.dotnet.core
                         hostChars[i] = (char)request[5 + i];
                     }
                     string host = new string(hostChars);
-                    // if host is ip but not real domain name
+                    // if host is real ip but not domain name
                     if(IPAddress.TryParse(host, out IPAddress ipa))
                     {
                         ip = host;
@@ -226,7 +226,14 @@ namespace eagle.tunnel.dotnet.core
                     else
                     {
                         IPHostEntry iphe = Dns.GetHostEntry(host);
-                        ip = iphe.AddressList[0].ToString();
+                        ip = null;
+                        foreach(IPAddress tmp in iphe.AddressList)
+                        {
+                            if(tmp.AddressFamily == AddressFamily.InterNetwork)
+                            {
+                                ip = tmp.ToString();
+                            }
+                        }
                     }
                     break;
                 default:

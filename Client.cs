@@ -133,6 +133,7 @@ namespace eagle.tunnel.dotnet.core
                 client2Server,
                 client2Client
                 );
+            pipe0.EncryptTo = true;
             pipe1.EncryptFrom = true;
 
             pipe0.Flow();
