@@ -40,7 +40,7 @@ namespace eagle.tunnel.dotnet.core
                 StartSocksServer();
             }
             if(allArgs.Contains("socksclient") ||
-                allArgs.Contains("ac")
+                allArgs.Contains("sc")
             )
             {
                 StartSocksClient();
