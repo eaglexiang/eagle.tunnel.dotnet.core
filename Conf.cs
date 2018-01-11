@@ -20,9 +20,9 @@ namespace eagle.tunnel.dotnet.core
         public static string RemoteIP;
         public static string LocalIP;
         public static int RemoteHttpPort;
-        public static int RemoteSocketPort;
+        public static int RemoteSocksPort;
         public static int LocalHttpPort;
-        public static int LocalSocketPort;
+        public static int LocalSocksPort;
 
         /// <summary>
         /// read single conf as string from all confs
@@ -97,33 +97,30 @@ namespace eagle.tunnel.dotnet.core
                 conf = File.ReadAllText(confPath, Encoding.UTF8);
                 conf = conf.Replace("\r", "");
             }
-
-            // read ip
-            result &= FixReadString("remote ip", out RemoteIP);
-            if(
-                uptype == UpType.SocksClient ||
-                uptype == UpType.HttpClient
-            )
-            {
-                result &= FixReadString("local ip", out LocalIP);
-            }
-
-            // read port
+            
             if(uptype == UpType.HttpServer)
             {
+                result &= FixReadString("remote ip", out RemoteIP);
                 result &= FixReadInt("remote http port", out RemoteHttpPort);
-            }
-            if(uptype == UpType.HttpClient)
-            {
-                result &= FixReadInt("local http port", out LocalHttpPort);
             }
             if(uptype == UpType.SocksServer)
             {
-                result &= FixReadInt("remote socket port", out RemoteSocketPort);
+                result &= FixReadString("remote ip", out RemoteIP);
+                result &= FixReadInt("remote socket port", out RemoteSocksPort);
+            }
+            if(uptype == UpType.HttpClient)
+            {
+                result &= FixReadString("remote ip", out RemoteIP);
+                result &= FixReadString("local ip", out LocalIP);
+                result &= FixReadInt("remote http port", out RemoteHttpPort);
+                result &= FixReadInt("local http port", out LocalHttpPort);
             }
             if(uptype == UpType.SocksClient)
             {
-                result &= FixReadInt("local socket port", out LocalSocketPort);
+                result &= FixReadString("remote ip", out RemoteIP);
+                result &= FixReadString("local ip", out LocalIP);
+                result &= FixReadInt("remote socket port", out RemoteSocksPort);
+                result &= FixReadInt("local socket port", out LocalSocksPort);
             }
 
             return result;

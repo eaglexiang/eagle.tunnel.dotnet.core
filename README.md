@@ -1,7 +1,5 @@
 # Eagle Tunnel
 
-![](https://img.shields.io/badge/language-csharp-green.svg) [![eagle.tunnel.dotnet.core](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core.svg?branch=dev)](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core)
-
 代理工具，SSR的替代品。
 
 [主页](https://www.eaglexiang.org/eagle-tunnel)
@@ -13,6 +11,7 @@
 - [x] HTTP代理
 - [x] HTTPS代理
 - [x] SOCKS5代理（暂只支持TCP）
+
 - [ ] GUI
 
 ### 支持平台
@@ -31,8 +30,9 @@
 
 需要先安装[.NET Core Runtime](https://www.microsoft.com/net/download/)。
 
+[点击下载](https://github.com/eaglexiang/eagle.tunnel.dotnet.core/raw/bin/eagle-tunnel.zip)
+
 ```shell
-git clone -b bin https://github.com/eaglexiang/eagle.tunnel.dotnet.core.git
 # 解压文件
 # 以服务端方式启动
 dotnet eagle.tunnel.dotnet.core.dll s

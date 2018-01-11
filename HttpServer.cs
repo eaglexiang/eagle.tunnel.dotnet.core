@@ -93,8 +93,20 @@ namespace eagle.tunnel.dotnet.core
                 {
                     return;
                 }
-                IPAddress[] ipas = Dns.GetHostAddresses(host);
-                string ip = ipas[0].ToString();
+                IPHostEntry iphe = Dns.GetHostEntry(host);
+                IPAddress ipa = null;
+                foreach ( IPAddress tmp in iphe.AddressList)
+                {
+                    if(tmp.AddressFamily == AddressFamily.InterNetwork)
+                    {
+                        ipa = tmp;
+                    }
+                }
+                if(ipa == null)
+                {
+                    return;
+                }
+                string ip = ipa.ToString();
                 Console.WriteLine("connect to " + host + ":" + port);
                 
                 TcpClient client2Server = new TcpClient(ip, port);
