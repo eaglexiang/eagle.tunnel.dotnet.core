@@ -103,9 +103,9 @@ namespace eagle.tunnel.dotnet.core
             Conf.ReadConfiguration(Conf.UpType.SocksServer);
 
             Console.WriteLine("Remote IP: " + Conf.RemoteIP);
-            Console.WriteLine("Remote Socks Port: " + Conf.RemoteSocketPort);
+            Console.WriteLine("Remote Socks Port: " + Conf.RemoteSocksPort);
 
-            socksServer = new SocksServer(Conf.RemoteIP, Conf.RemoteSocketPort);
+            socksServer = new SocksServer(Conf.RemoteIP, Conf.RemoteSocksPort);
 
             try
             {
