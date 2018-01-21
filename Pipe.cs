@@ -131,6 +131,8 @@ namespace eagle.tunnel.dotnet.core
             }
             catch
             {
+                StreamFrom.Close();
+                clientFrom.Close();
                 return null;
             }
             return buffer;

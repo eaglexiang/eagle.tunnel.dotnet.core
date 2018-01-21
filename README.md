@@ -69,6 +69,10 @@ dotnet eagle.tunnel.dotnet.core.dll hs ss
 
 [下载](https://github.com/eaglexiang/eagle.tunnel.dotnet/raw/bin/Eagle%20Tunnel.exe)
 
+### C++版
+
+[eagle.tuunel.cpp](https://github.com/eaglexiang/eagle.tunnel.cpp)
+
 ## 开源协议
 
 [MIT](./LICENSE)

@@ -123,7 +123,7 @@ namespace eagle.tunnel.dotnet.core
                 }
                 else if(cmdType == CMDType.Udp)
                 {
-                    HandleUDPReq(request, server2Client);
+                    //HandleUDPReq(request, server2Client);
                 }
             }
             catch (Exception ex)
