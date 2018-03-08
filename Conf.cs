@@ -8,167 +8,88 @@ namespace eagle.tunnel.dotnet.core
 {
     public class Conf
     {
-        public enum UpType
-        {
-            HttpServer,
-            HttpClient,
-            SocksServer,
-            SocksClient
-        }
-        private static string confPath = "./config.txt";
-        private static string conf;
-        public static string RemoteIP;
-        public static string LocalIP;
-        public static int RemoteHttpPort;
-        public static int RemoteSocksPort;
-        public static int LocalHttpPort;
-        public static int LocalSocksPort;
+        private static string allConf = "";
+        public static string confPath {get; set; } = "./config.txt";
 
-        /// <summary>
-        /// read single conf as string from all confs
-        /// </summary>
-        /// <param name="conf">all confs</param>
-        /// <param name="key">key of single conf</param>
-        /// <returns>value of specific conf</returns>
-        static string ReadConf(ref string conf, string key)
+        public static void Init()
         {
-            string value = "";
-            try
-            {
-                int ind0 = conf.IndexOf(key);
-                if(ind0 == -1)
-                {
-                    conf += (key + ":\n");
-                }
-                else
-                {
-                    int ind1 = ind0 + key.Length + 1;
-                    value = conf.Substring(
-                        ind1,
-                        conf.IndexOf('\n', ind1) - ind1
-                    );
-                }
-            }
-            catch
-            {
-                return "";
-            }
-            return value;
+            ReadAll(confPath);
         }
 
-        static void WriteConf(ref string conf, string key, string value)
+        public static void Close()
         {
-            try
-            {
-                int ind0 = conf.IndexOf(key) + key.Length + 1;
-                int ind1 = conf.IndexOf('\n', ind0);
-                conf = conf.Substring(0, ind0) + value + conf.Substring(ind1);
-            }
-            catch
-            {
-                return;
-            }
-        }
-
-        public static void ReadConfiguration(UpType uptype)
-        {
-            bool re = _ReadConfiguration(uptype);
-            if(!re)
-            {
-                File.WriteAllText(confPath, conf, Encoding.UTF8);
-            }
+            SaveAll(confPath);
         }
 
         /// <summary>
-        /// read configuration from conf file
+        /// Read all configurations from file
         /// </summary>
-        /// <returns>if conf read sucessfully</returns>
-        private static bool _ReadConfiguration(UpType uptype)
+        /// <param name="confPath">path of conf file</param>
+        private static void ReadAll(string confPath)
         {
-            bool result = true;
-            if(!File.Exists(confPath))
+            if (File.Exists(confPath))
             {
-                Console.WriteLine("no configuration file exsits");
-                conf = "";
-                result = false;
+                allConf = File.ReadAllText(confPath);
             }
-            else
-            {
-                conf = File.ReadAllText(confPath, Encoding.UTF8);
-                conf = conf.Replace("\r", "");
-            }
-            
-            if(uptype == UpType.HttpServer)
-            {
-                result &= FixReadString("remote ip", out RemoteIP);
-                result &= FixReadInt("remote http port", out RemoteHttpPort);
-            }
-            if(uptype == UpType.SocksServer)
-            {
-                result &= FixReadString("remote ip", out RemoteIP);
-                result &= FixReadInt("remote socks port", out RemoteSocksPort);
-            }
-            if(uptype == UpType.HttpClient)
-            {
-                result &= FixReadString("remote ip", out RemoteIP);
-                result &= FixReadString("local ip", out LocalIP);
-                result &= FixReadInt("remote http port", out RemoteHttpPort);
-                result &= FixReadInt("local http port", out LocalHttpPort);
-            }
-            if(uptype == UpType.SocksClient)
-            {
-                result &= FixReadString("remote ip", out RemoteIP);
-                result &= FixReadString("local ip", out LocalIP);
-                result &= FixReadInt("remote socks port", out RemoteSocksPort);
-                result &= FixReadInt("local socks port", out LocalSocksPort);
-            }
-
-            return result;
         }
 
-        static bool FixReadString(string key, out string value)
+        private static void SaveAll(string confPath)
         {
-            bool need2fix;
-            need2fix = !IPAddress.TryParse(
-                value = ReadConf(ref conf, key),
-                out IPAddress ipa
-            );
-            if(need2fix)
-            {
-                Console.WriteLine("invalid " + key);
-                WriteConf(ref conf, key, "127.0.0.1");
-            }
-            
-            // if(need2fix)
-            // {
-            //     Console.WriteLine("please input new " + key + ":");
-            //     value = Console.ReadLine();
-            //     WriteConf(ref conf, key, value);
-            // }
-            return !need2fix;
+            File.WriteAllText(confPath, allConf);
         }
 
-        static bool FixReadInt(string key, out int value)
+        /// <summary>
+        /// Read value from configurations
+        /// </summary>
+        /// <param name="key">configuration key</param>
+        /// <returns>configuration value, or null if key not found</returns>
+        public static string ReadValue(string key)
         {
-            bool need2fix;
-            need2fix = !int.TryParse(
-                ReadConf(ref conf, key),
-                out value
-            );
-            if(need2fix)
+            StringReader sr = new StringReader(allConf);
+            string line;
+            while ((line = sr.ReadLine()) != null)
             {
-                Console.WriteLine("invalid " + key);
-                WriteConf(ref conf, key, "8080");
+                if (line.Contains(":"))
+                {
+                    if (line.Substring(0, line.IndexOf(':')) == key)
+                    {
+                        sr.Close();
+                        return line.Substring(line.IndexOf(':') + 1);
+                    }
+                }
             }
-            
-            // if(need2fix)
-            // {
-            //     Console.WriteLine("please input new " + key + ":");
-            //     string newValue = Console.ReadLine();
-            //     int.TryParse(newValue, out value);
-            //     WriteConf(ref conf, key, newValue);
-            // }
-            return !need2fix;
+            sr.Close();
+            return null;
+        }
+
+        /// <summary>
+        /// Change value of specific key, if not key found, create it
+        /// </summary>
+        /// <param name="key">key specific</param>
+        /// <param name="value">value expected</param>
+        public static void WriteValue(string key, string value)
+        {
+            StringReader sr = new StringReader(allConf);
+            StringBuilder sb = new StringBuilder(allConf);
+            string line;
+            while ((line = sr.ReadLine()) != null)
+            {
+                if (line.Contains(":"))
+                {
+                    if (line.Substring(0, line.IndexOf(':')) == key)
+                    {
+                        sr.Close();
+                        string newLine = line.Substring(0, line.IndexOf(':') + 1) + value;
+                        sb.Replace(line, newLine);
+                        allConf = sb.ToString();
+                        return;
+                    }
+                }
+            }
+            sr.Close();
+            line = key + ":" + value;
+            sb.AppendLine(line);
+            allConf = sb.ToString();
         }
     }
 }

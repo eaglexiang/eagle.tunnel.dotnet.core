@@ -3,13 +3,13 @@
     "tasks": [
         {
             "label": "build",
-            "command": "dotnet",
+            "command": "sh",
             "type": "process",
             "args": [
-                "build",
-                "${workspaceFolder}/eagle.tunnel.dotnet.core.csproj"
+                "./build.sh"
             ],
             "problemMatcher": "$msCompile"
         }
     ]
+    
 }

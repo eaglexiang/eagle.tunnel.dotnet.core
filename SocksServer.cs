@@ -309,5 +309,11 @@ namespace eagle.tunnel.dotnet.core
                 return null;
             }
         }
+
+        public void Stop()
+        {
+            Console.WriteLine("quiting...");
+            Running = false;
+        }
     }
 }
