@@ -8,67 +8,13 @@ using System.IO;
 
 namespace eagle.tunnel.dotnet.core
 {
-    public class HttpServer
+    public class HttpServer : Server
     {
-        private string ServerIP { get; set;}
-        private int ServerHttpPort { get; set;}
-        public bool Running { get; set;}
+        
 
-        public HttpServer(string serverIP, int serverHttpPort)
-        {
-            ServerIP = serverIP;
-            ServerHttpPort = serverHttpPort;
-        }
+        public HttpServer(string serverIP, int serverPort) : base(serverIP, serverPort) { }
 
-        public void Start()
-        {
-            Thread startThread = new Thread(_Start);
-            startThread.IsBackground = true;
-            startThread.Start();
-        }
-
-        private void _Start()
-        {
-            TcpListener server;
-            while(true)
-            {
-                try
-                {
-                    if(!IPAddress.TryParse(ServerIP, out IPAddress ipa))
-                    {
-                        return;
-                    }
-                    server = new TcpListener(ipa, ServerHttpPort);
-                    server.Start(100);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                    Thread.Sleep(5000);
-                    continue;
-                }
-                Console.WriteLine("http server started: " + ServerIP + ":" + ServerHttpPort);
-                break;
-            }
-
-            Running = true;
-            while(Running)
-            {
-                TcpClient client = server.AcceptTcpClient();
-                string ip =client.Client.RemoteEndPoint.ToString().Split(':')[0];
-                Console.WriteLine("new client connected: from " + ip);
-                Thread handleClientThread = new Thread(HandleClient);
-                handleClientThread.IsBackground = true;
-                handleClientThread.Start(client);
-            }
-            Thread.Sleep(1000);
-            server.Stop();
-            Console.WriteLine("Server Stopped");
-            Thread.Sleep(1000);
-            Environment.Exit(0);
-        }
-
-        private void HandleClient(object clientObj)
+        protected override void HandleClient(object clientObj)
         {
             TcpClient socket2Client = clientObj as TcpClient;
 

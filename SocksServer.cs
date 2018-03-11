@@ -6,70 +6,11 @@ using System.Text;
 
 namespace eagle.tunnel.dotnet.core
 {
-    public class SocksServer
+    public class SocksServer : Server
     {
-        private string ServerIP { get; set;}
-        private int ServerSocksPort { get; set;}
-        public bool Running { get; set;}
         private static Random rand = new Random();
 
-        public SocksServer(string serverIP, int serverSocksPort)
-        {
-            ServerIP = serverIP;
-            ServerSocksPort = serverSocksPort;
-        }
-
-        public void Start()
-        {
-            Thread startTCPThread = new Thread(_StartTCP);
-            startTCPThread.IsBackground = true;
-            startTCPThread.Start();
-        }
-
-        private void _StartTCP()
-        {
-            TcpListener tcpServer;
-            while(true)
-            {
-                try
-                {
-                    if(!IPAddress.TryParse(ServerIP, out IPAddress ipa))
-                    {
-                        return;
-                    }
-                    tcpServer = new TcpListener(ipa, ServerSocksPort);
-                    tcpServer.Start(100);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                    Console.WriteLine("Retrying...");
-                    Thread.Sleep(5000);
-                    continue;
-                }
-                Console.WriteLine(
-                    "socks5 TCP server started: " +
-                    ServerIP + ":" + ServerSocksPort
-                );
-                break;
-            }
-
-            Running = true;
-            while(Running)
-            {
-                TcpClient client = tcpServer.AcceptTcpClient();
-                string ip =client.Client.RemoteEndPoint.ToString().Split(':')[0];
-                Console.WriteLine("new client connected: from " + ip);
-                Thread handleClientThread = new Thread(HandleClient);
-                handleClientThread.IsBackground = true;
-                handleClientThread.Start(client);
-            }
-            Thread.Sleep(1000);
-            tcpServer.Stop();
-            Console.WriteLine("Server Stopped");
-            Thread.Sleep(1000);
-            Environment.Exit(0);
-        }
+        public SocksServer(string serverIP, int serverPort) : base(serverIP, serverPort) { }
 
         enum CMDType
         {
@@ -78,7 +19,7 @@ namespace eagle.tunnel.dotnet.core
             Bind,
             Udp
         }
-        private void HandleClient(object clientObj)
+        protected override void HandleClient(object clientObj)
         {
             TcpClient socket2Client = clientObj as TcpClient;
 

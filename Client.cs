@@ -14,7 +14,7 @@ namespace eagle.tunnel.dotnet.core
         public int ServerPort { get; set;}
         public string LocalHost { get; set;}
         public int LocalPort { get; set;}
-        private bool Running { get; set;}
+        public bool Running { get; set;}
 
         public Client(
             string serverhost,
@@ -27,6 +27,7 @@ namespace eagle.tunnel.dotnet.core
             ServerPort = serverport;
             LocalHost = localhost;
             LocalPort = localport;
+            Running = false;
         }
 
         private TcpClient Connect2Server(string serverhost, int port)

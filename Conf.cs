@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Net;
 using System.Linq.Expressions;
+using System.Threading;
 
 namespace eagle.tunnel.dotnet.core
 {
@@ -14,11 +15,16 @@ namespace eagle.tunnel.dotnet.core
         public static void Init()
         {
             ReadAll(confPath);
+            while(confPath.Contains("\r\n"))
+            {
+                confPath = confPath.Replace("\r\n", "\n");
+            }
         }
 
         public static void Close()
         {
             SaveAll(confPath);
+            Thread.Sleep(2000);
         }
 
         /// <summary>

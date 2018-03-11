@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading;
 
 namespace eagle.tunnel.dotnet.core
 {
@@ -39,7 +40,6 @@ namespace eagle.tunnel.dotnet.core
                 CloseAll();
                 break;
             default:
-                Console.WriteLine("invalid command.");
                 break;
             }
         }
@@ -132,15 +132,7 @@ namespace eagle.tunnel.dotnet.core
                 if ((remoteHttpPort = ReadInt("Remote HTTP Port")) != -1)
                 {
                     httpServer = new HttpServer(remoteHttpIP, remoteHttpPort);
-                    try
-                    {
-                        httpServer.Start();
-                    }
-                    catch ( Exception e)
-                    {
-                        Console.WriteLine(e.Message);
-                        Console.WriteLine("Remote HTTP Server stopped");
-                    }
+                    httpServer.Start();
                 }
             }
         }
@@ -164,15 +156,7 @@ namespace eagle.tunnel.dotnet.core
                                 remoteHttpIP, remoteHttpPort,
                                 localHttpIP, localHttpPort
                             );
-                            try
-                            {
-                                httpClient.Start();
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e.Message);
-                                Console.WriteLine("Local HTTP Server Stop.");
-                            }
+                            httpClient.Start();
                         }
                     }
                 }
@@ -188,17 +172,9 @@ namespace eagle.tunnel.dotnet.core
                 if ((remoteSocksPort = ReadInt("Remote SOCKS Port")) != -1)
                 {
                     socksServer = new SocksServer(remoteSocksIP, remoteSocksPort);
-                    try
-                    {
-                        socksServer.Start();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e.Message);
-                        Console.WriteLine("Remote SOCKS Server Stop.");
-                    }
-                        }
-                    }
+                    socksServer.Start();
+                }
+            }
         }
 
         static void StartSocksClient()
@@ -220,15 +196,7 @@ namespace eagle.tunnel.dotnet.core
                                 remoteSocksIP, remoteSocksPort,
                                 localSocksIP, localSocksPort
                             );
-                            try
-                            {
-                                socksClient.Start();
-                            }
-                            catch(Exception e)
-                            {
-                                Console.WriteLine(e.Message);
-                                Console.WriteLine("Local SOCKS Server Stop.");
-                            }
+                            socksClient.Start();
                         }
                     }
                 }
@@ -260,6 +228,43 @@ namespace eagle.tunnel.dotnet.core
             {
                 Console.WriteLine("invalid number:{0}", _value);
                 return -1;
+            }
+        }
+
+        public static void Wait()
+        {
+            Console.WriteLine("Press X to quit.");
+            ConsoleKeyInfo cki;
+            while(true)
+            {
+                if ((httpServer != null && httpServer.Running == true) ||
+                    (socksServer != null && socksServer.Running == true))
+                {
+                    Thread.Sleep(10000); // reduce cpu time eaten
+                }
+                else
+                {
+                    if ((httpClient != null && httpClient.Running == true) ||
+                        (socksClient != null && socksClient.Running == true))
+                    {
+                        try
+                        {
+                            cki = Console.ReadKey(true);
+                            if (cki.Key == ConsoleKey.X)
+                            {
+                                break;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
             }
         }
     }

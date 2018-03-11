@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 namespace eagle.tunnel.dotnet.core
 {
@@ -7,24 +8,21 @@ namespace eagle.tunnel.dotnet.core
     {
         static void Main(string[] args)
         {
-            ConsoleKeyInfo cki;
+            foreach (string arg in args)
+            {
+                if (Regex.IsMatch(arg, @"\bc=*"))
+                {
+                    Conf.confPath = arg.Substring(2);
+                }
+            }
             Conf.Init();
             foreach (string arg in args)
             {
                 MyConsole.Run(arg);
             }
             Conf.Close();
-            Console.WriteLine("Press X to quit.");
-            while (true)
-            {
-                cki = Console.ReadKey(true);
-                if (cki.Key == ConsoleKey.X)
-                {
-                    break;
-                }
-            }
+            MyConsole.Wait();
             MyConsole.Run("close");
-            Thread.Sleep(2000);
         }
     }
 }
