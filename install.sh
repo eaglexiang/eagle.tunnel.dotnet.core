@@ -5,7 +5,8 @@ fi
 cp -r -f ./bin/Release/netcoreapp2.0/publish/* /usr/share/eagle-tunnel/
 # systemd.service
 if [ -d "/usr/lib/systemd/system" ]; then
-    cp -f ./scripts/eagle-tunnel.service /usr/lib/systemd/system/
+    cp -f ./scripts/eagle-tunnel-server.service /usr/lib/systemd/system/
+    cp -f ./scripts/eagle-tunnel-client.service /usr/lib/systemd/system/
     systemctl daemon-reload
 fi
 # conf file
