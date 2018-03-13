@@ -45,13 +45,24 @@ namespace eagle.tunnel.dotnet.core
         }
 
         /// <summary>
-        /// Read value from configurations
+        /// Read value for key from configurations
         /// </summary>
         /// <param name="key">configuration key</param>
         /// <returns>configuration value, or null if key not found</returns>
         public static string ReadValue(string key)
         {
-            StringReader sr = new StringReader(allConf);
+            return ReadValue(allConf, key);
+        }
+
+        /// <summary>
+        /// Read value for key from arg
+        /// </summary>
+        /// <param name="arg"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static string ReadValue(string arg, string key)
+        {
+            StringReader sr = new StringReader(arg);
             string line;
             while ((line = sr.ReadLine()) != null)
             {
