@@ -1,5 +1,5 @@
 [Unit]
-Description=Eagle Tunnel Daemon Service
+Description=Eagle Tunnel Server Service
 
 [Service]
 Type=simple
