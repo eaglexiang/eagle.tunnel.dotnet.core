@@ -56,13 +56,13 @@ sudo apt-get update
 sudo apt-get install dotnet-sdk-2.1.4
 ```
 
-### 其它
+### 其它系统
 
 如果是其它操作系统可到[.NET Core 官网](https://www.microsoft.com/net/download/dotnet-core/runtime-2.0.5)自行下载安装。
 
 ## 安装与运行
 
-#### 服务器端
+### 服务器端
 
 此小节默认服务器环境为CentOS 7，其它环境的朋友也可参考。
 
@@ -107,7 +107,7 @@ sudo firewall-cmd --reload
 
 此时，如果不出意外，服务端已经搭建完成。如果你的系统不支持systemd，也可以考虑使用[supervisor](https://www.baidu.com/s?wd=supervisor+dotnet+core)来实现服务的后台运行。
 
-#### 本地端
+### 本地端
 
 客户端的使用与服务端大同小异，首先是配置。不过与服务端不同的是，此时我们除了`Remote HTTP Address`和`Remote SOCKS Address`之外，还需要更改`Local HTTP Address`和`Local SOCKS Address`。简单的例子如下：
 
@@ -137,7 +137,7 @@ sudo firewall-cmd --reload
 
 完成。
 
-#### 系统配置
+### 系统配置
 
 假如你是个萌新，不知道怎么给系统用上刚刚搭建好的代理，建议百度`Windows设置HTTP代理`。我们设置系统代理的时候，会用到这个东西：
 
@@ -171,7 +171,6 @@ dotnet eagle.tunnel.dotnet.core.dll c=/etc/eagle-tunnel.conf hc sc #启动HTTP(S
 ## 源码
 
 [repo owner="eaglexiang" name="eagle.tunnel.dotnet.core"]
-
 
 ## 许可证
 
