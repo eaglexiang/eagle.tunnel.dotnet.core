@@ -18,19 +18,15 @@ namespace eagle.tunnel.dotnet.core
             switch (command)
             {
             case "hs":
-            case "httpserver":
                 StartHttpServer();
                 break;
             case "hc":
-            case "httpclient":
                 StartHttpClient();
                 break;
             case "ss":
-            case "socksserver":
                 StartSocksServer();
                 break;
             case "sc":
-            case "socksclient":
                 StartSocksClient();
                 break;
             case "edit":
@@ -69,14 +65,10 @@ namespace eagle.tunnel.dotnet.core
             while(true)
             {
                 Console.WriteLine(
-                    "1. Remote HTTP IP.\n" +
-                    "2. Remote HTTP Port.\n" +
-                    "3. Remote SOCKS IP.\n" +
-                    "4. Remote SOCKS Port.\n" +
-                    "5. Local HTTP IP.\n" +
-                    "6. Local HTTP Port.\n" +
-                    "7. Local SOCKS IP.\n" +
-                    "8. Local SOCKS Port.\n" +
+                    "1. Remote HTTP Address.\n" +
+                    "2. Remote SOCKS Address.\n" +
+                    "3. Local HTTP Address.\n" +
+                    "4. Local SOCKS Address.\n" +
                     "0. Quit\n" +
                     "Please Choose: "
                 );
@@ -94,28 +86,16 @@ namespace eagle.tunnel.dotnet.core
                 switch (choice)
                 {
                     case "1":
-                        Conf.WriteValue("Remote HTTP IP", value);
+                        Conf.WriteValue("Remote HTTP Address", value);
                         break;
                     case "2":
-                        Conf.WriteValue("Remote HTTP Port", value);
+                        Conf.WriteValue("Remote SOCKS Address", value);
                         break;
                     case "3":
-                        Conf.WriteValue("Remote SOCKS IP", value);
+                        Conf.WriteValue("Local HTTP Address", value);
                         break;
                     case "4":
-                        Conf.WriteValue("Remote SOCKS Port", value);
-                        break;
-                    case "5":
-                        Conf.WriteValue("Local HTTP IP", value);
-                        break;
-                    case "6":
-                        Conf.WriteValue("Local HTTP Port", value);
-                        break;
-                    case "7":
-                        Conf.WriteValue("Local SOCKS IP", value);
-                        break;
-                    case "8":
-                        Conf.WriteValue("Local SOCKS Port", value);
+                        Conf.WriteValue("Local SOCKS Address", value);
                         break;
                     default:
                         break;
@@ -125,80 +105,74 @@ namespace eagle.tunnel.dotnet.core
 
         private static void StartHttpServer()
         {
-            string remoteHttpIP;
-            int remoteHttpPort;
-            if ((remoteHttpIP = ReadStr("Remote HTTP IP")) != null)
+            string[] remoteHttpAddress = ReadStrs("Remote HTTP Address");
+            if (remoteHttpAddress.Length != 2)
             {
-                if ((remoteHttpPort = ReadInt("Remote HTTP Port")) != -1)
-                {
-                    httpServer = new HttpServer(remoteHttpIP, remoteHttpPort);
-                    httpServer.Start();
-                }
+                return; 
+            }
+
+            if (int.TryParse(remoteHttpAddress[1], out int remoteHttpPort))
+            {
+                httpServer = new HttpServer(remoteHttpAddress[0], remoteHttpPort);
+                httpServer.Start();
             }
         }
 
         private static void StartHttpClient()
         {
-            string remoteHttpIP;
-            int remoteHttpPort;
-            string localHttpIP;
-            int localHttpPort;
-
-            if ((remoteHttpIP = ReadStr("Remote HTTP IP")) != null)
+            string[] remoteHttpAddress = ReadStrs("Remote HTTP Address");
+            string[] localHttpAddress = ReadStrs("Local HTTP Address");
+            if (remoteHttpAddress.Length != 2 || localHttpAddress.Length != 2)
             {
-                if ((remoteHttpPort = ReadInt("Remote HTTP Port")) != -1)
+                return;
+            }
+
+            if (int.TryParse(remoteHttpAddress[1], out int remoteHttpPort))
+            {
+                if (int.TryParse(localHttpAddress[1], out int localHttpPort))
                 {
-                    if ((localHttpIP = ReadStr("Local HTTP IP")) != null)
-                    {
-                        if ((localHttpPort = ReadInt("Local HTTP Port")) != -1)
-                        {
-                            httpClient = new Client(
-                                remoteHttpIP, remoteHttpPort,
-                                localHttpIP, localHttpPort
-                            );
-                            httpClient.Start();
-                        }
-                    }
+                    httpClient = new Client(
+                        remoteHttpAddress[0], remoteHttpPort,
+                        localHttpAddress[0], localHttpPort
+                    );
+                    httpClient.Start();
                 }
             }
         }
 
         private static void StartSocksServer()
         {
-            string remoteSocksIP;
-            int remoteSocksPort;
-            if ((remoteSocksIP = ReadStr("Remote SOCKS IP")) != null)
+            string[] remoteSocksAddress = ReadStrs("Remote SOCKS Address");
+            if (remoteSocksAddress.Length != 2)
             {
-                if ((remoteSocksPort = ReadInt("Remote SOCKS Port")) != -1)
-                {
-                    socksServer = new SocksServer(remoteSocksIP, remoteSocksPort);
-                    socksServer.Start();
-                }
+                return;
+            }
+
+            if (int.TryParse(remoteSocksAddress[1], out int remoteSocksPort))
+            {
+                socksServer = new SocksServer(remoteSocksAddress[0], remoteSocksPort);
+                socksServer.Start();
             }
         }
 
         static void StartSocksClient()
         {
-            string remoteSocksIP;
-            int remoteSocksPort;
-            string localSocksIP;
-            int localSocksPort;
-
-            if ((remoteSocksIP = ReadStr("Remote SOCKS IP")) != null)
+            string[] remoteSocksAddress = ReadStrs("Remote SOCKS Address");
+            string[] localSocksAddress = ReadStrs("Local SOCKS Address");
+            if (remoteSocksAddress.Length != 2 || localSocksAddress.Length != 2)
             {
-                if ((remoteSocksPort = ReadInt("Remote SOCKS Port")) != -1)
+                return ;
+            }
+
+            if (int.TryParse(remoteSocksAddress[1], out int remoteSocksPort))
+            {
+                if (int.TryParse(localSocksAddress[1], out int localSocksPort))
                 {
-                    if ((localSocksIP = ReadStr("Local SOCKS IP")) != null)
-                    {
-                        if ((localSocksPort = ReadInt("Local SOCKS Port")) != -1)
-                        {
-                            socksClient = new Client(
-                                remoteSocksIP, remoteSocksPort,
-                                localSocksIP, localSocksPort
-                            );
-                            socksClient.Start();
-                        }
-                    }
+                    socksClient = new Client(
+                        remoteSocksAddress[0], remoteSocksPort,
+                        localSocksAddress[0], localSocksPort
+                    );
+                    socksClient.Start();
                 }
             }
         }
@@ -217,54 +191,18 @@ namespace eagle.tunnel.dotnet.core
             return value;
         }
 
-        private static int ReadInt(string key)
+        private static string[] ReadStrs(string key)
         {
-            string _value = ReadStr(key);
-            if (int.TryParse(_value, out int value))
-            {
-                return value;
-            }
-            else
-            {
-                Console.WriteLine("invalid number:{0}", _value);
-                return -1;
-            }
+            string value = ReadStr(key);
+            string[] values = value.Split(':');
+            return values;
         }
 
         public static void Wait()
         {
-            Console.WriteLine("Press X to quit.");
-            ConsoleKeyInfo cki;
-            while(true)
+            while (true)
             {
-                if ((httpServer != null && httpServer.Running == true) ||
-                    (socksServer != null && socksServer.Running == true))
-                {
-                    Thread.Sleep(10000); // reduce cpu time eaten
-                }
-                else
-                {
-                    if ((httpClient != null && httpClient.Running == true) ||
-                        (socksClient != null && socksClient.Running == true))
-                    {
-                        try
-                        {
-                            cki = Console.ReadKey(true);
-                            if (cki.Key == ConsoleKey.X)
-                            {
-                                break;
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex.Message);
-                        }
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
+                Thread.Sleep(10000);
             }
         }
     }

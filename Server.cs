@@ -11,6 +11,11 @@ namespace eagle.tunnel.dotnet.core
         protected int ServerPort { get; set;}
         public bool Running { get; set;}
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="serverIP">Server IP</param>
+        /// <param name="serverPort">Server Port</param>
         public Server(string serverIP, int serverPort)
         {
             ServerIP = serverIP;
@@ -18,6 +23,9 @@ namespace eagle.tunnel.dotnet.core
             Running = false;
         }
 
+        /// <summary>
+        /// Start Server on new background thread.
+        /// </summary>
         public void Start()
         {
             Thread startThread = new Thread(_Start);
@@ -25,6 +33,9 @@ namespace eagle.tunnel.dotnet.core
             startThread.Start();
         }
 
+        /// <summary>
+        /// realization for function Start
+        /// </summary>
         private void _Start()
         {
             TcpListener server;
@@ -63,7 +74,6 @@ namespace eagle.tunnel.dotnet.core
             server.Stop();
             Console.WriteLine("Server Stopped");
             Thread.Sleep(1000);
-            Environment.Exit(0);
         }
 
         protected virtual void HandleClient(object clientObj) { }

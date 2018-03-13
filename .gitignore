@@ -1,4 +1,3 @@
 bin/*
 obj/*
-config.txt
-.vscode/launch.json
+.vscode/*

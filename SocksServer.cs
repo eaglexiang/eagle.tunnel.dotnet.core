@@ -19,6 +19,7 @@ namespace eagle.tunnel.dotnet.core
             Bind,
             Udp
         }
+        
         protected override void HandleClient(object clientObj)
         {
             TcpClient socket2Client = clientObj as TcpClient;
