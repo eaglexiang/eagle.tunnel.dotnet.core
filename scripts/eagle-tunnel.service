@@ -1,0 +1,12 @@
+[Unit]
+Description=Eagle Tunnel Daemon Service
+
+[Service]
+Type=simple
+User=root
+Environment=TERM='xterm'
+ExecStart=/usr/bin/dotnet /usr/share/eagle-tunnel/eagle.tunnel.dotnet.core.dll c=/etc/eagle-tunnel.conf sc hc
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

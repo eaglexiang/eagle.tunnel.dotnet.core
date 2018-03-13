@@ -89,7 +89,7 @@ namespace eagle.tunnel.dotnet.core
                         Conf.WriteValue("Remote HTTP Address", value);
                         break;
                     case "2":
-                        Conf.WriteValue("Remote SOCKS Adress", value);
+                        Conf.WriteValue("Remote SOCKS Address", value);
                         break;
                     case "3":
                         Conf.WriteValue("Local HTTP Address", value);
