@@ -18,19 +18,15 @@ namespace eagle.tunnel.dotnet.core
             switch (command)
             {
             case "hs":
-            case "httpserver":
                 StartHttpServer();
                 break;
             case "hc":
-            case "httpclient":
                 StartHttpClient();
                 break;
             case "ss":
-            case "socksserver":
                 StartSocksServer();
                 break;
             case "sc":
-            case "socksclient":
                 StartSocksClient();
                 break;
             case "edit":
@@ -146,7 +142,7 @@ namespace eagle.tunnel.dotnet.core
 
         private static void StartSocksServer()
         {
-            string[] remoteSocksAddress = ReadStrs("Remote Socks Address");
+            string[] remoteSocksAddress = ReadStrs("Remote SOCKS Address");
             if (remoteSocksAddress.Length != 2)
             {
                 return;
@@ -161,8 +157,8 @@ namespace eagle.tunnel.dotnet.core
 
         static void StartSocksClient()
         {
-            string[] remoteSocksAddress = ReadStrs("Remote Socks Address");
-            string[] localSocksAddress = ReadStrs("Local Socks Address");
+            string[] remoteSocksAddress = ReadStrs("Remote SOCKS Address");
+            string[] localSocksAddress = ReadStrs("Local SOCKS Address");
             if (remoteSocksAddress.Length != 2 || localSocksAddress.Length != 2)
             {
                 return ;
