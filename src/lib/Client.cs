@@ -9,41 +9,29 @@ namespace eagle.tunnel.dotnet.core
 {
     public class Client : Server
     {
-        public string remoteIP { get; set;}
-        public int remotePort { get; set;}
+        IPEndPoint[] remoteAddresses;
 
         public Client(
-            string serverhost, int serverport,
-            string localhost, int localport
-        ) : base(localhost, localport)
+            IPEndPoint[] remoteaddresses,
+            IPEndPoint localaddress
+        ) : base(localaddress)
         {
-            remoteIP = serverhost;
-            remotePort = serverport;
-        }
-
-        private TcpClient Connect2Server(string serverhost, int port)
-        {
-            try
-            {
-                TcpClient client = new TcpClient(serverhost, port);
-                return client;
-            }
-            catch (SocketException se)
-            {
-                Console.WriteLine("error:\tfail to connect to server");
-                Console.WriteLine(se.Message);
-                return null;
-            }
+            remoteAddresses = remoteaddresses;
         }
 
         protected override void HandleClient(object clientObj)
         {
             TcpClient client2Client = clientObj as TcpClient;
-            TcpClient client2Server = Connect2Server(remoteIP, remotePort);
-            if(client2Server == null)
+            TcpClient client2Server = new TcpClient();
+            try
             {
-                return;
+                client2Server.Connect(remoteAddresses[0]);
             }
+            catch (SocketException se)
+            {
+                Console.WriteLine(se.Message);
+            }
+            
 
             Pipe pipe0 = new Pipe(
                 client2Client,

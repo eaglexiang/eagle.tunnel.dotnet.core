@@ -13,6 +13,7 @@ namespace eagle.tunnel.dotnet.core
         
 
         public HttpServer(string serverIP, int serverPort) : base(serverIP, serverPort) { }
+        public HttpServer(IPEndPoint ipep) : base(ipep) { }
 
         protected override void HandleClient(object clientObj)
         {

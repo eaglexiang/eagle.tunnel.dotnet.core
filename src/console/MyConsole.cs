@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Net;
 using System.Threading;
 using System.Collections;
 using System.Text.RegularExpressions;
@@ -13,10 +14,16 @@ namespace eagle.tunnel.dotnet.core
         private SocksServer socksServer;
         private Client socksClient;
 
-        private string[][] remoteHttpAddresses;
-        private string[][] localHttpAddresses;
-        private string[][] remoteSocksAddresses;
-        private string[][] localSocksAddresses;
+        private IPEndPoint[] remoteHttpIPEPs;
+        private IPEndPoint[] remoteSocksIPEPs;
+        private IPEndPoint[] localHttpIPEPs;
+        private IPEndPoint[] localSocksIPEPs;
+
+        public MyConsole() { }
+        ~MyConsole()
+        {
+            CloseAll();
+        }
 
         public void Run(string command)
         {
@@ -112,70 +119,43 @@ namespace eagle.tunnel.dotnet.core
 
         private void StartHttpServer()
         {
-            if (remoteHttpAddresses[0].Length != 2)
+            if (remoteHttpIPEPs.Length > 0)
             {
-                return; 
-            }
-
-            if (int.TryParse(remoteHttpAddresses[0][1], out int remoteHttpPort))
-            {
-                httpServer = new HttpServer(remoteHttpAddresses[0][1], remoteHttpPort);
+                httpServer = new HttpServer(remoteHttpIPEPs[0]);
                 httpServer.Start();
             }
         }
 
         private void StartHttpClient()
         {
-            if (remoteHttpAddresses[0].Length != 2 || localHttpAddresses[0].Length != 2)
+            if (remoteHttpIPEPs.Length > 0 && localHttpIPEPs.Length > 0)
             {
-                return;
-            }
-
-            if (int.TryParse(remoteHttpAddresses[0][1], out int remoteHttpPort))
-            {
-                if (int.TryParse(localHttpAddresses[0][1], out int localHttpPort))
-                {
-                    httpClient = new Client(
-                        remoteHttpAddresses[0][0], remoteHttpPort,
-                        localHttpAddresses[0][0], localHttpPort
-                    );
-                    httpClient.Start();
-                }
+                httpClient = new Client(
+                    remoteHttpIPEPs,
+                    localHttpIPEPs[0]
+                );
+                httpClient.Start();
             }
         }
 
         private void StartSocksServer()
         {
-            string[][] remoteSocksAddresses = ReadStrss("Remote SOCKS Address");
-            if (remoteSocksAddresses[0].Length != 2)
+            if (remoteSocksIPEPs.Length > 0)
             {
-                return;
-            }
-
-            if (int.TryParse(remoteSocksAddresses[0][1], out int remoteSocksPort))
-            {
-                socksServer = new SocksServer(remoteSocksAddresses[0][0], remoteSocksPort);
+                socksServer = new SocksServer(remoteSocksIPEPs[0]);
                 socksServer.Start();
             }
         }
 
         private void StartSocksClient()
         {
-            if (remoteSocksAddresses[0].Length != 2 || localSocksAddresses[0].Length != 2)
+            if (remoteSocksIPEPs.Length > 0 && localSocksIPEPs.Length > 0)
             {
-                return ;
-            }
-
-            if (int.TryParse(remoteSocksAddresses[0][1], out int remoteSocksPort))
-            {
-                if (int.TryParse(localSocksAddresses[0][1], out int localSocksPort))
-                {
-                    socksClient = new Client(
-                        remoteSocksAddresses[0][0], remoteSocksPort,
-                        localSocksAddresses[0][0], localSocksPort
-                    );
-                    socksClient.Start();
-                }
+                socksClient = new Client(
+                    remoteSocksIPEPs,
+                    localSocksIPEPs[0]
+                );
+                socksClient.Start();
             }
         }
 
@@ -206,7 +186,7 @@ namespace eagle.tunnel.dotnet.core
         {
             while (true)
             {
-                Thread.Sleep(10000);
+                Thread.Sleep(100000);
             }
         }
 
@@ -218,15 +198,37 @@ namespace eagle.tunnel.dotnet.core
             }
             Conf.Init();
 
-            remoteHttpAddresses = ReadStrss("Remote HTTP Address");
-            localHttpAddresses = ReadStrss("Local HTTP Address");
-            remoteSocksAddresses = ReadStrss("Remote SOCKS Address");
-            localSocksAddresses = ReadStrss("Local SOCKS Address");
+            string[][] remoteHttpAddresses = ReadStrss("Remote HTTP Address");
+            string[][] localHttpAddresses = ReadStrss("Local HTTP Address");
+            string[][] remoteSocksAddresses = ReadStrss("Remote SOCKS Address");
+            string[][] localSocksAddresses = ReadStrss("Local SOCKS Address");
+
+            remoteHttpIPEPs = CreateEndPoints(remoteHttpAddresses);
+            remoteSocksIPEPs = CreateEndPoints(remoteSocksAddresses);
+            localHttpIPEPs = CreateEndPoints(localHttpAddresses);
+            localSocksIPEPs = CreateEndPoints(localSocksAddresses);
         }
 
         public void Close()
         {
             Conf.Close();
+        }
+
+        private static IPEndPoint[] CreateEndPoints(string[][] addresses)
+        {
+            ArrayList list = new ArrayList();
+            for (int i = 0; i < addresses.Length; ++i)
+            {
+                if (IPAddress.TryParse(addresses[i][0], out IPAddress ipa))
+                {
+                    if (int.TryParse(addresses[i][1], out int port))
+                    {
+                        IPEndPoint ipep = new IPEndPoint(ipa, port);
+                        list.Add(ipep);
+                    }
+                }
+            }
+            return list.ToArray(typeof(IPEndPoint)) as IPEndPoint[];
         }
     }
 }

@@ -12,6 +12,8 @@ namespace eagle.tunnel.dotnet.core
 
         public SocksServer(string serverIP, int serverPort) : base(serverIP, serverPort) { }
 
+        public SocksServer(IPEndPoint ipep) : base(ipep) { }
+
         enum CMDType
         {
             Null,
@@ -100,35 +102,6 @@ namespace eagle.tunnel.dotnet.core
             catch
             {
                 CloseRequest(server2Client);
-            }
-        }
-
-        private void HandleUDPReq(byte[] request, Pipe server2Client)
-        {
-            string clientIp = server2Client.ClientTo.Client.RemoteEndPoint.ToString().Split(':')[0];
-            int clientPort = GetPort(request);
-            byte[] data = GetUDPData(request);
-            if(data == null)
-            {
-                CloseRequest(server2Client);
-            }
-            else
-            {
-                try
-                {
-                    int bondPort = rand.Next(5000, 10000);
-                    UdpPipe pipeFromClient = new UdpPipe(clientIp, clientPort, ServerIP, bondPort);
-                    pipeFromClient.Flow();
-                    IPAddress.TryParse(ServerIP, out IPAddress ipa);
-                    int high = bondPort / 0x100;
-                    int low = bondPort % 0x100;
-                    string reply = "\x05\x01\x00\x01" + ipa.GetAddressBytes() + high + low;
-                    server2Client.Write(reply);
-                }
-                catch
-                {
-                    CloseRequest(server2Client);
-                }
             }
         }
 
