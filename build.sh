@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
-TERM=xterm
-dotnet build
+
+export workspaceFolder=$(pwd)
+
+./scripts/buildRelease.sh

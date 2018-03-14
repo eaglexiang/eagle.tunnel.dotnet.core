@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="lib\lib.csproj" />
+    <ProjectReference Include="..\lib\eagle.tunnel.dotnet.core.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
