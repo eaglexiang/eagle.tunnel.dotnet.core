@@ -10,7 +10,8 @@ namespace eagle.tunnel.dotnet.core
     public class Conf
     {
         private static string allConf = "";
-        public static string confPath {get; set; } = "./config.txt";
+        public static string confPath { get; set;} = "./config.txt";
+        public static bool Dirty { get; private set;} = false;
 
         public static void Init()
         {
@@ -23,7 +24,10 @@ namespace eagle.tunnel.dotnet.core
 
         public static void Close()
         {
-            SaveAll(confPath);
+            if (Dirty)
+            {
+                SaveAll(confPath);
+            }
             Thread.Sleep(2000);
         }
 
@@ -41,7 +45,14 @@ namespace eagle.tunnel.dotnet.core
 
         private static void SaveAll(string confPath)
         {
-            File.WriteAllText(confPath, allConf);
+            try
+            {
+                File.WriteAllText(confPath, allConf);
+            }
+            catch (UnauthorizedAccessException uae)
+            {
+                Console.WriteLine(uae.Message);
+            }
         }
 
         /// <summary>
@@ -89,24 +100,30 @@ namespace eagle.tunnel.dotnet.core
             StringReader sr = new StringReader(allConf);
             StringBuilder sb = new StringBuilder(allConf);
             string line;
+            string newLine = null;
             while ((line = sr.ReadLine()) != null)
             {
                 if (line.Contains(":"))
                 {
                     if (line.Substring(0, line.IndexOf(':')) == key)
                     {
-                        sr.Close();
-                        string newLine = line.Substring(0, line.IndexOf(':') + 1) + value;
-                        sb.Replace(line, newLine);
-                        allConf = sb.ToString();
-                        return;
+                        newLine = line.Substring(0, line.IndexOf(':') + 1) + value;
+                        break;
                     }
                 }
             }
             sr.Close();
-            line = key + ":" + value;
-            sb.AppendLine(line);
+            if (newLine == null)
+            {
+                newLine = key + ':' + value;
+                sb.AppendLine(newLine);
+            }
+            else
+            {
+                sb.Replace(line, newLine);
+            }
             allConf = sb.ToString();
+            Dirty = true;
         }
     }
 }

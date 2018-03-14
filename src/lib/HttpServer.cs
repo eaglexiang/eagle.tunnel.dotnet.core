@@ -79,9 +79,9 @@ namespace eagle.tunnel.dotnet.core
                 pipe0.Flow();
                 pipe1.Flow();
             }
-            catch (Exception ex)
+            catch (SocketException se)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine(se.Message);
                 pipe0.Close();
                 if(pipe1 != null)
                 {

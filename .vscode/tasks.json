@@ -3,10 +3,10 @@
     "tasks": [
         {
             "label": "build",
-            "command": "sh",
+            "command": "bash",
             "type": "process",
             "args": [
-                "./build.sh"
+                "${workspaceFolder}/scripts/buildDebug.sh"
             ],
             "problemMatcher": "$msCompile"
         }

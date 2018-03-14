@@ -6,6 +6,8 @@
 
 [食用方法](https://www.eaglexiang.org/eagle-tunnel)
 
+[备用食用方法](https://github.com/eaglexiang/eagle.tunnel.dotnet.core/blob/master/doc/guide.md)
+
 ## 支持
 
 ### 基本功能
@@ -19,7 +21,9 @@
 - [x] Linux
 - [x] macOS
 
-### Windows版（图形界面）
+### 其它
+
+Windows版（图形界面）
 
 [eagle.tunnel.dotnet](https://github.com/eaglexiang/eagle.tunnel.dotnet)（只支持HTTP(S)代理）
 
