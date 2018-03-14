@@ -20,10 +20,6 @@ namespace eagle.tunnel.dotnet.core
         private IPEndPoint[] localSocksIPEPs;
 
         public MyConsole() { }
-        ~MyConsole()
-        {
-            CloseAll();
-        }
 
         public void Run(string command)
         {
@@ -182,7 +178,7 @@ namespace eagle.tunnel.dotnet.core
             return list.ToArray(typeof(string[])) as string[][];
         }
 
-        public void Wait()
+        public static void Wait()
         {
             while (true)
             {
