@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
 
 TERM=xterm
-source ./cd.sh
-dotnet publish -c Release
+cd src/console && dotnet publish -c Release

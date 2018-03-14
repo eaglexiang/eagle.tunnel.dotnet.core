@@ -2,7 +2,7 @@
 if [ ! -d "/usr/share/eagle-tunnel" ]; then
     mkdir /usr/share/eagle-tunnel
 fi
-cp -r -f .src/console/bin/Release/netcoreapp2.0/publish/* /usr/share/eagle-tunnel/
+cp -r -f ./src/console/bin/Release/netcoreapp2.0/publish/* /usr/share/eagle-tunnel/
 # systemd.service
 if [ -d "/usr/lib/systemd/system" ]; then
     cp -f ./scripts/eagle-tunnel-server.service /usr/lib/systemd/system/
