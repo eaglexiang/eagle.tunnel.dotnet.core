@@ -14,7 +14,7 @@ namespace eagle.tunnel.dotnet.core
                 console.Run(arg);
             }
             console.Close();
-            MyConsole.Wait();
+            console.Wait();
         }
     }
 }

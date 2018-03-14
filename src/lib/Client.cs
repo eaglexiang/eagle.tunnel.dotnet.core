@@ -21,6 +21,12 @@ namespace eagle.tunnel.dotnet.core
             indexOfRemoteAddresses = 0;
         }
 
+        public new void Start()
+        {
+            Console.WriteLine("Find Remote Server(s): {0}", remoteAddresses.Length);
+            base.Start();
+        }
+
         protected override void HandleClient(object clientObj)
         {
             TcpClient client2Client = clientObj as TcpClient;

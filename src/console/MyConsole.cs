@@ -182,7 +182,7 @@ namespace eagle.tunnel.dotnet.core
             return list.ToArray(typeof(string[])) as string[][];
         }
 
-        public static void Wait()
+        public void Wait()
         {
             while (true)
             {
