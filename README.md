@@ -21,7 +21,9 @@
 - [x] Linux
 - [x] macOS
 
-### Windows版（图形界面）
+### 其它
+
+Windows版（图形界面）
 
 [eagle.tunnel.dotnet](https://github.com/eaglexiang/eagle.tunnel.dotnet)（只支持HTTP(S)代理）
 

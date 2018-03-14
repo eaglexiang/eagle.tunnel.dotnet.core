@@ -68,9 +68,9 @@ namespace eagle.tunnel.dotnet.core
                     //HandleUDPReq(request, server2Client);
                 }
             }
-            catch (Exception ex)
+            catch (SocketException se)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine(se.Message);
                 client2Server.Close();
                 server2Client.Close();
             }

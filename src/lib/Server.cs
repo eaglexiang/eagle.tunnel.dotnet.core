@@ -38,42 +38,54 @@ namespace eagle.tunnel.dotnet.core
         /// </summary>
         private void _Start()
         {
-            TcpListener server;
-            while(true)
+            if(IPAddress.TryParse(ServerIP, out IPAddress ipa))
             {
-                try
+                TcpListener server;
+                while(true)
                 {
-                    if(!IPAddress.TryParse(ServerIP, out IPAddress ipa))
+                    try
                     {
-                        return;
+                        server = new TcpListener(ipa, ServerPort);
+                        server.Start(100);
+                        break;
                     }
-                    server = new TcpListener(ipa, ServerPort);
-                    server.Start(100);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                    Thread.Sleep(5000);
-                    continue;
+                    catch (SocketException se)
+                    {
+                        Console.WriteLine(se.Message);
+                        Console.WriteLine("Waiting for 10s...");
+                        Thread.Sleep(10000);
+                    }
                 }
                 Console.WriteLine("server started: " + ServerIP + ":" + ServerPort);
-                break;
-            }
 
-            Running = true;
-            while(Running)
-            {
-                TcpClient client = server.AcceptTcpClient();
-                string ip =client.Client.RemoteEndPoint.ToString().Split(':')[0];
-                Console.WriteLine("new client connected: from " + ip);
-                Thread handleClientThread = new Thread(HandleClient);
-                handleClientThread.IsBackground = true;
-                handleClientThread.Start(client);
+                Running = true;
+                while(Running)
+                {
+                    TcpClient client;
+                    try
+                    {
+                        client = server.AcceptTcpClient();
+                        // string ip =client.Client.RemoteEndPoint.ToString().Split(':')[0];
+                        // Console.WriteLine("new client connected: from " + ip);
+                    }
+                    catch (SocketException se)
+                    {
+                        Console.WriteLine(se.Message);
+                        continue;
+                    }
+                    
+                    Thread handleClientThread = new Thread(HandleClient);
+                    handleClientThread.IsBackground = true;
+                    handleClientThread.Start(client);
+                }
+                Thread.Sleep(1000);
+                server.Stop();
+                Console.WriteLine("Server Stopped");
             }
-            Thread.Sleep(1000);
-            server.Stop();
-            Console.WriteLine("Server Stopped");
-            Thread.Sleep(1000);
+            else
+            {
+                Console.WriteLine("invalid Server IP");
+            }
         }
 
         protected virtual void HandleClient(object clientObj) { }
