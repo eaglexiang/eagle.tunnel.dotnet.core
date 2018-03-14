@@ -10,6 +10,7 @@ namespace eagle.tunnel.dotnet.core
     public class Client : Server
     {
         IPEndPoint[] remoteAddresses;
+        int indexOfRemoteAddresses;
 
         public Client(
             IPEndPoint[] remoteaddresses,
@@ -17,6 +18,7 @@ namespace eagle.tunnel.dotnet.core
         ) : base(localaddress)
         {
             remoteAddresses = remoteaddresses;
+            indexOfRemoteAddresses = 0;
         }
 
         protected override void HandleClient(object clientObj)
@@ -25,7 +27,11 @@ namespace eagle.tunnel.dotnet.core
             TcpClient client2Server = new TcpClient();
             try
             {
-                client2Server.Connect(remoteAddresses[0]);
+                if (indexOfRemoteAddresses >= remoteAddresses.Length)
+                {
+                    indexOfRemoteAddresses %= remoteAddresses.Length;
+                }
+                client2Server.Connect(remoteAddresses[indexOfRemoteAddresses++]);
             }
             catch (SocketException se)
             {
