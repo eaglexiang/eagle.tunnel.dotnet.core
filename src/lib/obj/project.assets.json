@@ -183,9 +183,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/src/lib/eagle.tunnel.dotnet.core.dll.csproj",
-      "projectName": "eagle.tunnel.dotnet.core.dll",
-      "projectPath": "/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/src/lib/eagle.tunnel.dotnet.core.dll.csproj",
+      "projectUniqueName": "/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/src/lib/eagle.tunnel.dotnet.core.lib.csproj",
+      "projectName": "eagle.tunnel.dotnet.core.lib",
+      "projectPath": "/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/src/lib/eagle.tunnel.dotnet.core.lib.csproj",
       "packagesPath": "/home/eagle/.nuget/packages/",
       "outputPath": "/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/src/lib/obj/",
       "projectStyle": "PackageReference",

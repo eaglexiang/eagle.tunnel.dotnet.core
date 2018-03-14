@@ -1,6 +1,5 @@
 using System;
 using System.Threading;
-using System.Text.RegularExpressions;
 
 namespace eagle.tunnel.dotnet.core
 {
@@ -8,21 +7,14 @@ namespace eagle.tunnel.dotnet.core
     {
         static void Main(string[] args)
         {
+            MyConsole console = new MyConsole();
+            console.Init(args[0]);
             foreach (string arg in args)
             {
-                if (Regex.IsMatch(arg, @"\bc=*"))
-                {
-                    Conf.confPath = arg.Substring(2);
-                }
+                console.Run(arg);
             }
-            Conf.Init();
-            foreach (string arg in args)
-            {
-                MyConsole.Run(arg);
-            }
-            Conf.Close();
+            console.Close();
             MyConsole.Wait();
-            MyConsole.Run("close");
         }
     }
 }

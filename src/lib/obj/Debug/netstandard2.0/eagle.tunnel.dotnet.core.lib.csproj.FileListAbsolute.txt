@@ -1,0 +1,8 @@
+/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/src/lib/bin/Debug/netstandard2.0/eagle.tunnel.dotnet.core.lib.deps.json
+/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/src/lib/bin/Debug/netstandard2.0/eagle.tunnel.dotnet.core.lib.dll
+/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/src/lib/bin/Debug/netstandard2.0/eagle.tunnel.dotnet.core.lib.pdb
+/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/src/lib/obj/Debug/netstandard2.0/eagle.tunnel.dotnet.core.lib.csproj.CoreCompileInputs.cache
+/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/src/lib/obj/Debug/netstandard2.0/eagle.tunnel.dotnet.core.lib.AssemblyInfoInputs.cache
+/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/src/lib/obj/Debug/netstandard2.0/eagle.tunnel.dotnet.core.lib.AssemblyInfo.cs
+/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/src/lib/obj/Debug/netstandard2.0/eagle.tunnel.dotnet.core.lib.dll
+/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/src/lib/obj/Debug/netstandard2.0/eagle.tunnel.dotnet.core.lib.pdb

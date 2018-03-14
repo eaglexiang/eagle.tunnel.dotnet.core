@@ -1,17 +1,24 @@
 using System;
 using System.IO;
 using System.Threading;
+using System.Collections;
+using System.Text.RegularExpressions;
 
 namespace eagle.tunnel.dotnet.core
 {
     public class MyConsole
     {
-        private static HttpServer httpServer;
-        private static Client httpClient;
-        private static SocksServer socksServer;
-        private static Client socksClient;
+        private HttpServer httpServer;
+        private Client httpClient;
+        private SocksServer socksServer;
+        private Client socksClient;
 
-        public static void Run(string command)
+        private string[][] remoteHttpAddresses;
+        private string[][] localHttpAddresses;
+        private string[][] remoteSocksAddresses;
+        private string[][] localSocksAddresses;
+
+        public void Run(string command)
         {
             Console.WriteLine("command:\t{0}", command);
             
@@ -40,7 +47,7 @@ namespace eagle.tunnel.dotnet.core
             }
         }
 
-        private static void CloseAll()
+        private void CloseAll()
         {
             if (httpServer != null)
             {
@@ -103,99 +110,96 @@ namespace eagle.tunnel.dotnet.core
             }
         }
 
-        private static void StartHttpServer()
+        private void StartHttpServer()
         {
-            string[] remoteHttpAddress = ReadStrs("Remote HTTP Address");
-            if (remoteHttpAddress.Length != 2)
+            if (remoteHttpAddresses[0].Length != 2)
             {
                 return; 
             }
 
-            if (int.TryParse(remoteHttpAddress[1], out int remoteHttpPort))
+            if (int.TryParse(remoteHttpAddresses[0][1], out int remoteHttpPort))
             {
-                httpServer = new HttpServer(remoteHttpAddress[0], remoteHttpPort);
+                httpServer = new HttpServer(remoteHttpAddresses[0][1], remoteHttpPort);
                 httpServer.Start();
             }
         }
 
-        private static void StartHttpClient()
+        private void StartHttpClient()
         {
-            string[] remoteHttpAddress = ReadStrs("Remote HTTP Address");
-            string[] localHttpAddress = ReadStrs("Local HTTP Address");
-            if (remoteHttpAddress.Length != 2 || localHttpAddress.Length != 2)
+            if (remoteHttpAddresses[0].Length != 2 || localHttpAddresses[0].Length != 2)
             {
                 return;
             }
 
-            if (int.TryParse(remoteHttpAddress[1], out int remoteHttpPort))
+            if (int.TryParse(remoteHttpAddresses[0][1], out int remoteHttpPort))
             {
-                if (int.TryParse(localHttpAddress[1], out int localHttpPort))
+                if (int.TryParse(localHttpAddresses[0][1], out int localHttpPort))
                 {
                     httpClient = new Client(
-                        remoteHttpAddress[0], remoteHttpPort,
-                        localHttpAddress[0], localHttpPort
+                        remoteHttpAddresses[0][0], remoteHttpPort,
+                        localHttpAddresses[0][0], localHttpPort
                     );
                     httpClient.Start();
                 }
             }
         }
 
-        private static void StartSocksServer()
+        private void StartSocksServer()
         {
-            string[] remoteSocksAddress = ReadStrs("Remote SOCKS Address");
-            if (remoteSocksAddress.Length != 2)
+            string[][] remoteSocksAddresses = ReadStrss("Remote SOCKS Address");
+            if (remoteSocksAddresses[0].Length != 2)
             {
                 return;
             }
 
-            if (int.TryParse(remoteSocksAddress[1], out int remoteSocksPort))
+            if (int.TryParse(remoteSocksAddresses[0][1], out int remoteSocksPort))
             {
-                socksServer = new SocksServer(remoteSocksAddress[0], remoteSocksPort);
+                socksServer = new SocksServer(remoteSocksAddresses[0][0], remoteSocksPort);
                 socksServer.Start();
             }
         }
 
-        static void StartSocksClient()
+        private void StartSocksClient()
         {
-            string[] remoteSocksAddress = ReadStrs("Remote SOCKS Address");
-            string[] localSocksAddress = ReadStrs("Local SOCKS Address");
-            if (remoteSocksAddress.Length != 2 || localSocksAddress.Length != 2)
+            if (remoteSocksAddresses[0].Length != 2 || localSocksAddresses[0].Length != 2)
             {
                 return ;
             }
 
-            if (int.TryParse(remoteSocksAddress[1], out int remoteSocksPort))
+            if (int.TryParse(remoteSocksAddresses[0][1], out int remoteSocksPort))
             {
-                if (int.TryParse(localSocksAddress[1], out int localSocksPort))
+                if (int.TryParse(localSocksAddresses[0][1], out int localSocksPort))
                 {
                     socksClient = new Client(
-                        remoteSocksAddress[0], remoteSocksPort,
-                        localSocksAddress[0], localSocksPort
+                        remoteSocksAddresses[0][0], remoteSocksPort,
+                        localSocksAddresses[0][0], localSocksPort
                     );
                     socksClient.Start();
                 }
             }
         }
 
-        private static string ReadStr(string key)
+        private static string[] ReadStrs(string key)
         {
-            string value = Conf.ReadValue(key);
-            if (value == null)
+            string[] value = Conf.ReadValue(key);
+            if (value.Length == 0)
             {
                 Console.WriteLine("{0} not found.", key);
-            }
-            else
-            {
-                Console.WriteLine("{0}:{1}", key, value);
             }
             return value;
         }
 
-        private static string[] ReadStrs(string key)
+        private static string[][] ReadStrss(string key)
         {
-            string value = ReadStr(key);
-            string[] values = value.Split(':');
-            return values;
+            ArrayList list = new ArrayList();
+            string[] values = ReadStrs(key);
+            for (int i = 0; i < values.Length; ++i)
+            {
+                string[] tmp = values[i].Split(':');
+                list.Add(tmp);
+            }
+
+            return list.ToArray(typeof(string[])) as string[][];
         }
 
         public static void Wait()
@@ -204,6 +208,25 @@ namespace eagle.tunnel.dotnet.core
             {
                 Thread.Sleep(10000);
             }
+        }
+
+        public void Init(string arg)
+        {
+            if (Regex.IsMatch(arg, @"\bc=*"))
+            {
+                Conf.confPath = arg.Substring(2);
+            }
+            Conf.Init();
+
+            remoteHttpAddresses = ReadStrss("Remote HTTP Address");
+            localHttpAddresses = ReadStrss("Local HTTP Address");
+            remoteSocksAddresses = ReadStrss("Remote SOCKS Address");
+            localSocksAddresses = ReadStrss("Local SOCKS Address");
+        }
+
+        public void Close()
+        {
+            Conf.Close();
         }
     }
 }

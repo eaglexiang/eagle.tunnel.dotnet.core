@@ -197,14 +197,14 @@
           "build/netstandard2.0/NETStandard.Library.targets": {}
         }
       },
-      "eagle.tunnel.dotnet.core.dll/1.0.0": {
+      "eagle.tunnel.dotnet.core.lib/1.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "compile": {
-          "bin/placeholder/eagle.tunnel.dotnet.core.dll.dll": {}
+          "bin/placeholder/eagle.tunnel.dotnet.core.lib.dll": {}
         },
         "runtime": {
-          "bin/placeholder/eagle.tunnel.dotnet.core.dll.dll": {}
+          "bin/placeholder/eagle.tunnel.dotnet.core.lib.dll": {}
         }
       }
     }
@@ -667,16 +667,16 @@
         "netstandard.library.nuspec"
       ]
     },
-    "eagle.tunnel.dotnet.core.dll/1.0.0": {
+    "eagle.tunnel.dotnet.core.lib/1.0.0": {
       "type": "project",
-      "path": "../lib/eagle.tunnel.dotnet.core.dll.csproj",
-      "msbuildProject": "../lib/eagle.tunnel.dotnet.core.dll.csproj"
+      "path": "../lib/eagle.tunnel.dotnet.core.lib.csproj",
+      "msbuildProject": "../lib/eagle.tunnel.dotnet.core.lib.csproj"
     }
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
       "Microsoft.NETCore.App >= 2.0.0",
-      "eagle.tunnel.dotnet.core.dll >= 1.0.0"
+      "eagle.tunnel.dotnet.core.lib >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -707,8 +707,8 @@
       "frameworks": {
         "netcoreapp2.0": {
           "projectReferences": {
-            "/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/src/lib/eagle.tunnel.dotnet.core.dll.csproj": {
-              "projectPath": "/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/src/lib/eagle.tunnel.dotnet.core.dll.csproj"
+            "/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/src/lib/eagle.tunnel.dotnet.core.lib.csproj": {
+              "projectPath": "/mnt/sdb1/home/eagle/Projects/eagle.tunnel/eagle.tunnel.dotnet/eagle.tunnel.dotnet.core/src/lib/eagle.tunnel.dotnet.core.lib.csproj"
             }
           }
         }

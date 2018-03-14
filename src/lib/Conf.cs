@@ -4,6 +4,7 @@ using System.Text;
 using System.Net;
 using System.Linq.Expressions;
 using System.Threading;
+using System.Collections;
 
 namespace eagle.tunnel.dotnet.core
 {
@@ -56,38 +57,40 @@ namespace eagle.tunnel.dotnet.core
         }
 
         /// <summary>
-        /// Read value for key from configurations
+        /// Read all values for one specific key from configurations
         /// </summary>
         /// <param name="key">configuration key</param>
         /// <returns>configuration value, or null if key not found</returns>
-        public static string ReadValue(string key)
+        public static string[] ReadValue(string key)
         {
             return ReadValue(allConf, key);
         }
 
         /// <summary>
-        /// Read value for key from arg
+        /// Read all values for one specific key from arg
         /// </summary>
         /// <param name="arg"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static string ReadValue(string arg, string key)
+        public static string[] ReadValue(string arg, string key)
         {
             StringReader sr = new StringReader(arg);
             string line;
+            ArrayList valueList = new ArrayList();
             while ((line = sr.ReadLine()) != null)
             {
                 if (line.Contains(":"))
                 {
                     if (line.Substring(0, line.IndexOf(':')) == key)
                     {
-                        sr.Close();
-                        return line.Substring(line.IndexOf(':') + 1);
+                        string newLine = line.Substring(line.IndexOf(':') + 1);
+                        valueList.Add(newLine);
                     }
                 }
             }
             sr.Close();
-            return null;
+            string[] re = valueList.ToArray(typeof(string)) as string[];
+            return re;
         }
 
         /// <summary>
