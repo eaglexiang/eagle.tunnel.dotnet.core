@@ -1,6 +1,6 @@
 # Eagle Tunnel
 
-![csharp](https://img.shields.io/badge/language-csharp-blue.svg) [![eagle tunnel](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core.svg?branch=dev-load-balance)](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core)
+![csharp](https://img.shields.io/badge/language-csharp-blue.svg) [![eagle tunnel](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core.svg?branch=master)](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core)
 
 代理工具，SSR的替代品。
 
@@ -10,16 +10,20 @@
 
 ## 支持
 
-### 基本功能
-
-- [x] HTTP(S) 代理
-- [x] SOCKS 5 代理
-
-### 支持平台
+### 平台
 
 - [x] Windows
 - [x] Linux
 - [x] macOS
+
+### 特性
+
+- [x] HTTPS(S) 代理
+- [x] SOCKS 5 代理
+- [x] 多路负载均衡
+- [x] systemd系统服务
+- [ ] 用户认证
+- [ ] 用户限速
 
 ### 其它
 
