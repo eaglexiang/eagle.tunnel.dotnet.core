@@ -33,11 +33,12 @@ namespace eagle.tunnel.dotnet.core
             TcpClient client2Server = new TcpClient();
             try
             {
-                if (indexOfRemoteAddresses >= remoteAddresses.Length)
+                int tmpIndex = indexOfRemoteAddresses++;
+                if (tmpIndex >= remoteAddresses.Length)
                 {
-                    indexOfRemoteAddresses %= remoteAddresses.Length;
+                    tmpIndex %= remoteAddresses.Length;
                 }
-                client2Server.Connect(remoteAddresses[indexOfRemoteAddresses++]);
+                client2Server.Connect(remoteAddresses[tmpIndex]);
             }
             catch (SocketException se)
             {
