@@ -1,6 +1,6 @@
 # Eagle Tunnel
 
-![csharp](https://img.shields.io/badge/language-csharp-blue.svg) [![eagle tunnel](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core.svg?branch=master)](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core)
+![csharp](https://img.shields.io/badge/language-csharp-blue.svg) [![eagle tunnel](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core.svg?branch=dev-authentication)](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core)
 
 代理工具，SSR的替代品。
 
@@ -22,7 +22,7 @@
 - [x] SOCKS 5 代理
 - [x] 多路负载均衡
 - [x] systemd系统服务
-- [ ] 用户认证
+- [x] 用户认证
 - [ ] 用户限速
 - [ ] 代理规则表
 
