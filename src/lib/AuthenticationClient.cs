@@ -1,32 +1,15 @@
 using System;
-using System.Collections;
 using System.Net;
 using System.Net.Sockets;
-using System.IO;
-using System.Threading;
+using System.Linq;
 
 namespace eagle.tunnel.dotnet.core
 {
-    public class Client : Server
+    public class AuthenticationClient : Client
     {
-        protected IPEndPoint[] remoteAddresses;
-        protected int indexOfRemoteAddresses;
-
-        public Client(
-            IPEndPoint[] remoteaddresses,
-            IPEndPoint localaddress
-        ) : base(localaddress)
-        {
-            remoteAddresses = remoteaddresses;
-            indexOfRemoteAddresses = 0;
-        }
-
-        public new void Start()
-        {
-            Console.WriteLine("Find Remote Server(s): {0}", remoteAddresses.Length);
-            base.Start();
-        }
-
+        public AuthenticationClient(IPEndPoint[] remoteIPEPs, IPEndPoint localIPEP) :
+            base(remoteIPEPs, localIPEP) { }
+            
         protected override void HandleClient(object clientObj)
         {
             TcpClient client2Client = clientObj as TcpClient;
@@ -39,6 +22,12 @@ namespace eagle.tunnel.dotnet.core
                     tmpIndex %= remoteAddresses.Length;
                 }
                 client2Server.Connect(remoteAddresses[tmpIndex]);
+                if (!Authenticate(client2Server))
+                {
+                    client2Server.Close();
+                    client2Client.Close();
+                    return;
+                }
             }
             catch (SocketException se)
             {
@@ -62,10 +51,21 @@ namespace eagle.tunnel.dotnet.core
             pipe1.Flow();
         }
 
-        public void Stop()
+        private bool Authenticate(TcpClient client)
         {
-            Running = false;
-            Console.WriteLine("quitting...");
+            string id = Conf.Users.Keys.First();
+            string pswd = Conf.Users.Values.First();
+            WriteStr(client, id);
+            WriteStr(client, pswd);
+            string result = ReadStr(client);
+            if (result == "valid")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Net;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace eagle.tunnel.dotnet.core
 {
@@ -13,14 +14,39 @@ namespace eagle.tunnel.dotnet.core
         private static string allConf = "";
         public static string confPath { get; set;} = "./config.txt";
         public static bool Dirty { get; private set;} = false;
+        public static Dictionary<string, string> Users = new Dictionary<string, string>();
 
         public static void Init()
         {
             ReadAll(confPath);
-            while(confPath.Contains("\r\n"))
+            ImportUsers();
+        }
+
+        private static void ImportUsers()
+        {
+            string[] pathOfUsersConf = ReadValue("users");
+            if (File.Exists(pathOfUsersConf[0]))
             {
-                confPath = confPath.Replace("\r\n", "\n");
+                string usersText = File.ReadAllText(pathOfUsersConf[0]);
+                usersText = usersText.Replace("\r\n", "\n");
+                string[] usersArray = usersText.Split('\n');
+                string[][] users = ReadStrs_Split(usersArray);
+                foreach (string[] user in users)
+                {
+                    Users.Add(user[0], user[1]);
+                }
             }
+        }
+
+        public static string[][] ReadStrs_Split(string[] src)
+        {
+            ArrayList list = new ArrayList();
+            for (int i = 0; i < src.Length; ++i)
+            {
+                string[] tmp = src[i].Split(':');
+                list.Add(tmp);
+            }
+            return list.ToArray(typeof(string[])) as string[][];
         }
 
         public static void Close()
@@ -41,6 +67,7 @@ namespace eagle.tunnel.dotnet.core
             if (File.Exists(confPath))
             {
                 allConf = File.ReadAllText(confPath);
+                allConf = allConf.Replace("\r\n", "\n");
             }
         }
 

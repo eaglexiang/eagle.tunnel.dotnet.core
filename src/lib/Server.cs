@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Text;
 
 namespace eagle.tunnel.dotnet.core
 {
@@ -41,7 +42,7 @@ namespace eagle.tunnel.dotnet.core
         /// <summary>
         /// realization for function Start
         /// </summary>
-        private void _Start()
+        protected virtual void _Start()
         {
             TcpListener server;
             while(true)
@@ -87,5 +88,37 @@ namespace eagle.tunnel.dotnet.core
         }
 
         protected virtual void HandleClient(object clientObj) { }
+
+        protected static string ReadStr(TcpClient client)
+        {
+            int count;
+            byte[] buffer;
+            try
+            {
+                NetworkStream ns = client.GetStream();
+                buffer = new byte[1024];
+                count = ns.Read(buffer, 0, buffer.Length);
+            }
+            catch
+            {
+                return null;
+            }
+            string str = Encoding.UTF8.GetString(buffer, 0, count);
+            return str;
+        }
+
+        protected static void WriteStr(TcpClient client, string str)
+        {
+            try
+            {
+                NetworkStream ns = client.GetStream();
+                byte[] buffer = Encoding.UTF8.GetBytes(str);
+                ns.Write(buffer, 0, buffer.Length);
+            }
+            catch (SocketException se)
+            {
+                Console.WriteLine(se.Message);
+            }
+        }
     }
 }

@@ -126,7 +126,7 @@ namespace eagle.tunnel.dotnet.core
         {
             if (remoteHttpIPEPs.Length > 0 && localHttpIPEPs.Length > 0)
             {
-                httpClient = new Client(
+                httpClient = new AuthenticationClient(
                     remoteHttpIPEPs,
                     localHttpIPEPs[0]
                 );
@@ -147,7 +147,7 @@ namespace eagle.tunnel.dotnet.core
         {
             if (remoteSocksIPEPs.Length > 0 && localSocksIPEPs.Length > 0)
             {
-                socksClient = new Client(
+                socksClient = new AuthenticationClient(
                     remoteSocksIPEPs,
                     localSocksIPEPs[0]
                 );
@@ -155,28 +155,17 @@ namespace eagle.tunnel.dotnet.core
             }
         }
 
-        private static string[] ReadStrs(string key)
-        {
-            string[] value = Conf.ReadValue(key);
-            if (value.Length == 0)
-            {
-                Console.WriteLine("{0} not found.", key);
-            }
-            return value;
-        }
+        // private static string[] ReadStrs(string key)
+        // {
+        //     string[] value = Conf.ReadValue(key);
+        //     if (value.Length == 0)
+        //     {
+        //         Console.WriteLine("{0} not found.", key);
+        //     }
+        //     return value;
+        // }
 
-        private static string[][] ReadStrss(string key)
-        {
-            ArrayList list = new ArrayList();
-            string[] values = ReadStrs(key);
-            for (int i = 0; i < values.Length; ++i)
-            {
-                string[] tmp = values[i].Split(':');
-                list.Add(tmp);
-            }
-
-            return list.ToArray(typeof(string[])) as string[][];
-        }
+        
 
         public static void Wait()
         {
@@ -194,15 +183,15 @@ namespace eagle.tunnel.dotnet.core
             }
             Conf.Init();
 
-            string[][] remoteHttpAddresses = ReadStrss("Remote HTTP Address");
-            string[][] localHttpAddresses = ReadStrss("Local HTTP Address");
-            string[][] remoteSocksAddresses = ReadStrss("Remote SOCKS Address");
-            string[][] localSocksAddresses = ReadStrss("Local SOCKS Address");
+            string[] remoteHttpAddresses = Conf.ReadValue("Remote HTTP Address");
+            string[] localHttpAddresses = Conf.ReadValue("Local HTTP Address");
+            string[] remoteSocksAddresses = Conf.ReadValue("Remote SOCKS Address");
+            string[] localSocksAddresses = Conf.ReadValue("Local SOCKS Address");
 
-            remoteHttpIPEPs = CreateEndPoints(remoteHttpAddresses);
-            remoteSocksIPEPs = CreateEndPoints(remoteSocksAddresses);
-            localHttpIPEPs = CreateEndPoints(localHttpAddresses);
-            localSocksIPEPs = CreateEndPoints(localSocksAddresses);
+            remoteHttpIPEPs = CreateEndPoints(Conf.ReadStrs_Split(remoteHttpAddresses));
+            remoteSocksIPEPs = CreateEndPoints(Conf.ReadStrs_Split(remoteSocksAddresses));
+            localHttpIPEPs = CreateEndPoints(Conf.ReadStrs_Split(localHttpAddresses));
+            localSocksIPEPs = CreateEndPoints(Conf.ReadStrs_Split(localSocksAddresses));
         }
 
         public void Close()

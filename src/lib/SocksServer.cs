@@ -6,7 +6,7 @@ using System.Text;
 
 namespace eagle.tunnel.dotnet.core
 {
-    public class SocksServer : Server
+    public class SocksServer : AuthenticationServer
     {
         private static Random rand = new Random();
 
