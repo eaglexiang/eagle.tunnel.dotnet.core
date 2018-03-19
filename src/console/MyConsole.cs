@@ -127,10 +127,20 @@ namespace eagle.tunnel.dotnet.core
         {
             if (remoteHttpIPEPs.Length > 0 && localHttpIPEPs.Length > 0)
             {
-                httpClient = new AuthenticationClient(
-                    remoteHttpIPEPs,
-                    localHttpIPEPs[0]
-                );
+                if (Conf.allConf.ContainsKey("users"))
+                {
+                    httpClient = new AuthenticationClient(
+                        remoteHttpIPEPs,
+                        localHttpIPEPs[0]
+                    );
+                }
+                else
+                {
+                    httpClient = new Client(
+                        remoteHttpIPEPs,
+                        localHttpIPEPs[0]
+                    );
+                }
                 httpClient.Start();
             }
         }
@@ -148,10 +158,20 @@ namespace eagle.tunnel.dotnet.core
         {
             if (remoteSocksIPEPs.Length > 0 && localSocksIPEPs.Length > 0)
             {
-                socksClient = new AuthenticationClient(
-                    remoteSocksIPEPs,
-                    localSocksIPEPs[0]
-                );
+                if (Conf.allConf.ContainsKey("users"))
+                {
+                    socksClient = new AuthenticationClient(
+                        remoteSocksIPEPs,
+                        localSocksIPEPs[0]
+                    );
+                }
+                else
+                {
+                    socksClient = new Client(
+                        remoteSocksIPEPs,
+                        localSocksIPEPs[0]
+                    );
+                }
                 socksClient.Start();
             }
         }
@@ -179,7 +199,7 @@ namespace eagle.tunnel.dotnet.core
             }
             catch (KeyNotFoundException knfe)
             {
-                Console.WriteLine(knfe.Message);
+                Console.WriteLine(knfe.Message + " Remote HTTP Address");
             }
             try
             {
@@ -189,7 +209,7 @@ namespace eagle.tunnel.dotnet.core
             }
             catch (KeyNotFoundException knfe)
             {
-                Console.WriteLine(knfe.Message);
+                Console.WriteLine(knfe.Message + " Local HTTP Address");
             }
             try
             {
@@ -198,7 +218,7 @@ namespace eagle.tunnel.dotnet.core
             }
             catch (KeyNotFoundException knfe)
             {
-                Console.WriteLine(knfe.Message);
+                Console.WriteLine(knfe.Message + " Remote SOCKS Address");
             }
             try
             {
@@ -207,7 +227,7 @@ namespace eagle.tunnel.dotnet.core
             }
             catch (KeyNotFoundException knfe)
             {
-                Console.WriteLine(knfe.Message);
+                Console.WriteLine(knfe.Message + " Local SOCKS Address");
             }
         }
 

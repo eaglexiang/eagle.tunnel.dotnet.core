@@ -198,16 +198,5 @@ namespace eagle.tunnel.dotnet.core
             ClientFrom = null;
             ClientTo = null;
         }
-
-        public string ReadString()
-        {
-            byte[] buffer = Read();
-            if(buffer == null)
-            {
-                return null;
-            }
-            string str = Encoding.UTF8.GetString(buffer);
-            return str;
-        }
     }
 }

@@ -24,6 +24,7 @@ namespace eagle.tunnel.dotnet.core
             if (allConf.ContainsKey("users"))
             {
                 ImportUsers();
+                Console.WriteLine("find user(s): {0}", Users.Count);
             }
         }
 
@@ -113,6 +114,22 @@ namespace eagle.tunnel.dotnet.core
                     }
                 }
             }
+        }
+
+        private string[] RemoveNotes(string[] lines)
+        {
+            ArrayList newLines = new ArrayList();
+            foreach (string line in lines)
+            {
+                string validline = line.Trim();
+                if (validline.Contains("#"))
+                {
+                    int index = validline.IndexOf("#");
+                    validline = validline.Substring(0, index);
+                }
+                newLines.Add(validline);
+            }
+            return newLines.ToArray(typeof(string)) as string[];
         }
 
         private static void SaveAll(string confPath)

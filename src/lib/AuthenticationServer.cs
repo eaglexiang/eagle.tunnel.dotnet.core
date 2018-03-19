@@ -38,19 +38,31 @@ namespace eagle.tunnel.dotnet.core
 
         private static Connect Authenticate(TcpClient client)
         {
-            string req = ReadStr(client);
-            string id = req.Split(':')[0];
-            string pswd = req.Split(':')[1];
-            if (Authenticate(id, pswd))
+            if (Conf.allConf.ContainsKey("users"))
             {
-                WriteStr(client, "valid");
-                return new Connect(client, id);
+                string req = ReadStr(client);
+                string[] reqs = req.Split(':');
+                if (reqs.Length != 2)
+                {
+                    return null;
+                }
+                string id = reqs[0];
+                string pswd = reqs[1];
+                if (Authenticate(id, pswd))
+                {
+                    WriteStr(client, "valid");
+                    return new Connect(client, id);
+                }
+                else
+                {
+                    WriteStr(client, "invalid");
+                    client.Close();
+                    return null;
+                }
             }
             else
             {
-                WriteStr(client, "invalid");
-                client.Close();
-                return null;
+                return new Connect(client, null);
             }
         }
 

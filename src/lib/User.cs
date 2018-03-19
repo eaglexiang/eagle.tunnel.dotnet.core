@@ -34,11 +34,14 @@ namespace eagle.tunnel.dotnet.core
         {
             lock(lockSignal)
             {
-                SpeedSignal += count;
-                while (SpeedSignal > SpeedLimit)
+                if (SpeedLimit > 0)
                 {
-                    Thread.Sleep(1000);
-                    SpeedSignal -= SpeedLimit;
+                    SpeedSignal += count;
+                    while (SpeedSignal > SpeedLimit)
+                    {
+                        Thread.Sleep(1000);
+                        SpeedSignal -= SpeedLimit;
+                    }
                 }
             }
         }
