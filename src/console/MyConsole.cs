@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace eagle.tunnel.dotnet.core
@@ -80,10 +81,10 @@ namespace eagle.tunnel.dotnet.core
                     "3. Local HTTP Address.\n" +
                     "4. Local SOCKS Address.\n" +
                     "0. Quit\n" +
-                    "Please Choose: "
+                    "Please Choose to add: "
                 );
                 string choice = Console.ReadLine();
-                string[] value = new string[1];
+                string value;
                 if (choice == "0")
                 {
                     break;
@@ -91,22 +92,21 @@ namespace eagle.tunnel.dotnet.core
                 else
                 {
                     Console.WriteLine("New value: ");
-                    string input = Console.ReadLine();
-                    value[0] = input;
+                    value = Console.ReadLine();
                 }
                 switch (choice)
                 {
                     case "1":
-                        Conf.allConf["Remote HTTP Address"] = value;
+                        Conf.AddValue("Remote HTTP Address", value);
                         break;
                     case "2":
-                        Conf.allConf["Remote SOCKS Address"] = value;
+                        Conf.AddValue("Remote SOCKS Address", value);
                         break;
                     case "3":
-                        Conf.allConf["Local HTTP Address"] = value;
+                        Conf.AddValue("Local HTTP Address", value);
                         break;
                     case "4":
-                        Conf.allConf["Local SOCKS Address"] = value;
+                        Conf.AddValue("Local SOCKS Address", value);
                         break;
                     default:
                         break;
@@ -156,18 +156,6 @@ namespace eagle.tunnel.dotnet.core
             }
         }
 
-        // private static string[] ReadStrs(string key)
-        // {
-        //     string[] value = Conf.ReadValue(key);
-        //     if (value.Length == 0)
-        //     {
-        //         Console.WriteLine("{0} not found.", key);
-        //     }
-        //     return value;
-        // }
-
-        
-
         public static void Wait()
         {
             while (true)
@@ -184,15 +172,43 @@ namespace eagle.tunnel.dotnet.core
             }
             Conf.Init();
 
-            string[] remoteHttpAddresses = Conf.allConf["Remote HTTP Address"];
-            string[] localHttpAddresses = Conf.allConf["Local HTTP Address"];
-            string[] remoteSocksAddresses = Conf.allConf["Remote SOCKS Address"];
-            string[] localSocksAddresses = Conf.allConf["Local SOCKS Address"];
-
-            remoteHttpIPEPs = CreateEndPoints(Conf.ReadStrs_Split(remoteHttpAddresses));
-            remoteSocksIPEPs = CreateEndPoints(Conf.ReadStrs_Split(remoteSocksAddresses));
-            localHttpIPEPs = CreateEndPoints(Conf.ReadStrs_Split(localHttpAddresses));
-            localSocksIPEPs = CreateEndPoints(Conf.ReadStrs_Split(localSocksAddresses));
+            try
+            {
+                List<ArrayList> remoteHttpAddresses = Conf.allConf["Remote HTTP Address"];
+                remoteHttpIPEPs = CreateEndPoints(remoteHttpAddresses);
+            }
+            catch (KeyNotFoundException knfe)
+            {
+                Console.WriteLine(knfe.Message);
+            }
+            try
+            {
+                List<ArrayList> localHttpAddresses = Conf.allConf["Local HTTP Address"];
+                localHttpIPEPs = CreateEndPoints(localHttpAddresses);
+                
+            }
+            catch (KeyNotFoundException knfe)
+            {
+                Console.WriteLine(knfe.Message);
+            }
+            try
+            {
+                List<ArrayList> remoteSocksAddresses = Conf.allConf["Remote SOCKS Address"];
+                remoteSocksIPEPs = CreateEndPoints(remoteSocksAddresses);
+            }
+            catch (KeyNotFoundException knfe)
+            {
+                Console.WriteLine(knfe.Message);
+            }
+            try
+            {
+                List<ArrayList> localSocksAddresses = Conf.allConf["Local SOCKS Address"];
+                localSocksIPEPs = CreateEndPoints(localSocksAddresses);
+            }
+            catch (KeyNotFoundException knfe)
+            {
+                Console.WriteLine(knfe.Message);
+            }
         }
 
         public void Close()
@@ -200,17 +216,21 @@ namespace eagle.tunnel.dotnet.core
             Conf.Close();
         }
 
-        private static IPEndPoint[] CreateEndPoints(string[][] addresses)
+        private static IPEndPoint[] CreateEndPoints(List<ArrayList> addresses)
         {
             ArrayList list = new ArrayList();
-            for (int i = 0; i < addresses.Length; ++i)
+            foreach (ArrayList addressList in addresses)
             {
-                if (IPAddress.TryParse(addresses[i][0], out IPAddress ipa))
+                string[] address = addressList.ToArray(typeof(string)) as string[];
+                if (address.Length >= 2)
                 {
-                    if (int.TryParse(addresses[i][1], out int port))
+                    if (IPAddress.TryParse(address[0], out IPAddress ipa))
                     {
-                        IPEndPoint ipep = new IPEndPoint(ipa, port);
-                        list.Add(ipep);
+                        if (int.TryParse(address[1], out int port))
+                        {
+                            IPEndPoint ipep = new IPEndPoint(ipa, port);
+                            list.Add(ipep);
+                        }
                     }
                 }
             }

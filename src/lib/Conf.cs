@@ -11,23 +11,28 @@ namespace eagle.tunnel.dotnet.core
 {
     public class Conf
     {
-        public static Dictionary<string, string[]> allConf = new Dictionary<string, string[]>();
+        public static Dictionary<string, List<ArrayList>> allConf =
+            new Dictionary<string, List<ArrayList>>();
         public static string confPath { get; set;} = "./config.txt";
         public static bool Dirty { get; private set;} = false;
-        public static Dictionary<string, TunnelUser> Users = new Dictionary<string, TunnelUser>();
+        public static Dictionary<string, TunnelUser> Users =
+            new Dictionary<string, TunnelUser>();
 
         public static void Init()
         {
             ReadAll(confPath);
-            ImportUsers();
+            if (allConf.ContainsKey("users"))
+            {
+                ImportUsers();
+            }
         }
 
         private static void ImportUsers()
         {
-            string[] pathOfUsersConf = allConf["users"];
-            if (File.Exists(pathOfUsersConf[0]))
+            string pathOfUsersConf = allConf["users"][0][0] as string;
+            if (File.Exists(pathOfUsersConf))
             {
-                string usersText = File.ReadAllText(pathOfUsersConf[0]);
+                string usersText = File.ReadAllText(pathOfUsersConf);
                 usersText = usersText.Replace("\r\n", "\n");
                 string[] usersArray = usersText.Split('\n');
                 string[][] users = ReadStrs_Split(usersArray);
@@ -90,9 +95,21 @@ namespace eagle.tunnel.dotnet.core
                     if (args.Length >= 2)
                     {
                         string key = args[0];
-                        string[] remainingArgs = new string[args.Length - 1];
-                        args.CopyTo(remainingArgs, 1);
-                        allConf.Add(key, remainingArgs);
+                        ArrayList tmp = new ArrayList();
+                        for (int i = 1; i < args.Length; ++i)
+                        {
+                            tmp.Add(args[i]);
+                        }
+                        if (allConf.ContainsKey(key))
+                        {
+                            allConf[key].Add(tmp);
+                        }
+                        else
+                        {
+                            List<ArrayList> tmpList = new List<ArrayList>();
+                            tmpList.Add(tmp);
+                            allConf.Add(key, tmpList);
+                        }
                     }
                 }
             }
@@ -103,12 +120,17 @@ namespace eagle.tunnel.dotnet.core
             string allConfText = "";
             foreach (string key in allConf.Keys)
             {
-                string line = "";
-                foreach (string arg in allConf[key])
+                string values = "";
+                foreach (ArrayList args in allConf[key])
                 {
-                    line += (arg + ':');
+                    string line = "";
+                    foreach (string arg in args)
+                    {
+                        line += (':' + arg);
+                    }
+                    values += key + line + '\n';
                 }
-                allConfText += (line.Remove(line.Length - 1));
+                allConfText += values;
             }
             try
             {
@@ -120,31 +142,14 @@ namespace eagle.tunnel.dotnet.core
             }
         }
 
-        /// <summary>
-        /// Read all values for one specific key from arg
-        /// </summary>
-        /// <param name="arg"></param>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public static string[] ReadValue(string arg, string key)
+        public static void AddValue(string key, string value)
         {
-            StringReader sr = new StringReader(arg);
-            string line;
-            ArrayList valueList = new ArrayList();
-            while ((line = sr.ReadLine()) != null)
+            if (!Conf.allConf.ContainsKey(key))
             {
-                if (line.Contains(":"))
-                {
-                    if (line.Substring(0, line.IndexOf(':')) == key)
-                    {
-                        string newLine = line.Substring(line.IndexOf(':') + 1);
-                        valueList.Add(newLine);
-                    }
-                }
+                Conf.allConf.Add(key, new List<ArrayList>());
             }
-            sr.Close();
-            string[] re = valueList.ToArray(typeof(string)) as string[];
-            return re;
+            string[] values = value.Split(':');
+            Conf.allConf[key].Add(new ArrayList(values));
         }
     }
 }
