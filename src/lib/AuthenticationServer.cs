@@ -81,7 +81,7 @@ namespace eagle.tunnel.dotnet.core
             string rightPswd;
             try
             {
-                rightPswd = Conf.Users[id];
+                rightPswd = Conf.Users[id].Password;
             }
             catch(KeyNotFoundException)
             {

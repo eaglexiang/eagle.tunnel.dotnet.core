@@ -53,14 +53,19 @@ namespace eagle.tunnel.dotnet.core
 
         private bool Authenticate(TcpClient client)
         {
-            string id = Conf.Users.Keys.First();
-            string pswd = Conf.Users.Values.First();
+            TunnelUser firstUser = Conf.Users.Values.First();
+            string id = firstUser.ID;
+            string pswd = firstUser.Password;
             WriteStr(client, id);
             WriteStr(client, pswd);
             string result = ReadStr(client);
             if (result == "valid")
             {
                 return true;
+            }
+            else if (result == "valid")
+            {
+                return false;
             }
             else
             {

@@ -14,7 +14,7 @@ namespace eagle.tunnel.dotnet.core
         private static string allConf = "";
         public static string confPath { get; set;} = "./config.txt";
         public static bool Dirty { get; private set;} = false;
-        public static Dictionary<string, string> Users = new Dictionary<string, string>();
+        public static Dictionary<string, TunnelUser> Users = new Dictionary<string, TunnelUser>();
 
         public static void Init()
         {
@@ -33,7 +33,8 @@ namespace eagle.tunnel.dotnet.core
                 string[][] users = ReadStrs_Split(usersArray);
                 foreach (string[] user in users)
                 {
-                    Users.Add(user[0], user[1]);
+                    TunnelUser newUser = new TunnelUser(user[0], user[1]);
+                    Users.Add(newUser.ID, newUser);
                 }
             }
         }
