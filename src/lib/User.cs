@@ -32,9 +32,9 @@ namespace eagle.tunnel.dotnet.core
 
         public void CheckSpeed(int count)
         {
-            lock(lockSignal)
+            if (SpeedLimit > 0)
             {
-                if (SpeedLimit > 0)
+                lock(lockSignal)
                 {
                     SpeedSignal += count;
                     while (SpeedSignal > SpeedLimit)
