@@ -11,7 +11,7 @@ namespace eagle.tunnel.dotnet.core
 {
     public class Conf
     {
-        private static string allConf = "";
+        public static Dictionary<string, string[]> allConf = new Dictionary<string, string[]>();
         public static string confPath { get; set;} = "./config.txt";
         public static bool Dirty { get; private set;} = false;
         public static Dictionary<string, TunnelUser> Users = new Dictionary<string, TunnelUser>();
@@ -24,7 +24,7 @@ namespace eagle.tunnel.dotnet.core
 
         private static void ImportUsers()
         {
-            string[] pathOfUsersConf = ReadValue("users");
+            string[] pathOfUsersConf = allConf["users"];
             if (File.Exists(pathOfUsersConf[0]))
             {
                 string usersText = File.ReadAllText(pathOfUsersConf[0]);
@@ -33,8 +33,22 @@ namespace eagle.tunnel.dotnet.core
                 string[][] users = ReadStrs_Split(usersArray);
                 foreach (string[] user in users)
                 {
-                    TunnelUser newUser = new TunnelUser(user[0], user[1]);
-                    Users.Add(newUser.ID, newUser);
+                    if (user.Length >= 1)
+                    {
+                        TunnelUser newUser = new TunnelUser(user[0]);
+                        if (user.Length >= 2)
+                        {
+                            newUser.Password = user[1];
+                        }
+                        if (user.Length >= 3)
+                        {
+                            if (int.TryParse(user[2], out int speedlimit))
+                            {
+                                newUser.SpeedLimit = speedlimit;
+                            }
+                        }
+                        Conf.Users.Add(newUser.ID, newUser);
+                    }
                 }
             }
         }
@@ -67,31 +81,43 @@ namespace eagle.tunnel.dotnet.core
         {
             if (File.Exists(confPath))
             {
-                allConf = File.ReadAllText(confPath);
-                allConf = allConf.Replace("\r\n", "\n");
+                string allConfText = File.ReadAllText(confPath);
+                allConfText = allConfText.Replace("\r\n", "\n");
+                string[] lines = allConfText.Split('\n');
+                foreach (string line in lines)
+                {
+                    string[] args = line.Split(':');
+                    if (args.Length >= 2)
+                    {
+                        string key = args[0];
+                        string[] remainingArgs = new string[args.Length - 1];
+                        args.CopyTo(remainingArgs, 1);
+                        allConf.Add(key, remainingArgs);
+                    }
+                }
             }
         }
 
         private static void SaveAll(string confPath)
         {
+            string allConfText = "";
+            foreach (string key in allConf.Keys)
+            {
+                string line = "";
+                foreach (string arg in allConf[key])
+                {
+                    line += (arg + ':');
+                }
+                allConfText += (line.Remove(line.Length - 1));
+            }
             try
             {
-                File.WriteAllText(confPath, allConf);
+                File.WriteAllText(confPath, allConfText);
             }
             catch (UnauthorizedAccessException uae)
             {
                 Console.WriteLine(uae.Message);
             }
-        }
-
-        /// <summary>
-        /// Read all values for one specific key from configurations
-        /// </summary>
-        /// <param name="key">configuration key</param>
-        /// <returns>configuration value, or null if key not found</returns>
-        public static string[] ReadValue(string key)
-        {
-            return ReadValue(allConf, key);
         }
 
         /// <summary>
@@ -119,42 +145,6 @@ namespace eagle.tunnel.dotnet.core
             sr.Close();
             string[] re = valueList.ToArray(typeof(string)) as string[];
             return re;
-        }
-
-        /// <summary>
-        /// Change value of specific key, if not key found, create it
-        /// </summary>
-        /// <param name="key">key specific</param>
-        /// <param name="value">value expected</param>
-        public static void WriteValue(string key, string value)
-        {
-            StringReader sr = new StringReader(allConf);
-            StringBuilder sb = new StringBuilder(allConf);
-            string line;
-            string newLine = null;
-            while ((line = sr.ReadLine()) != null)
-            {
-                if (line.Contains(":"))
-                {
-                    if (line.Substring(0, line.IndexOf(':')) == key)
-                    {
-                        newLine = line.Substring(0, line.IndexOf(':') + 1) + value;
-                        break;
-                    }
-                }
-            }
-            sr.Close();
-            if (newLine == null)
-            {
-                newLine = key + ':' + value;
-                sb.AppendLine(newLine);
-            }
-            else
-            {
-                sb.Replace(line, newLine);
-            }
-            allConf = sb.ToString();
-            Dirty = true;
         }
     }
 }

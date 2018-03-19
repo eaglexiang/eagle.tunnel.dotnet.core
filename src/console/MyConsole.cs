@@ -83,7 +83,7 @@ namespace eagle.tunnel.dotnet.core
                     "Please Choose: "
                 );
                 string choice = Console.ReadLine();
-                string value = "";
+                string[] value = new string[1];
                 if (choice == "0")
                 {
                     break;
@@ -91,21 +91,22 @@ namespace eagle.tunnel.dotnet.core
                 else
                 {
                     Console.WriteLine("New value: ");
-                    value = Console.ReadLine();
+                    string input = Console.ReadLine();
+                    value[0] = input;
                 }
                 switch (choice)
                 {
                     case "1":
-                        Conf.WriteValue("Remote HTTP Address", value);
+                        Conf.allConf["Remote HTTP Address"] = value;
                         break;
                     case "2":
-                        Conf.WriteValue("Remote SOCKS Address", value);
+                        Conf.allConf["Remote SOCKS Address"] = value;
                         break;
                     case "3":
-                        Conf.WriteValue("Local HTTP Address", value);
+                        Conf.allConf["Local HTTP Address"] = value;
                         break;
                     case "4":
-                        Conf.WriteValue("Local SOCKS Address", value);
+                        Conf.allConf["Local SOCKS Address"] = value;
                         break;
                     default:
                         break;
@@ -183,10 +184,10 @@ namespace eagle.tunnel.dotnet.core
             }
             Conf.Init();
 
-            string[] remoteHttpAddresses = Conf.ReadValue("Remote HTTP Address");
-            string[] localHttpAddresses = Conf.ReadValue("Local HTTP Address");
-            string[] remoteSocksAddresses = Conf.ReadValue("Remote SOCKS Address");
-            string[] localSocksAddresses = Conf.ReadValue("Local SOCKS Address");
+            string[] remoteHttpAddresses = Conf.allConf["Remote HTTP Address"];
+            string[] localHttpAddresses = Conf.allConf["Local HTTP Address"];
+            string[] remoteSocksAddresses = Conf.allConf["Remote SOCKS Address"];
+            string[] localSocksAddresses = Conf.allConf["Local SOCKS Address"];
 
             remoteHttpIPEPs = CreateEndPoints(Conf.ReadStrs_Split(remoteHttpAddresses));
             remoteSocksIPEPs = CreateEndPoints(Conf.ReadStrs_Split(remoteSocksAddresses));

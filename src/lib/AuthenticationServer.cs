@@ -12,38 +12,17 @@ namespace eagle.tunnel.dotnet.core
 
         public AuthenticationServer(string url, int port) : base(url, port) { }
 
-        protected override void _Start()
+        protected override void Listen(TcpListener server)
         {
-            TcpListener server;
-            while(true)
-            {
-                try
-                {
-                    server = new TcpListener(serverIPEP);
-                    server.Start(100);
-                    break;
-                }
-                catch (SocketException se)
-                {
-                    Console.WriteLine(se.Message);
-                    Console.WriteLine("Waiting for 10s...");
-                    Thread.Sleep(10000);
-                }
-            }
-            Console.WriteLine("server started: " + serverIPEP.ToString());
-
             Running = true;
             while(Running)
             {
-                TcpClient client;
+                Connect newConnect;
                 try
                 {
-                    client = server.AcceptTcpClient();
-                    if (!Authenticate(client))
-                    {
-                        client.Close();
-                        continue;
-                    }
+                    TcpClient client = server.AcceptTcpClient();
+                    newConnect = Authenticate(client);
+                    if (newConnect == null) { continue;}
                 }
                 catch (SocketException se)
                 {
@@ -53,27 +32,26 @@ namespace eagle.tunnel.dotnet.core
                 
                 Thread handleClientThread = new Thread(HandleClient);
                 handleClientThread.IsBackground = true;
-                handleClientThread.Start(client);
+                handleClientThread.Start(newConnect);
             }
-            Thread.Sleep(1000);
-            server.Stop();
-            Console.WriteLine("Server Stopped");
         }
 
-        private static bool Authenticate(TcpClient client)
+        private static Connect Authenticate(TcpClient client)
         {
-            string id = ReadStr(client);
-            string pswd = ReadStr(client);
-            bool result = Authenticate(id, pswd);
-            if (result)
+            string req = ReadStr(client);
+            string id = req.Split(':')[0];
+            string pswd = req.Split(':')[1];
+            if (Authenticate(id, pswd))
             {
                 WriteStr(client, "valid");
+                return new Connect(client, id);
             }
             else
             {
                 WriteStr(client, "invalid");
+                client.Close();
+                return null;
             }
-            return result;
         }
 
         public static bool Authenticate(string id, string pswd)

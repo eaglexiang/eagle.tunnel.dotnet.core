@@ -56,8 +56,7 @@ namespace eagle.tunnel.dotnet.core
             TunnelUser firstUser = Conf.Users.Values.First();
             string id = firstUser.ID;
             string pswd = firstUser.Password;
-            WriteStr(client, id);
-            WriteStr(client, pswd);
+            WriteStr(client, id + ':' + pswd);
             string result = ReadStr(client);
             if (result == "valid")
             {

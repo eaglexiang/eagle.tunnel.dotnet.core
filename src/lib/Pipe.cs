@@ -9,6 +9,7 @@ namespace eagle.tunnel.dotnet.core
 {
     public class Pipe
     {
+        public string userFrom;
         private TcpClient clientFrom;
         private TcpClient clientTo;
         public TcpClient ClientFrom
@@ -71,7 +72,7 @@ namespace eagle.tunnel.dotnet.core
         private byte[] bufferRead;
         private int BufferSize { get; set;}
 
-        public Pipe(TcpClient from, TcpClient to)
+        public Pipe(TcpClient from, TcpClient to, string user = null)
         {
             ClientFrom = from;
             ClientTo = to;
@@ -80,6 +81,8 @@ namespace eagle.tunnel.dotnet.core
 
             flowThread = new Thread(_Flow);
             flowThread.IsBackground = true;
+
+            userFrom = user;
         }
 
         public void Flow()
@@ -122,6 +125,13 @@ namespace eagle.tunnel.dotnet.core
                 {
                     return null;
                 }
+                else
+                {
+                    if (userFrom != null)
+                    {
+                        Conf.Users[userFrom].CheckSpeed(count);
+                    }
+                }
                 buffer = new byte[count];
                 Array.Copy(bufferRead, buffer, count);
                 if(EncryptFrom)
@@ -129,8 +139,9 @@ namespace eagle.tunnel.dotnet.core
                     buffer = Decrypt(buffer);
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 StreamFrom.Close();
                 clientFrom.Close();
                 return null;

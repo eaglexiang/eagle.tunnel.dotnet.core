@@ -3,4 +3,5 @@ src/console/obj
 src/lib/bin
 src/lib/obj
 tmp
+bin
 .vscode

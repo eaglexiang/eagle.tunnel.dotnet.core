@@ -24,15 +24,18 @@ namespace eagle.tunnel.dotnet.core
         
         protected override void HandleClient(object clientObj)
         {
-            TcpClient socket2Client = clientObj as TcpClient;
+            Connect connect2Client = clientObj as Connect;
+            TcpClient socket2Client = connect2Client.client;
 
             Pipe client2Server = new Pipe(
                 socket2Client,
-                null
+                null,
+                connect2Client.userFrom
             );
             Pipe server2Client = new Pipe(
                 null,
-                socket2Client
+                socket2Client,
+                connect2Client.userFrom
             );
             client2Server.EncryptFrom = true;
             server2Client.EncryptTo = true;

@@ -42,7 +42,7 @@ namespace eagle.tunnel.dotnet.core
         /// <summary>
         /// realization for function Start
         /// </summary>
-        protected virtual void _Start()
+        private void _Start()
         {
             TcpListener server;
             while(true)
@@ -56,12 +56,21 @@ namespace eagle.tunnel.dotnet.core
                 catch (SocketException se)
                 {
                     Console.WriteLine(se.Message);
-                    Console.WriteLine("Waiting for 10s...");
-                    Thread.Sleep(10000);
+                    Console.WriteLine("Waiting for 30s...");
+                    Thread.Sleep(30000);
                 }
             }
             Console.WriteLine("server started: " + serverIPEP.ToString());
 
+            Listen(server);
+
+            Thread.Sleep(1000);
+            server.Stop();
+            Console.WriteLine("Server Stopped");
+        }
+
+        protected virtual void Listen(TcpListener server)
+        {
             Running = true;
             while(Running)
             {
@@ -69,8 +78,6 @@ namespace eagle.tunnel.dotnet.core
                 try
                 {
                     client = server.AcceptTcpClient();
-                    // string ip =client.Client.RemoteEndPoint.ToString().Split(':')[0];
-                    // Console.WriteLine("new client connected: from " + ip);
                 }
                 catch (SocketException se)
                 {
@@ -82,9 +89,6 @@ namespace eagle.tunnel.dotnet.core
                 handleClientThread.IsBackground = true;
                 handleClientThread.Start(client);
             }
-            Thread.Sleep(1000);
-            server.Stop();
-            Console.WriteLine("Server Stopped");
         }
 
         protected virtual void HandleClient(object clientObj) { }
