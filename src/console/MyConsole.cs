@@ -197,9 +197,9 @@ namespace eagle.tunnel.dotnet.core
                 List<ArrayList> remoteHttpAddresses = Conf.allConf["Remote HTTP Address"];
                 remoteHttpIPEPs = CreateEndPoints(remoteHttpAddresses);
             }
-            catch (KeyNotFoundException knfe)
+            catch (KeyNotFoundException)
             {
-                Console.WriteLine(knfe.Message + " Remote HTTP Address");
+                Console.WriteLine("Remote HTTP Address not found.");
             }
             try
             {
@@ -207,27 +207,27 @@ namespace eagle.tunnel.dotnet.core
                 localHttpIPEPs = CreateEndPoints(localHttpAddresses);
                 
             }
-            catch (KeyNotFoundException knfe)
+            catch (KeyNotFoundException)
             {
-                Console.WriteLine(knfe.Message + " Local HTTP Address");
+                Console.WriteLine("Local HTTP Address not found");
             }
             try
             {
                 List<ArrayList> remoteSocksAddresses = Conf.allConf["Remote SOCKS Address"];
                 remoteSocksIPEPs = CreateEndPoints(remoteSocksAddresses);
             }
-            catch (KeyNotFoundException knfe)
+            catch (KeyNotFoundException)
             {
-                Console.WriteLine(knfe.Message + " Remote SOCKS Address");
+                Console.WriteLine("Remote SOCKS Address not found");
             }
             try
             {
                 List<ArrayList> localSocksAddresses = Conf.allConf["Local SOCKS Address"];
                 localSocksIPEPs = CreateEndPoints(localSocksAddresses);
             }
-            catch (KeyNotFoundException knfe)
+            catch (KeyNotFoundException)
             {
-                Console.WriteLine(knfe.Message + " Local SOCKS Address");
+                Console.WriteLine("Local SOCKS Address not found");
             }
         }
 

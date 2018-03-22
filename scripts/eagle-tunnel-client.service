@@ -5,7 +5,7 @@ Description=Eagle Tunnel Server Service
 Type=simple
 User=root
 Environment=TERM='xterm'
-ExecStart=/usr/bin/dotnet /usr/share/eagle-tunnel/eagle.tunnel.dotnet.core.dll c=/etc/eagle-tunnel.conf sc hc
+ExecStart=/usr/bin/dotnet /usr/lib/eagle-tunnel/eagle.tunnel.dotnet.core.dll c=/etc/eagle-tunnel.conf sc hc
 Restart=on-abort
 
 [Install]

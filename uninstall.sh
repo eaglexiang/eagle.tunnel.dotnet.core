@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # bin files
-rm -rf /usr/share/eagle-tunnel
+rm -rf /usr/lib/eagle-tunnel
+rm -rf /usr/bin/eagle-tunnel
 # conf files
 rm -rf /etc/eagle-tunnel.conf
 rm -rf /etc/eagle-tunnel.d

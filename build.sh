@@ -1,3 +1,7 @@
 #!/usr/bin/env bash
 
-./scripts/buildRelease.sh
+if [ $1 == "clean" ]; then
+    rm -rf ./publish/*
+else
+    ./scripts/buildRelease.sh
+fi

@@ -30,30 +30,33 @@ namespace eagle.tunnel.dotnet.core
 
         private static void ImportUsers()
         {
-            string pathOfUsersConf = allConf["users"][0][0] as string;
-            if (File.Exists(pathOfUsersConf))
+            if (allConf["users"].Count >= 1)
             {
-                string usersText = File.ReadAllText(pathOfUsersConf);
-                usersText = usersText.Replace("\r\n", "\n");
-                string[] usersArray = usersText.Split('\n');
-                string[][] users = ReadStrs_Split(usersArray);
-                foreach (string[] user in users)
+                if (allConf["users"][0].Count >= 1)
                 {
-                    if (user.Length >= 1)
+                    string pathOfUsersConf = allConf["users"][0][0] as string;
+                    if (File.Exists(pathOfUsersConf))
                     {
-                        TunnelUser newUser = new TunnelUser(user[0]);
-                        if (user.Length >= 2)
+                        string usersText = File.ReadAllText(pathOfUsersConf);
+                        usersText = usersText.Replace("\r\n", "\n");
+                        string[] usersArray = usersText.Split('\n');
+                        // usersArray = RemoveNotes(usersArray);
+                        string[][] users = ReadStrs_Split(usersArray);
+                        foreach (string[] user in users)
                         {
-                            newUser.Password = user[1];
-                        }
-                        if (user.Length >= 3)
-                        {
-                            if (int.TryParse(user[2], out int speedlimit))
+                            if (user.Length >= 2)
                             {
-                                newUser.SpeedLimit = speedlimit;
+                                TunnelUser newUser = new TunnelUser(user[0], user[1]);
+                                if (user.Length >= 3)
+                                {
+                                    if (int.TryParse(user[2], out int speedlimit))
+                                    {
+                                        newUser.SpeedLimit = speedlimit;
+                                    }
+                                }
+                                Conf.Users.Add(newUser.ID, newUser);
                             }
                         }
-                        Conf.Users.Add(newUser.ID, newUser);
                     }
                 }
             }
@@ -116,17 +119,18 @@ namespace eagle.tunnel.dotnet.core
             }
         }
 
-        private string[] RemoveNotes(string[] lines)
+        private static string[] RemoveNotes(string[] lines)
         {
             ArrayList newLines = new ArrayList();
             foreach (string line in lines)
             {
-                string validline = line.Trim();
+                string validline = line;
                 if (validline.Contains("#"))
                 {
                     int index = validline.IndexOf("#");
                     validline = validline.Substring(0, index);
                 }
+                validline = validline.Trim();
                 newLines.Add(validline);
             }
             return newLines.ToArray(typeof(string)) as string[];

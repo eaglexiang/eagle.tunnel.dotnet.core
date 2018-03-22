@@ -22,10 +22,10 @@ namespace eagle.tunnel.dotnet.core
         private object lockSignal = new object();
         public int SpeedSignal { get; set;}
 
-        public TunnelUser(string id)
+        public TunnelUser(string id, string password)
         {
             ID = id;
-            Password = null;
+            Password = password;
             SpeedLimit = defaultSpeedLimit;
             SpeedSignal = 0;
         }
