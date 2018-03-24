@@ -104,7 +104,7 @@ namespace eagle.tunnel.dotnet.core
 
             try
             {
-                List<ArrayList> remoteAddresses = Conf.allConf["Remote Address"];
+                List<string[]> remoteAddresses = Conf.allConf["Remote Address"];
                 remoteIPEPs = CreateEndPoints(remoteAddresses);
             }
             catch (KeyNotFoundException)
@@ -113,7 +113,7 @@ namespace eagle.tunnel.dotnet.core
             }
             try
             {
-                List<ArrayList> localHttpAddresses = Conf.allConf["Local HTTP Address"];
+                List<string[]> localHttpAddresses = Conf.allConf["Local HTTP Address"];
                 localHttpIPEPs = CreateEndPoints(localHttpAddresses);
                 
             }
@@ -123,7 +123,7 @@ namespace eagle.tunnel.dotnet.core
             }
             try
             {
-                List<ArrayList> localSocksAddresses = Conf.allConf["Local SOCKS Address"];
+                List<string[]> localSocksAddresses = Conf.allConf["Local SOCKS Address"];
                 localSocksIPEPs = CreateEndPoints(localSocksAddresses);
             }
             catch (KeyNotFoundException)
@@ -137,12 +137,11 @@ namespace eagle.tunnel.dotnet.core
             Conf.Close();
         }
 
-        private static IPEndPoint[] CreateEndPoints(List<ArrayList> addresses)
+        private static IPEndPoint[] CreateEndPoints(List<string[]> addresses)
         {
             ArrayList list = new ArrayList();
-            foreach (ArrayList addressList in addresses)
+            foreach (string[] address in addresses)
             {
-                string[] address = addressList.ToArray(typeof(string)) as string[];
                 if (address.Length >= 2)
                 {
                     if (IPAddress.TryParse(address[0], out IPAddress ipa))

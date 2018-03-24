@@ -11,8 +11,8 @@ namespace eagle.tunnel.dotnet.core
 {
     public class Conf
     {
-        public static Dictionary<string, List<ArrayList>> allConf =
-            new Dictionary<string, List<ArrayList>>();
+        public static Dictionary<string, List<string[]>> allConf =
+            new Dictionary<string, List<string[]>>();
         public static string confPath { get; set;} = "./config.txt";
         public static bool Dirty { get; private set;} = false;
         public static Dictionary<string, TunnelUser> Users =
@@ -32,7 +32,7 @@ namespace eagle.tunnel.dotnet.core
         {
             if (allConf["users"].Count >= 1)
             {
-                if (allConf["users"][0].Count >= 1)
+                if (allConf["users"][0].Length == 1)
                 {
                     string pathOfUsersConf = allConf["users"][0][0] as string;
                     if (File.Exists(pathOfUsersConf))
@@ -95,23 +95,19 @@ namespace eagle.tunnel.dotnet.core
                 string[] lines = allConfText.Split('\n');
                 foreach (string line in lines)
                 {
-                    string[] args = line.Split(':');
-                    if (args.Length >= 2)
+                    string[] arg = line.Split('=');
+                    if (arg.Length == 2)
                     {
-                        string key = args[0];
-                        ArrayList tmp = new ArrayList();
-                        for (int i = 1; i < args.Length; ++i)
-                        {
-                            tmp.Add(args[i]);
-                        }
+                        string key = arg[0];
+                        string[] args = arg[1].Split(':');
                         if (allConf.ContainsKey(key))
                         {
-                            allConf[key].Add(tmp);
+                            allConf[key].Add(args);
                         }
                         else
                         {
-                            List<ArrayList> tmpList = new List<ArrayList>();
-                            tmpList.Add(tmp);
+                            List<string[]> tmpList = new List<string[]>();
+                            tmpList.Add(args);
                             allConf.Add(key, tmpList);
                         }
                     }
@@ -142,7 +138,7 @@ namespace eagle.tunnel.dotnet.core
             foreach (string key in allConf.Keys)
             {
                 string values = "";
-                foreach (ArrayList args in allConf[key])
+                foreach (string[] args in allConf[key])
                 {
                     string line = "";
                     foreach (string arg in args)
@@ -161,16 +157,6 @@ namespace eagle.tunnel.dotnet.core
             {
                 Console.WriteLine(uae.Message);
             }
-        }
-
-        public static void AddValue(string key, string value)
-        {
-            if (!Conf.allConf.ContainsKey(key))
-            {
-                Conf.allConf.Add(key, new List<ArrayList>());
-            }
-            string[] values = value.Split(':');
-            Conf.allConf[key].Add(new ArrayList(values));
         }
     }
 }
