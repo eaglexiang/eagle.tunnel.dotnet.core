@@ -1,8 +1,6 @@
 using System;
-using System.Threading;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 namespace eagle.tunnel.dotnet.core
 {
@@ -22,6 +20,7 @@ namespace eagle.tunnel.dotnet.core
 
         protected override bool WorkFlow(Pipe pipeClient2Server, Pipe pipeServer2Client)
         {
+            bool result = false;
             byte[] request = pipeClient2Server.ReadByte();
             if(request != null)
             {
@@ -38,23 +37,27 @@ namespace eagle.tunnel.dotnet.core
                         CMDType cmdType = (CMDType)request[1];
                         if(cmdType == CMDType.Connect)
                         {
-                            return HandleTCPReq(request, pipeServer2Client, pipeClient2Server);
+                            result = HandleTCPReq(request, pipeServer2Client, pipeClient2Server);
                         }
                         else if(cmdType == CMDType.Udp)
                         {
-                            //HandleUDPReq(request, server2Client);
-                            return false;
+                            // result = HandleUDPReq(request, pipeServer2Client, pipeClient2Server);
                         }
                     }
                 }
             }
-            return false;
+            return result;
         }
 
         protected override void PrintServerInfo(IPEndPoint localIPEP)
         {
             Console.WriteLine ("Socks Relay started: " + serverIPEP.ToString ());
         }
+
+        // private bool HandleUDPReq(byte[] request, Pipe pipeServer2Client, Pipe pipeClient2Server)
+        // {
+
+        // }
 
         private bool HandleTCPReq(byte[] request, Pipe pipeServer2Client, Pipe pipeClient2Server)
         {

@@ -1,15 +1,20 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace eagle.tunnel.dotnet.core {
     public class Pipe {
+        private static List<int> pipes = new List<int>();
+        private static int maxPipeNumber = 100;
+        private static object lock_Pipes = new object();
+        private static int idSignal = 0;
+        private static object lock_id = new object();
+        private int id;
         public string userFrom;
         private int speedSignal;
-        private const int speedCheckThreshold = 1048576;
+        private const int speedCheckThreshold = 1048576; // 1MB
         private Socket socketFrom;
         private Socket socketTo;
         public Socket SocketFrom {
@@ -82,9 +87,18 @@ namespace eagle.tunnel.dotnet.core {
             userFrom = user;
             speedSignal = 0;
             IsRunning = false;
+            id = NewID();
         }
 
         public void Flow () {
+            lock(lock_Pipes)
+            {
+                while(pipes.Count >= maxPipeNumber)
+                {
+                    Thread.Sleep(10);
+                }
+                pipes.Add(id);
+            }
             IsRunning = true;
             flowThread.Start ();
         }
@@ -104,6 +118,14 @@ namespace eagle.tunnel.dotnet.core {
                 }
             }
             return false;
+        }
+
+        private static int NewID()
+        {
+            lock(lock_id)
+            {
+                return idSignal++;
+            }
         }
 
         public bool Write (byte[] buffer) {
@@ -168,6 +190,10 @@ namespace eagle.tunnel.dotnet.core {
                 }
             }
             Close ();
+            lock(lock_Pipes)
+            {
+                pipes.Remove(id);
+            }
         }
 
         public static byte[] Encryption (byte[] src) {

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -6,21 +7,25 @@ using System.Threading;
 
 namespace eagle.tunnel.dotnet.core {
     public abstract class Relay {
+        private Thread thread_Main;
         protected IPEndPoint serverIPEP;
         public bool IsRunning { get; set; }
+        private ManualResetEvent connectDone = new ManualResetEvent (false);
 
-        public Relay (IPEndPoint ipep) {
+        public Relay (IPEndPoint ipep, int worker = 100) {
             serverIPEP = ipep;
             IsRunning = false;
+
+            thread_Main = new Thread (_Start);
+            thread_Main.IsBackground = true;
         }
 
         /// <summary>
         /// Start Server on new background thread.
         /// </summary>
-        public virtual void Start (int backlog) {
-            Thread startThread = new Thread (_Start);
-            startThread.IsBackground = true;
-            startThread.Start (backlog);
+        public virtual void Start (int backlog = 200) {
+            IsRunning = true;
+            thread_Main.Start (backlog);
         }
 
         /// <summary>
@@ -35,33 +40,32 @@ namespace eagle.tunnel.dotnet.core {
                 Thread.Sleep (60000);
                 serverSocket = CreateSocketListen (serverIPEP, backlog);
             }
-            PrintServerInfo(serverIPEP);
+            PrintServerInfo (serverIPEP);
 
             Listen (serverSocket);
 
-            Thread.Sleep (1000);
             if (serverSocket.Connected) {
+                serverSocket.Shutdown (SocketShutdown.Both);
+                Thread.Sleep (10);
                 serverSocket.Close ();
             }
             Console.WriteLine ("Server Stopped");
         }
 
-        protected virtual void PrintServerInfo(IPEndPoint localIPEP)
-        {
+        protected virtual void PrintServerInfo (IPEndPoint localIPEP) {
             Console.WriteLine ("Relay started: " + serverIPEP.ToString ());
         }
 
         protected virtual void Listen (Socket server) {
-            IsRunning = true;
             while (IsRunning) {
                 Socket client;
                 try {
                     client = server.Accept ();
-                } catch (SocketException) { continue; }
+                } catch (SocketException) { break; }
 
-                Thread handleClientThread = new Thread (HandleClient);
-                handleClientThread.IsBackground = true;
-                handleClientThread.Start (client);
+                Thread thread_HandleClient = new Thread(_HandleClient);
+                thread_HandleClient.IsBackground = true;
+                thread_HandleClient.Start(client);
             }
         }
 
@@ -69,57 +73,113 @@ namespace eagle.tunnel.dotnet.core {
             IsRunning = false;
         }
 
-        protected abstract void HandleClient (object clientObj);
+        private void _HandleClient(object socketObj)
+        {
+            Socket socket = socketObj as Socket;
+            HandleClient(socket);
+        }
+
+        protected abstract void HandleClient (Socket socket2Client);
 
         protected abstract bool WorkFlow (Pipe pipeClient2Server, Pipe pipeServer2Client);
 
         protected static string ReadStr (Socket client) {
-            if (client != null)
-            {
+            DateTime now;
+            if (Conf.IsDebug) {
+                now = DateTime.Now;
+            }
+
+            string result = "";
+            if (client != null) {
                 int count;
                 byte[] buffer = new byte[1024];
                 try {
-                    count = client.Receive(buffer);
+                    count = client.Receive (buffer);
                 } catch (SocketException) {
-                    return null;
+                    count = 0;
                 }
-                string str = Encoding.UTF8.GetString (buffer, 0, count);
-                return str;
+                if (count != 0) {
+                    result = Encoding.UTF8.GetString (buffer, 0, count);
+                }
             }
-            else
-            {
-                return null;
+
+            if (Conf.IsDebug) {
+                double sec = (DateTime.Now - now).TotalSeconds;
+                if (sec > Conf.DebugTimeThreshold) {
+                    Console.WriteLine ("Time for Relay.ReadStr is {0} s", sec);
+                }
             }
+            return result;
         }
 
         protected static bool WriteStr (Socket client, string str) {
+            DateTime now;
+            if (Conf.IsDebug) {
+                now = DateTime.Now;
+            }
+
+            bool result = false;
             if (client != null) {
                 byte[] buffer = Encoding.UTF8.GetBytes (str);
                 try {
                     client.Send (buffer);
-                    return true;
+                    result = true;
                 } catch (SocketException se) {
                     Console.WriteLine (se.Message);
-                    return false;
                 }
-            } else {
-                return false;
             }
+
+            if (Conf.IsDebug) {
+                double sec = (DateTime.Now - now).TotalSeconds;
+                if (sec > Conf.DebugTimeThreshold) {
+                    Console.WriteLine ("Time for Relay.WriteStr is {0} s", sec);
+                }
+            }
+
+            return result;
         }
 
-        protected static Socket CreateSocketConnect (IPEndPoint remoteIPEP) {
+        protected Socket CreateSocketConnect (IPEndPoint remoteIPEP) {
+            DateTime now;
+            if (Conf.IsDebug) {
+                now = DateTime.Now;
+            }
+
             Socket client = new Socket (AddressFamily.InterNetwork,
                 SocketType.Stream,
                 ProtocolType.Tcp);
             try {
-
-                client.Connect (remoteIPEP);
-                return client;
+                // connectDone.Reset ();
+                // client.BeginConnect (remoteIPEP, new AsyncCallback (CreateSocketConnectCallback), client);
+                // connectDone.WaitOne (5000, false);
+                // if (!client.Connected) {
+                //     client = null;
+                // }
+                client.Connect(remoteIPEP);
             } catch (SocketException se) {
                 Console.WriteLine (se.Message);
-                return null;
+                client = null;
             }
+
+            if (Conf.IsDebug) {
+                double sec = (DateTime.Now - now).TotalSeconds;
+                if (sec > Conf.DebugTimeThreshold) {
+                    Console.WriteLine ("Time to connect to {0} is : {1} s", remoteIPEP.ToString (), sec);
+                }
+            }
+
+            return client;
         }
+
+        // private void CreateSocketConnectCallback (IAsyncResult ar) {
+        //     try {
+        //         Socket client = ar.AsyncState as Socket;
+        //         client.EndConnect (ar);
+
+        //     } catch {; } finally {
+        //         connectDone.Set ();
+        //     }
+        // }
 
         protected static Socket CreateSocketListen (IPEndPoint localIPEP, int backlog = 100) {
             Socket server = new Socket (AddressFamily.InterNetwork,
@@ -138,18 +198,18 @@ namespace eagle.tunnel.dotnet.core {
         protected IPEndPoint ReceiveReqEndPoint (Socket socket2Client) {
             if (socket2Client != null) {
                 string req = ReadStr (socket2Client);
-                if (req != null) {
+                if (req != "") {
                     string[] address = req.Split (':');
                     if (address.Length == 2) {
                         if (IPAddress.TryParse (address[0], out IPAddress ipa)) {
                             if (int.TryParse (address[1], out int port)) {
-                                if (WriteStr (socket2Client, "ok")) {
+                                if (WriteStr (socket2Client, "req_ep_ok")) {
                                     return new IPEndPoint (ipa, port);
                                 }
                             }
                         }
                     }
-                    WriteStr (socket2Client, "nok");
+                    WriteStr (socket2Client, "req_ep_nok");
                 }
             }
             return null;
@@ -159,7 +219,7 @@ namespace eagle.tunnel.dotnet.core {
             if (reqEndPoint != null) {
                 if (WriteStr (socket2Server, reqEndPoint.ToString ())) {
                     string reply = ReadStr (socket2Server);
-                    return reply == "ok";
+                    return reply == "req_ep_ok";
                 }
             }
             return false;

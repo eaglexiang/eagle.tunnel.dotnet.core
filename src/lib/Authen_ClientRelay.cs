@@ -9,20 +9,39 @@ namespace eagle.tunnel.dotnet.core {
             base (remoteIPEPs, localIPEP) { }
 
         protected override bool Authenticate (Socket socket2Server) {
-            if (socket2Server != null) {
-                TunnelUser firstUser = Conf.Users.Values.First ();
-                string id = firstUser.ID;
-                string pswd = firstUser.Password;
-                WriteStr (socket2Server, id + ':' + pswd);
-                string result = ReadStr (socket2Server);
-                return result == "valid";
-            } else {
-                return false;
+            DateTime now;
+            if (Conf.IsDebug)
+            {
+                now = DateTime.Now;
             }
+
+            bool result = false;
+            if (socket2Server != null) {
+                if (base.Authenticate (socket2Server)) {
+                    if (Conf.Users.Count > 0) {
+                        TunnelUser firstUser = Conf.Users.Values.First ();
+                        string id = firstUser.ID;
+                        string pswd = firstUser.Password;
+                        WriteStr (socket2Server, id + ':' + pswd);
+                        string reply = ReadStr (socket2Server);
+                        result = reply == "valid";
+                    }
+                }
+            }
+
+            if(Conf.IsDebug)
+            {
+                double sec = (DateTime.Now - now).TotalSeconds;
+                if (sec > Conf.DebugTimeThreshold)
+                {
+                    Console.WriteLine("Time for Authen_ClientRelay.Authenticate(Socket) is {0} s", sec);
+                }
+            }
+
+            return result;
         }
 
-        protected override void PrintServerInfo(IPEndPoint localIPEP)
-        {
+        protected override void PrintServerInfo (IPEndPoint localIPEP) {
             Console.WriteLine ("Authen Client Relay started: " + serverIPEP.ToString ());
         }
     }
