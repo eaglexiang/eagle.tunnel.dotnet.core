@@ -6,13 +6,11 @@ using System.Text;
 
 namespace eagle.tunnel.dotnet.core
 {
-    public class SocksServer : AuthenticationServer
+    public class SocksClient : Authen_ClientRelay
     {
         private static Random rand = new Random();
 
-        public SocksServer(string serverIP, int serverPort) : base(serverIP, serverPort) { }
-
-        public SocksServer(IPEndPoint ipep) : base(ipep) { }
+        public SocksClient(IPEndPoint[] remoteIPEPs, IPEndPoint localIPEP) : base(remoteIPEPs, localIPEP) { }
 
         enum CMDType
         {
@@ -21,97 +19,67 @@ namespace eagle.tunnel.dotnet.core
             Bind,
             Udp
         }
-        
-        protected override void HandleClient(object clientObj)
+
+        protected override bool WorkFlow(Pipe pipeClient2Server, Pipe pipeServer2Client)
         {
-            Connect connect2Client = clientObj as Connect;
-            TcpClient socket2Client = connect2Client.client;
-
-            Pipe client2Server = new Pipe(
-                socket2Client,
-                null,
-                connect2Client.userFrom
-            );
-            Pipe server2Client = new Pipe(
-                null,
-                socket2Client,
-                connect2Client.userFrom
-            );
-            client2Server.EncryptFrom = true;
-            server2Client.EncryptTo = true;
-            try
+            byte[] request = pipeClient2Server.ReadByte();
+            if(request != null)
             {
-                byte[] request = client2Server.Read();
-                if(request == null)
-                {
-                    return;
-                }
-                // not socket 5 request
                 int version = request[0];
-                if(version != '\u0005')
+                // check if is socks version 5
+                if(version == '\u0005')
                 {
-                    return;
-                }
+                    string reply = "\u0005\u0000";
+                    pipeServer2Client.Write(reply);
 
-                string reply = "\u0005\u0000";
-                server2Client.Write(reply);
-
-                request = client2Server.Read();
-                if(request == null)
-                {
-                    return;
-                }
-
-                CMDType cmdType = (CMDType)request[1];
-
-                if(cmdType == CMDType.Connect)
-                {
-                    HandleTCPReq(request, server2Client, client2Server);
-                }
-                else if(cmdType == CMDType.Udp)
-                {
-                    //HandleUDPReq(request, server2Client);
+                    request = pipeClient2Server.ReadByte();
+                    if(request != null)
+                    {
+                        CMDType cmdType = (CMDType)request[1];
+                        if(cmdType == CMDType.Connect)
+                        {
+                            return HandleTCPReq(request, pipeServer2Client, pipeClient2Server);
+                        }
+                        else if(cmdType == CMDType.Udp)
+                        {
+                            //HandleUDPReq(request, server2Client);
+                            return false;
+                        }
+                    }
                 }
             }
-            catch (SocketException se)
-            {
-                Console.WriteLine(se.Message);
-                client2Server.Close();
-                server2Client.Close();
-            }
+            return false;
         }
 
-        private void HandleTCPReq(byte[] request, Pipe server2Client, Pipe client2Server)
+        protected override void PrintServerInfo(IPEndPoint localIPEP)
+        {
+            Console.WriteLine ("Socks Relay started: " + serverIPEP.ToString ());
+        }
+
+        private bool HandleTCPReq(byte[] request, Pipe pipeServer2Client, Pipe pipeClient2Server)
         {
             string ip = GetIP(request);
             int port = GetPort(request);
-            string reply;
-            if(ip == null)
+            if(ip != null && port != 0)
             {
-                string str = Encoding.UTF8.GetString(request);
-                return;
+                if (IPAddress.TryParse(ip, out IPAddress ipa))
+                {
+                    IPEndPoint reqIPEP = new IPEndPoint(ipa, port);
+                    string reply;
+                    bool reqReply = SendReqEndPoint(pipeClient2Server.SocketTo, reqIPEP);
+                    if (reqReply)
+                    {
+                        reply = "\u0005\u0000\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0000";
+                    }
+                    else
+                    {
+                        reply = "\u0005\u0001\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0000";
+                    }
+                    pipeServer2Client.Write(reply);
+                    return reqReply;
+                }
             }
-            TcpClient tcpClient2Server;
-            try
-            {
-                tcpClient2Server = new TcpClient(ip, port);
-                reply = "\u0005\u0000\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0000";
-                server2Client.Write(reply);
-                client2Server.ClientTo = tcpClient2Server;
-                server2Client.ClientFrom = tcpClient2Server;
-                client2Server.Flow();
-                server2Client.Flow();
-            }
-            catch
-            {
-                CloseRequest(server2Client);
-            }
-        }
-
-        private void CloseRequest(Pipe server2Client)
-        {
-            string reply = "\u0005\u0001\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0000";
-            server2Client.Write(reply);
+            return false;
         }
 
         public static string GetIP(byte[] request)
@@ -226,12 +194,6 @@ namespace eagle.tunnel.dotnet.core
             {
                 return null;
             }
-        }
-
-        public void Stop()
-        {
-            Console.WriteLine("quiting...");
-            Running = false;
         }
     }
 }

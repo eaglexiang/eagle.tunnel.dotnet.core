@@ -10,13 +10,11 @@ namespace eagle.tunnel.dotnet.core
 {
     public class MyConsole
     {
-        private HttpServer httpServer;
-        private Client httpClient;
-        private SocksServer socksServer;
-        private Client socksClient;
+        private HttpClient httpClient;
+        private SocksClient socksClient;
+        private Authen_ServerRelay serverRelay;
 
-        private IPEndPoint[] remoteHttpIPEPs;
-        private IPEndPoint[] remoteSocksIPEPs;
+        private IPEndPoint[] remoteIPEPs;
         private IPEndPoint[] localHttpIPEPs;
         private IPEndPoint[] localSocksIPEPs;
 
@@ -28,20 +26,14 @@ namespace eagle.tunnel.dotnet.core
             
             switch (command)
             {
-            case "hs":
-                StartHttpServer();
+            case "s":
+                StartServerRelay();
                 break;
             case "hc":
                 StartHttpClient();
                 break;
-            case "ss":
-                StartSocksServer();
-                break;
             case "sc":
                 StartSocksClient();
-                break;
-            case "edit":
-                StartEdit();
                 break;
             case "close":
                 CloseAll();
@@ -53,126 +45,44 @@ namespace eagle.tunnel.dotnet.core
 
         private void CloseAll()
         {
-            if (httpServer != null)
-            {
-                httpServer.Stop();
-            }
             if (httpClient != null)
             {
-                httpClient.Stop();
-            }
-            if (socksServer != null)
-            {
-                socksServer.Stop();
+                httpClient.Close();
             }
             if (socksClient != null)
             {
-                socksClient.Stop();
+                socksClient.Close();
+            }
+            if (serverRelay != null)
+            {
+                serverRelay.Close();
             }
         }
 
-        private static void StartEdit()
+        private void StartServerRelay()
         {
-            while(true)
+            if (remoteIPEPs.Length > 0)
             {
-                Console.WriteLine(
-                    "1. Remote HTTP Address.\n" +
-                    "2. Remote SOCKS Address.\n" +
-                    "3. Local HTTP Address.\n" +
-                    "4. Local SOCKS Address.\n" +
-                    "0. Quit\n" +
-                    "Please Choose to add: "
-                );
-                string choice = Console.ReadLine();
-                string value;
-                if (choice == "0")
-                {
-                    break;
-                }
-                else
-                {
-                    Console.WriteLine("New value: ");
-                    value = Console.ReadLine();
-                }
-                switch (choice)
-                {
-                    case "1":
-                        Conf.AddValue("Remote HTTP Address", value);
-                        break;
-                    case "2":
-                        Conf.AddValue("Remote SOCKS Address", value);
-                        break;
-                    case "3":
-                        Conf.AddValue("Local HTTP Address", value);
-                        break;
-                    case "4":
-                        Conf.AddValue("Local SOCKS Address", value);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        private void StartHttpServer()
-        {
-            if (remoteHttpIPEPs.Length > 0)
-            {
-                httpServer = new HttpServer(remoteHttpIPEPs[0]);
-                httpServer.Start();
+                serverRelay = new Authen_ServerRelay(remoteIPEPs[0]);
+                serverRelay.Start(100);
             }
         }
 
         private void StartHttpClient()
         {
-            if (remoteHttpIPEPs.Length > 0 && localHttpIPEPs.Length > 0)
+            if (remoteIPEPs.Length > 0 && localHttpIPEPs.Length > 0)
             {
-                if (Conf.allConf.ContainsKey("users"))
-                {
-                    httpClient = new AuthenticationClient(
-                        remoteHttpIPEPs,
-                        localHttpIPEPs[0]
-                    );
-                }
-                else
-                {
-                    httpClient = new Client(
-                        remoteHttpIPEPs,
-                        localHttpIPEPs[0]
-                    );
-                }
-                httpClient.Start();
-            }
-        }
-
-        private void StartSocksServer()
-        {
-            if (remoteSocksIPEPs.Length > 0)
-            {
-                socksServer = new SocksServer(remoteSocksIPEPs[0]);
-                socksServer.Start();
+                httpClient = new HttpClient(remoteIPEPs, localHttpIPEPs[0]);
+                httpClient.Start(100);
             }
         }
 
         private void StartSocksClient()
         {
-            if (remoteSocksIPEPs.Length > 0 && localSocksIPEPs.Length > 0)
+            if (remoteIPEPs.Length > 0 && localSocksIPEPs.Length > 0)
             {
-                if (Conf.allConf.ContainsKey("users"))
-                {
-                    socksClient = new AuthenticationClient(
-                        remoteSocksIPEPs,
-                        localSocksIPEPs[0]
-                    );
-                }
-                else
-                {
-                    socksClient = new Client(
-                        remoteSocksIPEPs,
-                        localSocksIPEPs[0]
-                    );
-                }
-                socksClient.Start();
+                socksClient = new SocksClient(remoteIPEPs, localSocksIPEPs[0]);
+                socksClient.Start(100);
             }
         }
 
@@ -194,8 +104,8 @@ namespace eagle.tunnel.dotnet.core
 
             try
             {
-                List<ArrayList> remoteHttpAddresses = Conf.allConf["Remote HTTP Address"];
-                remoteHttpIPEPs = CreateEndPoints(remoteHttpAddresses);
+                List<ArrayList> remoteAddresses = Conf.allConf["Remote Address"];
+                remoteIPEPs = CreateEndPoints(remoteAddresses);
             }
             catch (KeyNotFoundException)
             {
@@ -210,15 +120,6 @@ namespace eagle.tunnel.dotnet.core
             catch (KeyNotFoundException)
             {
                 Console.WriteLine("Local HTTP Address not found");
-            }
-            try
-            {
-                List<ArrayList> remoteSocksAddresses = Conf.allConf["Remote SOCKS Address"];
-                remoteSocksIPEPs = CreateEndPoints(remoteSocksAddresses);
-            }
-            catch (KeyNotFoundException)
-            {
-                Console.WriteLine("Remote SOCKS Address not found");
             }
             try
             {
