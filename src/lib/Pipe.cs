@@ -1,17 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Collections.Generic;
 
 namespace eagle.tunnel.dotnet.core {
     public class Pipe {
-        private static List<int> pipes = new List<int>();
-        private static int maxPipeNumber = 100;
-        private static object lock_Pipes = new object();
-        private static int idSignal = 0;
-        private static object lock_id = new object();
-        private int id;
         public string userFrom;
         private int speedSignal;
         private const int speedCheckThreshold = 1048576; // 1MB
@@ -54,7 +48,6 @@ namespace eagle.tunnel.dotnet.core {
         }
         public bool EncryptFrom { get; set; }
         public bool EncryptTo { get; set; }
-        private Thread flowThread;
         private static byte EncryptionKey = 0x22;
         private byte[] bufferRead;
         private int BufferSize {
@@ -81,26 +74,9 @@ namespace eagle.tunnel.dotnet.core {
             EncryptFrom = false;
             EncryptTo = false;
 
-            flowThread = new Thread (_Flow);
-            flowThread.IsBackground = true;
-
             userFrom = user;
             speedSignal = 0;
             IsRunning = false;
-            id = NewID();
-        }
-
-        public void Flow () {
-            lock(lock_Pipes)
-            {
-                while(pipes.Count >= maxPipeNumber)
-                {
-                    Thread.Sleep(10);
-                }
-                pipes.Add(id);
-            }
-            IsRunning = true;
-            flowThread.Start ();
         }
 
         public bool Write (byte[] buffer, int offset, int count) {
@@ -108,7 +84,7 @@ namespace eagle.tunnel.dotnet.core {
                 byte[] tmpBuffer = new byte[count];
                 Array.Copy (buffer, tmpBuffer, count);
                 if (EncryptTo) {
-                    tmpBuffer = Encryption (tmpBuffer);
+                    tmpBuffer = Encrypt (tmpBuffer);
                 }
                 try {
                     SocketTo.Send (tmpBuffer);
@@ -118,14 +94,6 @@ namespace eagle.tunnel.dotnet.core {
                 }
             }
             return false;
-        }
-
-        private static int NewID()
-        {
-            lock(lock_id)
-            {
-                return idSignal++;
-            }
         }
 
         public bool Write (byte[] buffer) {
@@ -180,6 +148,14 @@ namespace eagle.tunnel.dotnet.core {
             return null;
         }
 
+        public void Flow()
+        {
+            IsRunning = true;
+            Thread thread_Flow = new Thread(_Flow);
+            thread_Flow.IsBackground = true;
+            thread_Flow.Start();
+        }
+
         private void _Flow () {
             byte[] buffer = ReadByte ();
             while (IsRunning && buffer != null) {
@@ -190,13 +166,9 @@ namespace eagle.tunnel.dotnet.core {
                 }
             }
             Close ();
-            lock(lock_Pipes)
-            {
-                pipes.Remove(id);
-            }
         }
 
-        public static byte[] Encryption (byte[] src) {
+        public static byte[] Encrypt (byte[] src) {
             byte[] des = new byte[src.Length];
             for (int i = 0; i < src.Length; ++i) {
                 des[i] = (byte) (src[i] ^ EncryptionKey);

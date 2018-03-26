@@ -10,7 +10,8 @@ namespace eagle.tunnel.dotnet.core {
         private Thread thread_Main;
         protected IPEndPoint serverIPEP;
         public bool IsRunning { get; set; }
-        private ManualResetEvent connectDone = new ManualResetEvent (false);
+        private int clientsCount;
+        private object lock_ClientsCount;
 
         public Relay (IPEndPoint ipep, int worker = 100) {
             serverIPEP = ipep;
@@ -18,6 +19,8 @@ namespace eagle.tunnel.dotnet.core {
 
             thread_Main = new Thread (_Start);
             thread_Main.IsBackground = true;
+            clientsCount = 0;
+            lock_ClientsCount = new object ();
         }
 
         /// <summary>
@@ -63,9 +66,13 @@ namespace eagle.tunnel.dotnet.core {
                     client = server.Accept ();
                 } catch (SocketException) { break; }
 
-                Thread thread_HandleClient = new Thread(_HandleClient);
+                Thread thread_HandleClient = new Thread (_HandleClient);
                 thread_HandleClient.IsBackground = true;
-                thread_HandleClient.Start(client);
+                while (clientsCount > Conf.maxClientHandleThreads) { Thread.Sleep (1000); }
+                thread_HandleClient.Start (client);
+                lock (lock_ClientsCount) {
+                    clientsCount++;
+                }
             }
         }
 
@@ -73,10 +80,12 @@ namespace eagle.tunnel.dotnet.core {
             IsRunning = false;
         }
 
-        private void _HandleClient(object socketObj)
-        {
+        private void _HandleClient (object socketObj) {
             Socket socket = socketObj as Socket;
-            HandleClient(socket);
+            HandleClient (socket);
+            lock (lock_ClientsCount) {
+                clientsCount--;
+            }
         }
 
         protected abstract void HandleClient (Socket socket2Client);
@@ -84,11 +93,6 @@ namespace eagle.tunnel.dotnet.core {
         protected abstract bool WorkFlow (Pipe pipeClient2Server, Pipe pipeServer2Client);
 
         protected static string ReadStr (Socket client) {
-            DateTime now;
-            if (Conf.IsDebug) {
-                now = DateTime.Now;
-            }
-
             string result = "";
             if (client != null) {
                 int count;
@@ -102,22 +106,10 @@ namespace eagle.tunnel.dotnet.core {
                     result = Encoding.UTF8.GetString (buffer, 0, count);
                 }
             }
-
-            if (Conf.IsDebug) {
-                double sec = (DateTime.Now - now).TotalSeconds;
-                if (sec > Conf.DebugTimeThreshold) {
-                    Console.WriteLine ("Time for Relay.ReadStr is {0} s", sec);
-                }
-            }
             return result;
         }
 
         protected static bool WriteStr (Socket client, string str) {
-            DateTime now;
-            if (Conf.IsDebug) {
-                now = DateTime.Now;
-            }
-
             bool result = false;
             if (client != null) {
                 byte[] buffer = Encoding.UTF8.GetBytes (str);
@@ -128,58 +120,21 @@ namespace eagle.tunnel.dotnet.core {
                     Console.WriteLine (se.Message);
                 }
             }
-
-            if (Conf.IsDebug) {
-                double sec = (DateTime.Now - now).TotalSeconds;
-                if (sec > Conf.DebugTimeThreshold) {
-                    Console.WriteLine ("Time for Relay.WriteStr is {0} s", sec);
-                }
-            }
-
             return result;
         }
 
         protected Socket CreateSocketConnect (IPEndPoint remoteIPEP) {
-            DateTime now;
-            if (Conf.IsDebug) {
-                now = DateTime.Now;
-            }
-
             Socket client = new Socket (AddressFamily.InterNetwork,
                 SocketType.Stream,
                 ProtocolType.Tcp);
             try {
-                // connectDone.Reset ();
-                // client.BeginConnect (remoteIPEP, new AsyncCallback (CreateSocketConnectCallback), client);
-                // connectDone.WaitOne (5000, false);
-                // if (!client.Connected) {
-                //     client = null;
-                // }
-                client.Connect(remoteIPEP);
+                client.Connect (remoteIPEP);
             } catch (SocketException se) {
                 Console.WriteLine (se.Message);
                 client = null;
             }
-
-            if (Conf.IsDebug) {
-                double sec = (DateTime.Now - now).TotalSeconds;
-                if (sec > Conf.DebugTimeThreshold) {
-                    Console.WriteLine ("Time to connect to {0} is : {1} s", remoteIPEP.ToString (), sec);
-                }
-            }
-
             return client;
         }
-
-        // private void CreateSocketConnectCallback (IAsyncResult ar) {
-        //     try {
-        //         Socket client = ar.AsyncState as Socket;
-        //         client.EndConnect (ar);
-
-        //     } catch {; } finally {
-        //         connectDone.Set ();
-        //     }
-        // }
 
         protected static Socket CreateSocketListen (IPEndPoint localIPEP, int backlog = 100) {
             Socket server = new Socket (AddressFamily.InterNetwork,

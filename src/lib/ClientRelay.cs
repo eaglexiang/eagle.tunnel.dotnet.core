@@ -37,12 +37,6 @@ namespace eagle.tunnel.dotnet.core {
         }
 
         protected override void HandleClient (Socket socket2Client) {
-            DateTime now;
-            if (Conf.IsDebug)
-            {
-                now = DateTime.Now;
-            }
-
             if (socket2Client != null) {
                 Socket socket2Server = CreateSocketConnect (
                     GetRemoteIPEndPoint ());
@@ -66,24 +60,9 @@ namespace eagle.tunnel.dotnet.core {
                     socket2Client.Close ();
                 }
             }
-
-            if (Conf.IsDebug)
-            {
-                double sec = (DateTime.Now - now).TotalSeconds;
-                if (sec > Conf.DebugTimeThreshold)
-                {
-                    Console.WriteLine("Time for ClientRelay.Handle_Client is {0} s", sec);
-                }
-            }
         }
 
         protected virtual bool Authenticate (Socket socket2Server) {
-            DateTime now;
-            if (Conf.IsDebug)
-            {
-                now = DateTime.Now;
-            }
-
             bool result = false;
             if (socket2Server != null) {
                 if (WriteStr (socket2Server, "eagle_tunnel_v2.0")) {
@@ -96,16 +75,6 @@ namespace eagle.tunnel.dotnet.core {
                     }
                 }
             }
-
-            if (Conf.IsDebug)
-            {
-                double sec = (DateTime.Now -now).TotalSeconds;
-                if (sec > Conf.DebugTimeThreshold)
-                {
-                    Console.WriteLine("Time for ClientRelay.Authenticate(Socket) is {0} s", sec);
-                }
-            }
-
             return result;
         }
 

@@ -9,12 +9,6 @@ namespace eagle.tunnel.dotnet.core {
             base (remoteIPEPs, localIPEP) { }
 
         protected override bool Authenticate (Socket socket2Server) {
-            DateTime now;
-            if (Conf.IsDebug)
-            {
-                now = DateTime.Now;
-            }
-
             bool result = false;
             if (socket2Server != null) {
                 if (base.Authenticate (socket2Server)) {
@@ -28,16 +22,6 @@ namespace eagle.tunnel.dotnet.core {
                     }
                 }
             }
-
-            if(Conf.IsDebug)
-            {
-                double sec = (DateTime.Now - now).TotalSeconds;
-                if (sec > Conf.DebugTimeThreshold)
-                {
-                    Console.WriteLine("Time for Authen_ClientRelay.Authenticate(Socket) is {0} s", sec);
-                }
-            }
-
             return result;
         }
 

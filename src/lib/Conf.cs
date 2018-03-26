@@ -10,8 +10,8 @@ namespace eagle.tunnel.dotnet.core {
         public static string confPath { get; set; } = "./config.txt";
         public static Dictionary<string, TunnelUser> Users =
             new Dictionary<string, TunnelUser> ();
-        public const bool IsDebug = false;
-        public const double DebugTimeThreshold = 2;
+        public static int maxSocketTimeout = 5000;
+        public static int maxClientHandleThreads = 50;
 
         public static void Init () {
             ReadAll (confPath);
