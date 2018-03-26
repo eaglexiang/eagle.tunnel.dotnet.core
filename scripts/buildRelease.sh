@@ -29,7 +29,7 @@ if [ ! -d ${ConfDIR} ]; then
     mkdir -p ${ConfDIR}
 fi
 cd ${Workspace}/src/console && dotnet publish -c Release -o ${LibDIR}
-cp -rf ${Workspace}/scripts/run.sh ${LibDIR}
-cp -rf ${Workspace}/scripts/eagle-tunnel-*.service ${ServiceDIR}
-cp -rf ${Workspace}/scripts/eagle-tunnel.conf ${EtcDIR}
-cp -rf ${Workspace}/scripts/users.conf ${ConfDIR}
+cp -rf ${Workspace}/src/scripts/run.sh ${LibDIR}
+cp -rf ${Workspace}/src/doc/eagle-tunnel-*.service ${ServiceDIR}
+cp -rf ${Workspace}/src/doc/eagle-tunnel.conf ${EtcDIR}
+cp -rf ${Workspace}/src/doc/users.conf ${ConfDIR}
