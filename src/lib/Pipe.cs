@@ -8,44 +8,9 @@ namespace eagle.tunnel.dotnet.core {
     public class Pipe {
         public string userFrom;
         private int speedSignal;
-        private const int speedCheckThreshold = 1048576; // 1MB
-        private Socket socketFrom;
-        private Socket socketTo;
-        public Socket SocketFrom {
-            set {
-                if (socketFrom != null) {
-                    try {
-                        socketFrom.Shutdown (SocketShutdown.Both);
-                        Thread.Sleep (10);
-                        socketFrom.Close ();
-                    } catch { }
-                }
-                socketFrom = value;
-                if (socketFrom != null) {
-                    BufferSize = socketFrom.ReceiveBufferSize;
-                } else {
-                    BufferSize = 0;
-                }
-            }
-            get {
-                return socketFrom;
-            }
-        }
-        public Socket SocketTo {
-            set {
-                if (socketTo != null) {
-                    try {
-                        socketTo.Shutdown (SocketShutdown.Both);
-                        Thread.Sleep (10);
-                        socketTo.Close ();
-                    } catch { }
-                }
-                socketTo = value;
-            }
-            get {
-                return socketTo;
-            }
-        }
+        private const int speedCheckThreshold = 1048576; // 1024 x 1024 = 1M (B)
+        public Socket SocketFrom { get; set; }
+        public Socket SocketTo { get; set; }
         public bool EncryptFrom { get; set; }
         public bool EncryptTo { get; set; }
         private static byte EncryptionKey = 0x22;
@@ -66,9 +31,9 @@ namespace eagle.tunnel.dotnet.core {
                 }
             }
         }
-        private bool IsRunning;
+        public bool IsRunning { get; private set; }
 
-        public Pipe (Socket from, Socket to, string user = null) {
+        public Pipe (Socket from = null, Socket to = null, string user = null) {
             SocketFrom = from;
             SocketTo = to;
             EncryptFrom = false;
@@ -76,24 +41,27 @@ namespace eagle.tunnel.dotnet.core {
 
             userFrom = user;
             speedSignal = 0;
+            BufferSize = 128;
             IsRunning = false;
         }
 
         public bool Write (byte[] buffer, int offset, int count) {
-            if (SocketTo != null) {
+            bool result = false;
+            if (buffer != null) {
                 byte[] tmpBuffer = new byte[count];
                 Array.Copy (buffer, tmpBuffer, count);
                 if (EncryptTo) {
                     tmpBuffer = Encrypt (tmpBuffer);
                 }
-                try {
-                    SocketTo.Send (tmpBuffer);
-                    return true;
-                } catch {
-                    return false;
+                if (SocketTo != null && SocketTo.Connected) {
+                    int written;
+                    try {
+                        written = SocketTo.Send (tmpBuffer);
+                    } catch { written = 0; }
+                    result = written > 0;
                 }
             }
-            return false;
+            return result;
         }
 
         public bool Write (byte[] buffer) {
@@ -101,8 +69,12 @@ namespace eagle.tunnel.dotnet.core {
         }
 
         public bool Write (string msg) {
-            byte[] buffer = Encoding.UTF8.GetBytes (msg);
-            return Write (buffer);
+            bool result = false;
+            if (!string.IsNullOrEmpty (msg)) {
+                byte[] buffer = Encoding.UTF8.GetBytes (msg);
+                result = Write (buffer);
+            }
+            return result;
         }
 
         public string ReadString () {
@@ -119,53 +91,56 @@ namespace eagle.tunnel.dotnet.core {
         }
 
         public byte[] ReadByte () {
-            if (SocketFrom != null) {
+            byte[] result = null;
+            if (SocketFrom != null && SocketFrom.Connected) {
                 int count = 0;
                 try {
                     count = SocketFrom.Receive (bufferRead);
                 } catch {
                     count = 0;
                 }
-                if (count != 0) {
+                if (count > 0) {
+                    byte[] tmpBuffer = new byte[count];
+                    Array.Copy (bufferRead, tmpBuffer, count);
+                    if (EncryptFrom) {
+                        tmpBuffer = Decrypt (tmpBuffer);
+                    }
+                    result = tmpBuffer;
                     if (userFrom != null) {
                         // check speed limit
-                        speedSignal += count;
+                        speedSignal += result.Length;
                         // reduce use of lock (Conf.Users.CheckSpeed().lock)
                         if (speedSignal > speedCheckThreshold) {
                             Conf.Users[userFrom].CheckSpeed (speedSignal);
                             speedSignal = 0;
                         }
                     }
-
-                    byte[] tmpBuffer = new byte[count];
-                    Array.Copy (bufferRead, tmpBuffer, count);
-                    if (EncryptFrom) {
-                        tmpBuffer = Decrypt (tmpBuffer);
-                    }
-                    return tmpBuffer;
                 }
             }
-            return null;
+            return result;
         }
 
-        public void Flow()
-        {
-            IsRunning = true;
-            Thread thread_Flow = new Thread(_Flow);
-            thread_Flow.IsBackground = true;
-            thread_Flow.Start();
+        public void Flow () {
+            if (!IsRunning) {
+                IsRunning = true;
+                Thread thread_Flow = new Thread (_Flow);
+                thread_Flow.IsBackground = true;
+                thread_Flow.Start ();
+            }
         }
 
         private void _Flow () {
             byte[] buffer = ReadByte ();
-            while (IsRunning && buffer != null) {
-                if (!Write (buffer)) {
-                    break;
-                } else {
-                    buffer = ReadByte ();
+            while (IsRunning) {
+                if (buffer != null) {
+                    bool done = Write (buffer);
+                    if (done) {
+                        buffer = ReadByte ();
+                        continue;
+                    }
                 }
+                Close ();
             }
-            Close ();
         }
 
         public static byte[] Encrypt (byte[] src) {
@@ -186,8 +161,30 @@ namespace eagle.tunnel.dotnet.core {
 
         public void Close () {
             IsRunning = false;
-            SocketFrom = null;
-            SocketTo = null;
+            if (SocketFrom != null) {
+                if (SocketFrom.Connected) {
+                    try {
+                        SocketFrom.Shutdown (SocketShutdown.Both);
+                    } catch {; }
+                    Thread.Sleep (100);
+                    try {
+                        SocketFrom.Close ();
+                    } catch {; }
+                }
+                SocketFrom = null;
+            }
+            if (SocketTo != null) {
+                if (SocketTo.Connected) {
+                    try {
+                        SocketTo.Shutdown (SocketShutdown.Both);
+                    } catch {; }
+                    Thread.Sleep (100);
+                    try {
+                        SocketTo.Close ();
+                    } catch {; }
+                }
+                SocketTo = null;
+            }
         }
     }
 }

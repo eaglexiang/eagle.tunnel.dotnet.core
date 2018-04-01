@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -6,24 +7,81 @@ using System.IO;
 namespace eagle.tunnel.dotnet.core {
     public class Conf {
         public static Dictionary<string, List<string>> allConf =
-            new Dictionary<string, List<string>> ();
-        public static string confPath { get; set; } = "./config.txt";
+            new Dictionary<string, List<string>> (StringComparer.OrdinalIgnoreCase);
         public static Dictionary<string, TunnelUser> Users =
             new Dictionary<string, TunnelUser> ();
         public static int maxSocketTimeout = 5000;
-        public static int maxClientHandleThreads = 50;
+        public static int maxClientsCount = 100;
+        public static IPEndPoint[] localAddresses;
+        private static IPEndPoint[] remoteAddresses;
 
-        public static void Init () {
+        private static object lockOfIndex;
+
+        private static int indexOfRemoteAddresses;
+        private static int GetIndexOfRemoteAddresses () {
+            if (remoteAddresses.Length > 1) {
+                lock (lockOfIndex) {
+                    indexOfRemoteAddresses += 1;
+                    indexOfRemoteAddresses %= remoteAddresses.Length;
+                }
+            }
+            return indexOfRemoteAddresses;
+        }
+
+        public static IPEndPoint GetRemoteIPEndPoint () {
+            return remoteAddresses[GetIndexOfRemoteAddresses ()];
+        }
+
+        public static void Init (string confPath = "./config.txt") {
             ReadAll (confPath);
-            if (allConf.ContainsKey ("UsersConf")) {
+            if (allConf.ContainsKey ("user-conf")) {
                 ImportUsers ();
                 Console.WriteLine ("find user(s): {0}", Users.Count);
             }
-        }
 
+            if (allConf.ContainsKey("worker"))
+            {
+                if (int.TryParse(allConf["worker"][0], out int workerCount))
+                {
+                    maxClientsCount = workerCount;
+                }
+            }
+            Console.WriteLine("worker: {0}", maxClientsCount);
+
+            try {
+                List<string> remoteAddressStrs = Conf.allConf["remote address"];
+                remoteAddresses = CreateEndPoints (remoteAddressStrs);
+            } catch (KeyNotFoundException) {
+                Console.WriteLine ("Remote Address not found.");
+            }
+            try {
+                List<string> localAddressStrs = Conf.allConf["local address"];
+                localAddresses = CreateEndPoints (localAddressStrs);
+                lockOfIndex = new object();
+
+            } catch (KeyNotFoundException) {
+                Console.WriteLine ("Local Address not found");
+            }
+        }
+        
+        private static IPEndPoint[] CreateEndPoints (List<string> addresses) {
+            ArrayList list = new ArrayList ();
+            foreach (string address in addresses) {
+                string[] endpoints = address.Split (':');
+                if (endpoints.Length >= 2) {
+                    if (IPAddress.TryParse (endpoints[0], out IPAddress ipa)) {
+                        if (int.TryParse (endpoints[1], out int port)) {
+                            IPEndPoint ipep = new IPEndPoint (ipa, port);
+                            list.Add (ipep);
+                        }
+                    }
+                }
+            }
+            return list.ToArray (typeof (IPEndPoint)) as IPEndPoint[];
+        }
         private static void ImportUsers () {
-            if (allConf["UsersConf"].Count >= 1) {
-                string pathOfUsersConf = allConf["UsersConf"][0];
+            if (allConf["user-conf"].Count >= 1) {
+                string pathOfUsersConf = allConf["user-conf"][0];
                 if (File.Exists (pathOfUsersConf)) {
                     string usersText = File.ReadAllText (pathOfUsersConf);
                     usersText = usersText.Replace ("\r\n", "\n");
@@ -41,6 +99,10 @@ namespace eagle.tunnel.dotnet.core {
                             Conf.Users.Add (newUser.ID, newUser);
                         }
                     }
+                }
+                else
+                {
+                    Console.WriteLine("user-conf file not found: {0}", pathOfUsersConf);
                 }
             }
         }
