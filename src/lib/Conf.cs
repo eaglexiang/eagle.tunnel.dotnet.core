@@ -23,17 +23,25 @@ namespace eagle.tunnel.dotnet.core {
 
         private static int indexOfRemoteAddresses;
         private static int GetIndexOfRemoteAddresses () {
-            if (remoteAddresses.Length > 1) {
-                lock (lockOfIndex) {
-                    indexOfRemoteAddresses += 1;
-                    indexOfRemoteAddresses %= remoteAddresses.Length;
+            int result = 0;
+            if (remoteAddresses != null) {
+                if (remoteAddresses.Length > 1) {
+                    lock (lockOfIndex) {
+                        indexOfRemoteAddresses += 1;
+                        indexOfRemoteAddresses %= remoteAddresses.Length;
+                    }
+                    result = indexOfRemoteAddresses;
                 }
             }
-            return indexOfRemoteAddresses;
+            return result;
         }
 
         public static IPEndPoint GetRemoteIPEndPoint () {
-            return remoteAddresses[GetIndexOfRemoteAddresses ()];
+            IPEndPoint result = null;
+            if (remoteAddresses != null) {
+                result = remoteAddresses[GetIndexOfRemoteAddresses ()];
+            }
+            return result;
         }
 
         public static void Init (string confPath = "./config.txt") {
@@ -46,14 +54,12 @@ namespace eagle.tunnel.dotnet.core {
 
             LocalUser = null;
             if (allConf.ContainsKey ("user")) {
-                if (EagleTunnelUser.TryParse(allConf["user"][0], out EagleTunnelUser user))
-                {
+                if (EagleTunnelUser.TryParse (allConf["user"][0], out EagleTunnelUser user)) {
                     LocalUser = user;
                 }
             }
-            if (LocalUser!=null)
-            {
-                Console.WriteLine("User: {0}", LocalUser.ID);
+            if (LocalUser != null) {
+                Console.WriteLine ("User: {0}", LocalUser.ID);
             }
 
             if (allConf.ContainsKey ("worker")) {
@@ -63,12 +69,14 @@ namespace eagle.tunnel.dotnet.core {
             }
             Console.WriteLine ("worker: {0}", maxClientsCount);
 
+            remoteAddresses = null;
             try {
                 List<string> remoteAddressStrs = Conf.allConf["remote address"];
                 remoteAddresses = CreateEndPoints (remoteAddressStrs);
             } catch (KeyNotFoundException) {
                 Console.WriteLine ("Remote Address not found.");
             }
+            localAddresses = null;
             try {
                 List<string> localAddressStrs = Conf.allConf["local address"];
                 localAddresses = CreateEndPoints (localAddressStrs);
@@ -123,13 +131,10 @@ namespace eagle.tunnel.dotnet.core {
                     usersText = usersText.Replace ("\r\n", "\n");
                     string[] usersArray = usersText.Split ('\n');
                     usersArray = Format (usersArray);
-                    foreach (string line in usersArray)
-                    {
-                        if(EagleTunnelUser.TryParse(line,out EagleTunnelUser user))
-                        {
-                            if (!Users.ContainsKey(user.ID))
-                            {
-                                Users.Add(user.ID, user);
+                    foreach (string line in usersArray) {
+                        if (EagleTunnelUser.TryParse (line, out EagleTunnelUser user)) {
+                            if (!Users.ContainsKey (user.ID)) {
+                                Users.Add (user.ID, user);
                             }
                         }
                     }
