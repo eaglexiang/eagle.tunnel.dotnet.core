@@ -76,6 +76,9 @@ namespace eagle.tunnel.dotnet.core {
             } catch (KeyNotFoundException) {
                 Console.WriteLine ("Remote Address not found.");
             }
+            if (remoteAddresses != null) {
+                Console.WriteLine ("Remote Address(es) Count: {0}", remoteAddresses.Length);
+            }
             localAddresses = null;
             try {
                 List<string> localAddressStrs = Conf.allConf["local address"];
