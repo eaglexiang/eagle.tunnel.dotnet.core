@@ -38,7 +38,7 @@ namespace eagle.tunnel.dotnet.core {
         private static Tunnel CheckVersion (Socket socket2Server) {
             Tunnel result = null;
             if (socket2Server != null) {
-                string req = "eagle_tunnel 1.0 null";
+                string req = "eagle_tunnel 1.0 simple";
                 byte[] buffer = Encoding.ASCII.GetBytes (req);
                 int written;
                 try {

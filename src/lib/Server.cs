@@ -50,8 +50,11 @@ namespace eagle.tunnel.dotnet.core {
         }
 
         private static void HandleClient (Socket socket2Client) {
-            while (clients.Count > Conf.maxClientsCount) {
-                Thread.Sleep (100);
+            lock (clients) {
+                while (clients.Count > Conf.maxClientsCount) {
+                    Tunnel tunnel2Close = clients.Dequeue ();
+                    tunnel2Close.Close ();
+                }
             }
             Thread threadHandleClient = new Thread (_handleClient);
             threadHandleClient.IsBackground = true;
@@ -73,18 +76,6 @@ namespace eagle.tunnel.dotnet.core {
                 if (tunnel != null) {
                     lock (clients) {
                         clients.Enqueue (tunnel);
-                    }
-                    while (tunnel.IsWorking) {
-                        Thread.Sleep (1000);
-                        Tunnel tunnel2Close = null;
-                        lock (clients) {
-                            if (clients.Count > Conf.maxClientsCount) {
-                                tunnel2Close = clients.Dequeue ();
-                            }
-                        }
-                        if (tunnel2Close != null) {
-                            tunnel2Close.Close ();
-                        }
                     }
                 }
             }

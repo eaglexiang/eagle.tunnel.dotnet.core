@@ -56,7 +56,7 @@ namespace eagle.tunnel.dotnet.core {
                 bool valid1 = args[1] == "1.0";
                 valid &= valid1;
                 reply += valid1 ? " valid" : " invalid";
-                valid1 = args[2] == "null";
+                valid1 = args[2] == "simple";
                 valid &= valid1;
                 reply += valid1 ? " valid" : " invalid";
                 if (valid) {

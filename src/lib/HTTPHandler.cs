@@ -19,7 +19,8 @@ namespace eagle.tunnel.dotnet.core {
                         bool done;
                         if (e0.HTTP_Request_Type == HTTP_Request_Type.CONNECT) {
                             // HTTPS: reply web client;
-                            string re443 = "HTTP/1.1 200 Connection Established\r\n\r\n";
+                            // string re443 = "HTTP/1.1 200 Connection Established\r\n\r\n";
+                            string re443 = "HTTP/1.1 OK\r\n\r\n";
                             byte[] buffer = Encoding.UTF8.GetBytes (re443);
                             int written;
                             try {
