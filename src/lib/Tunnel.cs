@@ -4,7 +4,7 @@ namespace eagle.tunnel.dotnet.core
 {
     public class Tunnel
     {
-        public Pipe[] pipes;
+        public Pipe[] pipes; // { L2R, R2L}
         public Socket SocketL
         {
             get

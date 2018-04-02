@@ -1,11 +1,14 @@
 using System;
-using System.Net;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 
 namespace eagle.tunnel.dotnet.core {
     public class Conf {
+        public static bool EnableSOCKS { get; set; }
+        public static bool EnableHTTP { get; set; }
+        public static bool EnableEagleTunnel { get; set; }
         public static Dictionary<string, List<string>> allConf =
             new Dictionary<string, List<string>> (StringComparer.OrdinalIgnoreCase);
         public static Dictionary<string, TunnelUser> Users =
@@ -39,14 +42,12 @@ namespace eagle.tunnel.dotnet.core {
                 Console.WriteLine ("find user(s): {0}", Users.Count);
             }
 
-            if (allConf.ContainsKey("worker"))
-            {
-                if (int.TryParse(allConf["worker"][0], out int workerCount))
-                {
+            if (allConf.ContainsKey ("worker")) {
+                if (int.TryParse (allConf["worker"][0], out int workerCount)) {
                     maxClientsCount = workerCount;
                 }
             }
-            Console.WriteLine("worker: {0}", maxClientsCount);
+            Console.WriteLine ("worker: {0}", maxClientsCount);
 
             try {
                 List<string> remoteAddressStrs = Conf.allConf["remote address"];
@@ -57,13 +58,31 @@ namespace eagle.tunnel.dotnet.core {
             try {
                 List<string> localAddressStrs = Conf.allConf["local address"];
                 localAddresses = CreateEndPoints (localAddressStrs);
-                lockOfIndex = new object();
+                lockOfIndex = new object ();
 
             } catch (KeyNotFoundException) {
                 Console.WriteLine ("Local Address not found");
             }
+
+            if (allConf.ContainsKey ("socks")) {
+                if (allConf["socks"][0] == "on") {
+                    EnableSOCKS = true;
+                }
+            }
+
+            if (allConf.ContainsKey ("http")) {
+                if (allConf["http"][0] == "on") {
+                    EnableHTTP = true;
+                }
+            }
+
+            if (allConf.ContainsKey ("eagle tunnel")) {
+                if (allConf["eagle tunnel"][0] == "on") {
+                    EnableEagleTunnel = true;
+                }
+            }
         }
-        
+
         private static IPEndPoint[] CreateEndPoints (List<string> addresses) {
             ArrayList list = new ArrayList ();
             foreach (string address in addresses) {
@@ -99,10 +118,8 @@ namespace eagle.tunnel.dotnet.core {
                             Conf.Users.Add (newUser.ID, newUser);
                         }
                     }
-                }
-                else
-                {
-                    Console.WriteLine("user-conf file not found: {0}", pathOfUsersConf);
+                } else {
+                    Console.WriteLine ("user-conf file not found: {0}", pathOfUsersConf);
                 }
             }
         }

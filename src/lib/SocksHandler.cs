@@ -46,32 +46,30 @@ namespace eagle.tunnel.dotnet.core {
         private static Tunnel HandleTCPReq (byte[] request, Socket socket2Client) {
             Tunnel result = null;
             if (request != null && socket2Client != null) {
-                string ip = GetIP (request);
+                IPAddress ip = GetIP (request);
                 int port = GetPort (request);
                 if (ip != null && port != 0) {
-                    if (IPAddress.TryParse (ip, out IPAddress ipa)) {
-                        IPEndPoint reqIPEP = new IPEndPoint (ipa, port);
-                        string reply;
-                        EagleTunnelArgs e = new EagleTunnelArgs();
-                        e.EndPoint = reqIPEP;
-                        result = EagleTunnelSender.Handle (EagleTunnelHandler.EagleTunnelRequestType.TCP, e);
-                        if (result != null) {
-                            reply = "\u0005\u0000\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0000";
+                    IPEndPoint reqIPEP = new IPEndPoint (ip, port);
+                    string reply;
+                    EagleTunnelArgs e = new EagleTunnelArgs ();
+                    e.EndPoint = reqIPEP;
+                    result = EagleTunnelSender.Handle (EagleTunnelHandler.EagleTunnelRequestType.TCP, e);
+                    if (result != null) {
+                        reply = "\u0005\u0000\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0000";
+                    } else {
+                        reply = "\u0005\u0001\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0000";
+                    }
+                    byte[] buffer = Encoding.ASCII.GetBytes (reply);
+                    int written;
+                    try {
+                        written = socket2Client.Send (buffer);
+                    } catch { written = 0; }
+                    if (result != null) {
+                        if (written > 0) {
+                            result.SocketL = socket2Client;
                         } else {
-                            reply = "\u0005\u0001\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0000";
-                        }
-                        byte[] buffer = Encoding.ASCII.GetBytes (reply);
-                        int written;
-                        try {
-                            written = socket2Client.Send (buffer);
-                        } catch { written = 0; }
-                        if (result != null) {
-                            if (written > 0) {
-                                result.SocketL = socket2Client;
-                            } else {
-                                result.Close ();
-                                result = null;
-                            }
+                            result.Close ();
+                            result = null;
                         }
                     }
                 }
@@ -79,16 +77,20 @@ namespace eagle.tunnel.dotnet.core {
             return result;
         }
 
-        public static string GetIP (byte[] request) {
+        public static IPAddress GetIP (byte[] request) {
+            IPAddress ip = null;
             try {
                 int destype = request[3];
-                string ip;
+                string ip_str;
                 switch (destype) {
                     case 1:
-                        ip = request[4].ToString ();
-                        ip += '.' + request[5].ToString ();
-                        ip += '.' + request[6].ToString ();
-                        ip += '.' + request[7].ToString ();
+                        ip_str = request[4].ToString ();
+                        ip_str += '.' + request[5].ToString ();
+                        ip_str += '.' + request[6].ToString ();
+                        ip_str += '.' + request[7].ToString ();
+                        if (IPAddress.TryParse (ip_str, out IPAddress ipa0)) {
+                            ip = ipa0;
+                        }
                         break;
                     case 3:
                         int len = request[4];
@@ -98,26 +100,18 @@ namespace eagle.tunnel.dotnet.core {
                         }
                         string host = new string (hostChars);
                         // if host is real ip but not domain name
-                        if (IPAddress.TryParse (host, out IPAddress ipa)) {
-                            ip = host;
+                        if (IPAddress.TryParse (host, out IPAddress ipa1)) {
+                            ip = ipa1;
                         } else {
-                            IPHostEntry iphe = Dns.GetHostEntry (host);
-                            ip = null;
-                            foreach (IPAddress tmp in iphe.AddressList) {
-                                if (tmp.AddressFamily == AddressFamily.InterNetwork) {
-                                    ip = tmp.ToString ();
-                                }
-                            }
+                            EagleTunnelArgs e = new EagleTunnelArgs ();
+                            e.Domain = host;
+                            EagleTunnelSender.Handle (EagleTunnelHandler.EagleTunnelRequestType.DNS, e);
+                            ip = e.IP;
                         }
                         break;
-                    default:
-                        ip = null;
-                        break;
                 }
-                return ip;
-            } catch {
-                return null;
-            }
+            } catch { ip = null; }
+            return ip;
         }
 
         public static int GetPort (byte[] request) {

@@ -23,13 +23,19 @@ namespace eagle.tunnel.dotnet.core {
                 string msgStr = Encoding.ASCII.GetString (firstMsg);
                 switch (reqType) {
                     case RequestType.Eagle_Tunnel:
-                        result = EagleTunnelHandler.Handle (msgStr, socket2Client);
+                        if (Conf.EnableEagleTunnel) {
+                            result = EagleTunnelHandler.Handle (msgStr, socket2Client);
+                        }
                         break;
                     case RequestType.HTTP_Proxy:
-                        result = HTTPHandler.Handle (msgStr, socket2Client);
+                        if (Conf.EnableHTTP) {
+                            result = HTTPHandler.Handle (msgStr, socket2Client);
+                        }
                         break;
                     case RequestType.SOCKS5:
-                        result = SocksHandler.Handle (firstMsg, socket2Client);
+                        if (Conf.EnableSOCKS) {
+                            result = SocksHandler.Handle (firstMsg, socket2Client);
+                        }
                         break;
                 }
                 if (result != null) {
