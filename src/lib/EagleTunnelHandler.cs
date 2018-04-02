@@ -32,12 +32,11 @@ namespace eagle.tunnel.dotnet.core {
                                     // no need to continue;
                                     break;
                                 case EagleTunnelRequestType.TCP:
-                                    done = TCPReqHandle(req, result);
+                                    done = TCPReqHandle (req, result);
                                     break;
                             }
-                            if (!done)
-                            {
-                                result.Close();
+                            if (!done) {
+                                result.Close ();
                                 result = null;
                             }
                         }
@@ -80,12 +79,9 @@ namespace eagle.tunnel.dotnet.core {
                 byte[] buffer = new byte[100];
                 string req = tunnel.ReadStringL ();
                 if (!string.IsNullOrEmpty (req)) {
-                    string[] args = req.Split (':');
-                    if (args.Length >= 2) {
-                        string id = args[0];
-                        string password = args[1];
-                        if (Conf.Users.ContainsKey (id)) {
-                            result = Conf.Users[id].Password == password;
+                    if (EagleTunnelUser.TryParse (req, out EagleTunnelUser user)) {
+                        if (Conf.Users.ContainsKey (user.ID)) {
+                            result = Conf.Users[user.ID].CheckAuthen (user.Password);
                         }
                     }
                 }
@@ -144,14 +140,11 @@ namespace eagle.tunnel.dotnet.core {
                                 socket2Server.Connect (ipeReq);
                                 result = true;
                             } catch {; }
-                            if(result)
-                            {
+                            if (result) {
                                 tunnel.SocketR = socket2Server;
-                                result = tunnel.WriteL("ok");
-                            }
-                            else
-                            {
-                                tunnel.WriteL("nok");
+                                result = tunnel.WriteL ("ok");
+                            } else {
+                                tunnel.WriteL ("nok");
                             }
                         }
                     }

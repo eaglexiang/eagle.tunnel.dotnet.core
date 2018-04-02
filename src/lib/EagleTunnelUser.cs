@@ -2,7 +2,7 @@ using System.Threading;
 
 namespace eagle.tunnel.dotnet.core
 {
-    public class TunnelUser
+    public class EagleTunnelUser
     {
         public string ID { get; }
         public string Password { get; set;}
@@ -18,16 +18,37 @@ namespace eagle.tunnel.dotnet.core
                 _SpeedLimit = value;
             }
         }
-        private const int defaultSpeedLimit = 0;
         private object lockSignal = new object();
         public int SpeedSignal { get; set;}
 
-        public TunnelUser(string id, string password)
+        public EagleTunnelUser(string id, string password)
         {
             ID = id;
             Password = password;
-            SpeedLimit = defaultSpeedLimit;
+            SpeedLimit = 0;
             SpeedSignal = 0;
+        }
+
+        public static bool TryParse(string parameter, out EagleTunnelUser user)
+        {
+            user = null;
+            if (parameter != null)
+            {
+                string[] args = parameter.Split(':');
+                if (args.Length>=2)
+                {
+                    user = new EagleTunnelUser(args[0], args[1]);
+                    if (args.Length>=3)
+                    {
+                        if(int.TryParse(args[2], out int speed))
+                        {
+                            user.SpeedLimit = speed;
+                        }
+                    }
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void CheckSpeed(int count)
@@ -44,6 +65,16 @@ namespace eagle.tunnel.dotnet.core
                     }
                 }
             }
+        }
+
+        public override string ToString()
+        {
+            return ID + ':' + Password;
+        }
+
+        public bool CheckAuthen(string pswd)
+        {
+            return pswd == Password;
         }
     }
 }

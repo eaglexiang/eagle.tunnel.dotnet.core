@@ -6,13 +6,14 @@ using System.Net;
 
 namespace eagle.tunnel.dotnet.core {
     public class Conf {
+        public static EagleTunnelUser LocalUser { get; set; }
         public static bool EnableSOCKS { get; set; }
         public static bool EnableHTTP { get; set; }
         public static bool EnableEagleTunnel { get; set; }
         public static Dictionary<string, List<string>> allConf =
             new Dictionary<string, List<string>> (StringComparer.OrdinalIgnoreCase);
-        public static Dictionary<string, TunnelUser> Users =
-            new Dictionary<string, TunnelUser> ();
+        public static Dictionary<string, EagleTunnelUser> Users =
+            new Dictionary<string, EagleTunnelUser> ();
         public static int maxSocketTimeout = 5000;
         public static int maxClientsCount = 100;
         public static IPEndPoint[] localAddresses;
@@ -37,9 +38,22 @@ namespace eagle.tunnel.dotnet.core {
 
         public static void Init (string confPath = "./config.txt") {
             ReadAll (confPath);
+
             if (allConf.ContainsKey ("user-conf")) {
                 ImportUsers ();
                 Console.WriteLine ("find user(s): {0}", Users.Count);
+            }
+
+            LocalUser = null;
+            if (allConf.ContainsKey ("user")) {
+                if (EagleTunnelUser.TryParse(allConf["user"][0], out EagleTunnelUser user))
+                {
+                    LocalUser = user;
+                }
+            }
+            if (LocalUser!=null)
+            {
+                Console.WriteLine("User: {0}", LocalUser.ID);
             }
 
             if (allConf.ContainsKey ("worker")) {
@@ -69,21 +83,21 @@ namespace eagle.tunnel.dotnet.core {
                     EnableSOCKS = true;
                 }
             }
-            Console.WriteLine("SOCKS Switch: {0}", EnableSOCKS.ToString());
+            Console.WriteLine ("SOCKS Switch: {0}", EnableSOCKS.ToString ());
 
             if (allConf.ContainsKey ("http")) {
                 if (allConf["http"][0] == "on") {
                     EnableHTTP = true;
                 }
             }
-            Console.WriteLine("HTTP Switch: {0}", EnableHTTP.ToString());
+            Console.WriteLine ("HTTP Switch: {0}", EnableHTTP.ToString ());
 
             if (allConf.ContainsKey ("eagle tunnel")) {
                 if (allConf["eagle tunnel"][0] == "on") {
                     EnableEagleTunnel = true;
                 }
             }
-            Console.WriteLine("Eagle Tunnel Switch: {0}", EnableEagleTunnel.ToString());
+            Console.WriteLine ("Eagle Tunnel Switch: {0}", EnableEagleTunnel.ToString ());
         }
 
         private static IPEndPoint[] CreateEndPoints (List<string> addresses) {
@@ -109,16 +123,14 @@ namespace eagle.tunnel.dotnet.core {
                     usersText = usersText.Replace ("\r\n", "\n");
                     string[] usersArray = usersText.Split ('\n');
                     usersArray = Format (usersArray);
-                    string[][] users = SplitStrs (usersArray, ':');
-                    foreach (string[] user in users) {
-                        if (user.Length >= 2) {
-                            TunnelUser newUser = new TunnelUser (user[0], user[1]);
-                            if (user.Length >= 3) {
-                                if (int.TryParse (user[2], out int speedlimit)) {
-                                    newUser.SpeedLimit = speedlimit;
-                                }
+                    foreach (string line in usersArray)
+                    {
+                        if(EagleTunnelUser.TryParse(line,out EagleTunnelUser user))
+                        {
+                            if (!Users.ContainsKey(user.ID))
+                            {
+                                Users.Add(user.ID, user);
                             }
-                            Conf.Users.Add (newUser.ID, newUser);
                         }
                     }
                 } else {

@@ -64,9 +64,8 @@ namespace eagle.tunnel.dotnet.core {
 
         private static bool CheckUser (Tunnel tunnel) {
             bool result = false;
-            if (Conf.allConf.ContainsKey ("user-conf")) {
-                string user_pswd = Conf.allConf["user"][0];
-                bool done = tunnel.WriteR (user_pswd);
+            if (Conf.LocalUser != null) {
+                bool done = tunnel.WriteR (Conf.LocalUser.ToString ());
                 if (done) {
                     string reply = tunnel.ReadStringR ();
                     if (!string.IsNullOrEmpty (reply)) {
