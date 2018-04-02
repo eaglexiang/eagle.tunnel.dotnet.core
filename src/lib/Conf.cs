@@ -69,18 +69,21 @@ namespace eagle.tunnel.dotnet.core {
                     EnableSOCKS = true;
                 }
             }
+            Console.WriteLine("SOCKS Switch: {0}", EnableSOCKS.ToString());
 
             if (allConf.ContainsKey ("http")) {
                 if (allConf["http"][0] == "on") {
                     EnableHTTP = true;
                 }
             }
+            Console.WriteLine("HTTP Switch: {0}", EnableHTTP.ToString());
 
             if (allConf.ContainsKey ("eagle tunnel")) {
                 if (allConf["eagle tunnel"][0] == "on") {
                     EnableEagleTunnel = true;
                 }
             }
+            Console.WriteLine("Eagle Tunnel Switch: {0}", EnableEagleTunnel.ToString());
         }
 
         private static IPEndPoint[] CreateEndPoints (List<string> addresses) {
