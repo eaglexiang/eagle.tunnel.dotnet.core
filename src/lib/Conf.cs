@@ -10,12 +10,9 @@ namespace eagle.tunnel.dotnet.core {
         public static bool EnableSOCKS { get; set; }
         public static bool EnableHTTP { get; set; }
         public static bool EnableEagleTunnel { get; set; }
-        public static Dictionary<string, List<string>> allConf =
-            new Dictionary<string, List<string>> (StringComparer.OrdinalIgnoreCase);
-        public static Dictionary<string, EagleTunnelUser> Users =
-            new Dictionary<string, EagleTunnelUser> ();
-        public static int maxSocketTimeout = 5000;
-        public static int maxClientsCount = 100;
+        public static Dictionary<string, List<string>> allConf;
+        public static Dictionary<string, EagleTunnelUser> Users;
+        public static int maxClientsCount;
         public static IPEndPoint[] localAddresses;
         private static IPEndPoint[] remoteAddresses;
 
@@ -44,10 +41,13 @@ namespace eagle.tunnel.dotnet.core {
             return result;
         }
 
-        public static void Init (string confPath = "./config.txt") {
+        public static void Init (string confPath = "/etc/eagle-tunnel.conf") {
+            allConf = new Dictionary<string, List<string>> (StringComparer.OrdinalIgnoreCase);
             ReadAll (confPath);
 
             if (allConf.ContainsKey ("user-conf")) {
+                Users =
+                    new Dictionary<string, EagleTunnelUser> ();
                 ImportUsers ();
                 Console.WriteLine ("find user(s): {0}", Users.Count);
             }
@@ -62,6 +62,7 @@ namespace eagle.tunnel.dotnet.core {
                 Console.WriteLine ("User: {0}", LocalUser.ID);
             }
 
+            maxClientsCount = 200;
             if (allConf.ContainsKey ("worker")) {
                 if (int.TryParse (allConf["worker"][0], out int workerCount)) {
                     maxClientsCount = workerCount;
@@ -172,6 +173,8 @@ namespace eagle.tunnel.dotnet.core {
                         AddValue (arg_line[0], arg_line[1]);
                     }
                 }
+            } else {
+                Console.WriteLine ("Conf file not found: {0}", confPath);
             }
         }
 

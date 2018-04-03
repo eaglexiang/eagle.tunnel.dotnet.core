@@ -1,11 +1,10 @@
 using System;
 using System.Net;
-using System.Net.Sockets;
 
 namespace eagle.tunnel.dotnet.core {
 
-    public enum HTTP_Request_Type {
-        ERROR,
+    public enum HTTPRequestType {
+        Unknown,
         OPTIONS,
         HEAD,
         GET,
@@ -17,12 +16,12 @@ namespace eagle.tunnel.dotnet.core {
     }
 
     public class HTTPReqArgs {
-        public HTTP_Request_Type HTTP_Request_Type;
+        public HTTPRequestType HTTP_Request_Type;
         public string Host { get; set; }
         public int Port { get; set; }
 
         private HTTPReqArgs () {
-            HTTP_Request_Type = HTTP_Request_Type.ERROR;
+            HTTP_Request_Type = HTTPRequestType.Unknown;
             Host = "";
             Port = 0;
         }
@@ -33,7 +32,7 @@ namespace eagle.tunnel.dotnet.core {
             if (request != null) {
                 string[] args = request.Split (' ');
                 if (args.Length >= 2) {
-                    if (Enum.TryParse (args[0], out HTTP_Request_Type type)) {
+                    if (Enum.TryParse (args[0], out HTTPRequestType type)) {
                         string host = GetHost (request);
                         int port = GetPort (request);
                         if (!string.IsNullOrEmpty (host) && port != 0) {
@@ -78,9 +77,10 @@ namespace eagle.tunnel.dotnet.core {
                     // resolv ip of domain name by EagleTunnel Sender
                     EagleTunnelArgs e1 = new EagleTunnelArgs ();
                     e1.Domain = e0.Host;
-                    EagleTunnelSender.Handle (EagleTunnelHandler.EagleTunnelRequestType.DNS, e1);
-                    // resolv successfully
+                    EagleTunnelSender.Handle (
+                        EagleTunnelHandler.EagleTunnelRequestType.DNS, e1);
                     if (e1.IP != null) {
+                        // resolv successfully
                         result = new IPEndPoint (e1.IP, e0.Port);
                     }
                 }
@@ -96,7 +96,8 @@ namespace eagle.tunnel.dotnet.core {
                 if (ind0 == ind1) {
                     ind1 = line.Length;
                 }
-                string uri = request.Substring (ind0 + 1, ind1 - ind0 - 1);
+                string uri = request.Substring (
+                    ind0 + 1, ind1 - ind0 - 1);
                 return uri;
             } else {
                 return null;
