@@ -193,6 +193,8 @@ namespace eagle.tunnel.dotnet.core {
         }
 
         private static void AddValue (string key, string value) {
+            key = key.Trim();
+            value = value.Trim();
             if (!allConf.ContainsKey (key)) {
                 allConf.Add (key, new List<string> ());
             }
