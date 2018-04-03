@@ -72,22 +72,22 @@ namespace eagle.tunnel.dotnet.core {
 
             remoteAddresses = null;
             try {
-                List<string> remoteAddressStrs = Conf.allConf["remote address"];
+                List<string> remoteAddressStrs = Conf.allConf["relayer"];
                 remoteAddresses = CreateEndPoints (remoteAddressStrs);
             } catch (KeyNotFoundException) {
-                Console.WriteLine ("Remote Address not found.");
+                Console.WriteLine ("`Relayer` not found.");
             }
             if (remoteAddresses != null) {
-                Console.WriteLine ("Remote Address(es) Count: {0}", remoteAddresses.Length);
+                Console.WriteLine ("Count of `Relayer`: {0}", remoteAddresses.Length);
             }
             localAddresses = null;
             try {
-                List<string> localAddressStrs = Conf.allConf["local address"];
+                List<string> localAddressStrs = Conf.allConf["listen"];
                 localAddresses = CreateEndPoints (localAddressStrs);
                 lockOfIndex = new object ();
 
             } catch (KeyNotFoundException) {
-                Console.WriteLine ("Local Address not found");
+                Console.WriteLine ("`Listen` not found");
             }
 
             if (allConf.ContainsKey ("socks")) {
