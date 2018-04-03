@@ -1,3 +1,8 @@
-bin/*
-obj/*
-config.txt
+src/console/bin
+src/console/obj
+src/lib/bin
+src/lib/obj
+publish
+tmp
+bin
+.vscode

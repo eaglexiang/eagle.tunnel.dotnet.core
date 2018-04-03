@@ -6,24 +6,24 @@
 
 [食用方法](https://www.eaglexiang.org/eagle-tunnel)
 
+[备用食用方法](https://github.com/eaglexiang/eagle.tunnel.dotnet.core/blob/master/doc/guide.md)
+
 ## 支持
 
-### 基本功能
-
-- [x] HTTP(S) 代理
-- [x] SOCKS 5 代理
-
-### 支持平台
+### 平台
 
 - [x] Windows
 - [x] Linux
 - [x] macOS
 
-### Windows版（图形界面）
+### 特性
 
-[eagle.tunnel.dotnet](https://github.com/eaglexiang/eagle.tunnel.dotnet)（只支持HTTP(S)代理）
-
-[下载](https://github.com/eaglexiang/eagle.tunnel.dotnet/raw/bin/Eagle%20Tunnel.exe)
+- [x] HTTPS(S) 代理
+- [x] SOCKS 5 代理
+- [x] 多路负载均衡
+- [x] systemd系统服务
+- [x] 用户认证
+- [x] 用户限速
 
 ## 开源协议
 

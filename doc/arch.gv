@@ -1,19 +1,34 @@
 digraph startgame {
-    label="基本结构"
-    rankdir = LR
+    label="Eagle Tunnel"
+    rankdir=LR
+    ranksep=equally 
 
-    app[label="浏览器" shape=box, height=1]
-    local[label="本地服务" shape=box, height=1, color=blue]
-    remote[label="远端服务" shape=box, height=1, color=blue]
-    server[label="网站服务器" shape=box, height=1]
+    app [label="Web Clients" shape=ellipse, height=1]
+    server [label="Web Servers", shape=ellipse, height=1]
+    rh [label="Request Handler" shape=circle, height=1, color=red]
+    arh [label="Request Handler" shape=circle, height=1, color=red]
+    eth [label="Eagle Tunnel Handler", shape=box, height=1, color=gray]
+    ets [label="Eagle Tunnel Sender", shape=box, height=1, color=gray]
+    aets [label="Eagle Tunnel Sender", shape=box, height=1, color=gray]
+    hh [label="HTTP(S) Handler", shape=box, height=1, color=blue]
+    sh [label="SOCKS Handler", shape=box, height=1, color=blue]
+    oh [label="Other Handlers", shape=box, height=1, color=blue]
+    t [label="Trash", shape=box, height=1]
 
+    app -> rh [label="Raw Proxy Request", color=blue]
+    aets -> rh [label="Eagle Tunnel Requets", color=gray]
+    
+    rh -> eth [label="Eagle Tunnel Requests", color=gray]
+    rh -> hh [label="HTTP(S) Proxy Requests", color=blue]
+    rh -> sh [label="SOCKS Requests", color=blue]
+    rh -> oh [label="Other Requests", color=blue]
+    rh -> t [label="Invalid Requests"]
 
-    app -> local [label="网络请求"]
-    local -> app [label="解密后的请求反馈", color=green]
+    hh -> ets [color=blue]
+    sh -> ets [color=blue]
+    oh -> ets [color=blue]
 
-    local -> remote [label="加密后的网络请求", color=red]
-    remote -> local [label="加密后的请求反馈", color=red]
+    ets -> arh [label="Eagle Tunnel Request", color=gray]
 
-    remote -> server [label="解密后的网络请求", color=green]
-    server -> remote [label="请求反馈"]
+    eth -> server [label="Raw Web Request"]
 }
