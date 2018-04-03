@@ -3,7 +3,7 @@ digraph startgame {
     rankdir=LR
     ranksep=equally 
 
-    app [label="Web Browsers" shape=ellipse, height=1]
+    app [label="Web Clients" shape=ellipse, height=1]
     server [label="Web Servers", shape=ellipse, height=1]
     rh [label="Request Handler" shape=circle, height=1, color=red]
     arh [label="Request Handler" shape=circle, height=1, color=red]
@@ -15,18 +15,18 @@ digraph startgame {
     oh [label="Other Handlers", shape=box, height=1, color=blue]
     t [label="Trash", shape=box, height=1]
 
-    app -> rh [label="Raw Proxy Request"]
+    app -> rh [label="Raw Proxy Request", color=blue]
     aets -> rh [label="Eagle Tunnel Requets", color=gray]
     
     rh -> eth [label="Eagle Tunnel Requests", color=gray]
-    rh -> hh [label="HTTP(S) Proxy Requests", color=green]
-    rh -> sh [label="SOCKS Requests", color=green]
-    rh -> oh [label="Other Requests", color=green]
+    rh -> hh [label="HTTP(S) Proxy Requests", color=blue]
+    rh -> sh [label="SOCKS Requests", color=blue]
+    rh -> oh [label="Other Requests", color=blue]
     rh -> t [label="Invalid Requests"]
 
-    hh -> ets [color=green]
-    sh -> ets [color=green]
-    oh -> ets [color=green]
+    hh -> ets [color=blue]
+    sh -> ets [color=blue]
+    oh -> ets [color=blue]
 
     ets -> arh [label="Eagle Tunnel Request", color=gray]
 
