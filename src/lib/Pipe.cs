@@ -33,7 +33,7 @@ namespace eagle.tunnel.dotnet.core {
             bool result = false;
             if (buffer != null) {
                 byte[] tmpBuffer = new byte[count];
-                Array.Copy (buffer, offset, tmpBuffer, 0,count);
+                Array.Copy (buffer, offset, tmpBuffer, 0, count);
                 if (EncryptTo) {
                     tmpBuffer = Encrypt (tmpBuffer);
                 }
@@ -80,9 +80,7 @@ namespace eagle.tunnel.dotnet.core {
                 int count;
                 try {
                     count = SocketFrom.Receive (bufferRead);
-                } catch {
-                    count = 0;
-                }
+                } catch { count = 0; }
                 if (count > 0) {
                     byte[] tmpBuffer = new byte[count];
                     Array.Copy (bufferRead, tmpBuffer, count);

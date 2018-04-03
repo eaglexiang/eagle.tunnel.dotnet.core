@@ -68,13 +68,12 @@ namespace eagle.tunnel.dotnet.core {
             try {
                 read = socket2Client.Receive (buffer);
             } catch { read = 0; }
-            Tunnel tunnel;
             if (read > 0) {
                 byte[] req = new byte[read];
                 Array.Copy (buffer, req, read);
-                tunnel = RequestHandler.Handle (req, socket2Client);
+                Tunnel tunnel = RequestHandler.Handle (req, socket2Client);
                 if (tunnel != null) {
-                    tunnel.Flow();
+                    tunnel.Flow ();
                     lock (clients) {
                         clients.Enqueue (tunnel);
                     }

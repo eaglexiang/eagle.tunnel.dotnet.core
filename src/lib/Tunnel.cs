@@ -1,125 +1,120 @@
 using System.Net.Sockets;
 
-namespace eagle.tunnel.dotnet.core
-{
-    public class Tunnel
-    {
-        public Pipe[] pipes; // { L2R, R2L}
-        public Socket SocketL
-        {
-            get
-            {
-                return pipes[0].SocketFrom;
+namespace eagle.tunnel.dotnet.core {
+    public class Tunnel {
+        private Pipe pipeL2R; // pipe from Left socket to Right socket
+        private Pipe pipeR2L; // pipe from Right socket to Left socket
+
+        public string UserL {
+            get {
+                return pipeL2R.UserFrom;
             }
-            set
-            {
-                pipes[0].SocketFrom = value;
-                pipes[1].SocketTo = value;
+            set {
+                pipeL2R.UserFrom = value;
+            }
+        }
+
+        public string UserFrom {
+            get {
+                return pipeR2L.UserFrom;
+            }
+            set {
+                pipeR2L.UserFrom = value;
+            }
+        }
+
+        public Socket SocketL {
+            get {
+                return pipeL2R.SocketFrom;
+            }
+            set {
+                pipeL2R.SocketFrom = value;
+                pipeR2L.SocketTo = value;
             }
         }
 
         public Socket SocketR
 
         {
-            get
-            {
-                return pipes[0].SocketTo;
+            get {
+                return pipeL2R.SocketTo;
             }
-            set
-            {
-                pipes[0].SocketTo = value;
-                pipes[1].SocketFrom = value;
+            set {
+                pipeL2R.SocketTo = value;
+                pipeR2L.SocketFrom = value;
             }
         }
 
-        public bool EncryptL
-        {
-            get
-            {
-                return pipes[0].EncryptFrom;
+        public bool EncryptL {
+            get {
+                return pipeL2R.EncryptFrom;
             }
-            set
-            {
-                pipes[0].EncryptFrom = value;
-                pipes[1].EncryptTo = value;
+            set {
+                pipeL2R.EncryptFrom = value;
+                pipeR2L.EncryptTo = value;
             }
         }
 
-        public bool EncryptR
-        {
-            get
-            {
-                return pipes[0].EncryptTo;
+        public bool EncryptR {
+            get {
+                return pipeL2R.EncryptTo;
             }
-            set
-            {
-                pipes[0].EncryptTo = value;
-                pipes[1].EncryptFrom = value;
+            set {
+                pipeL2R.EncryptTo = value;
+                pipeR2L.EncryptFrom = value;
             }
         }
 
-        public bool IsWorking
-        {
-            get
-            {
+        public bool IsWorking {
+            get {
                 bool result = false;
-                if (SocketL != null)
-                {
+                if (SocketL != null) {
                     result = SocketL.Connected;
                 }
-                if (SocketR != null)
-                {
+                if (SocketR != null) {
                     result = SocketR.Connected || result;
                 }
                 return result;
             }
         }
 
-        public Tunnel(Socket socketl = null, Socket socketr = null)
-        {
-            pipes = new Pipe[2] { new Pipe(socketl, socketr), new Pipe(socketr, socketl)};
+        public Tunnel (Socket socketl = null, Socket socketr = null) {
+            pipeL2R = new Pipe(socketl, socketr);
+            pipeR2L = new Pipe(socketr, socketl);
         }
 
-        public void Flow()
-        {
-            pipes[0].Flow();
-            pipes[1].Flow();
+        public void Flow () {
+            pipeL2R.Flow();
+            pipeR2L.Flow();
         }
 
-        public void Close()
-        {
-            pipes[0].Close();
-            pipes[1].Close();
+        public void Close () {
+            pipeL2R.Close();
+            pipeR2L.Close();
         }
 
-        public string ReadStringL()
-        {
-            return pipes[0].ReadString();
+        public string ReadStringL () {
+            return pipeL2R.ReadString ();
         }
 
-        public string ReadStringR()
-        {
-            return pipes[1].ReadString();
+        public string ReadStringR () {
+            return pipeR2L.ReadString ();
         }
 
-        public bool WriteL(string msg)
-        {
-            return pipes[1].Write(msg);
+        public bool WriteL (string msg) {
+            return pipeR2L.Write (msg);
         }
 
-        public bool WriteR(string msg)
-        {
-            return pipes[0].Write(msg);
+        public bool WriteR (string msg) {
+            return pipeL2R.Write (msg);
         }
 
-        public byte[] ReadL()
-        {
-            return pipes[0].ReadByte();
+        public byte[] ReadL () {
+            return pipeL2R.ReadByte ();
         }
 
-        public byte[] ReadR()
-        {
-            return pipes[1].ReadByte();
+        public byte[] ReadR () {
+            return pipeR2L.ReadByte ();
         }
     }
 }

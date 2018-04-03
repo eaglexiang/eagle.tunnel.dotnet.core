@@ -19,18 +19,18 @@ namespace eagle.tunnel.dotnet.core {
         public static Tunnel Handle (byte[] firstMsg, Socket socket2Client) {
             Tunnel result = null;
             if (firstMsg != null && socket2Client != null) {
-                RequestType reqType = GetType (firstMsg);
-                string msgStr = Encoding.UTF8.GetString (firstMsg);
                 Tunnel tunnel = null;
+                string firstMsg_Str = Encoding.UTF8.GetString (firstMsg);
+                RequestType reqType = GetType (firstMsg);
                 switch (reqType) {
                     case RequestType.Eagle_Tunnel:
                         if (Conf.EnableEagleTunnel) {
-                            tunnel = EagleTunnelHandler.Handle (msgStr, socket2Client);
+                            tunnel = EagleTunnelHandler.Handle (firstMsg_Str, socket2Client);
                         }
                         break;
                     case RequestType.HTTP_Proxy:
                         if (Conf.EnableHTTP) {
-                            tunnel = HTTPHandler.Handle (msgStr, socket2Client);
+                            tunnel = HTTPHandler.Handle (firstMsg_Str, socket2Client);
                         }
                         break;
                     case RequestType.SOCKS5:

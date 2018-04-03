@@ -24,7 +24,7 @@ namespace eagle.tunnel.dotnet.core {
                             done = tunnel.WriteL (re443);
                         } else {
                             // HTTP: relay new request to web server
-                            string newReq = HTTPReqArgs.CreateRequest (firstMsg);
+                            string newReq = HTTPReqArgs.CreateNewRequest (firstMsg);
                             done = tunnel.WriteR (newReq);
                         }
                         if (done) {

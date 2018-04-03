@@ -36,28 +36,21 @@ namespace eagle.tunnel.dotnet.core {
                     if (Enum.TryParse (args[0], out HTTP_Request_Type type)) {
                         string host = GetHost (request);
                         int port = GetPort (request);
-                        if (host != null && port != 0) {
+                        if (!string.IsNullOrEmpty (host) && port != 0) {
                             e.HTTP_Request_Type = type;
                             e.Host = host;
                             e.Port = port;
                             result = true;
-                        } else {
-                            e.HTTP_Request_Type = HTTP_Request_Type.ERROR;
-                            result = false;
                         }
-                    } else {
-                        // can not resolv the type
-                        e.HTTP_Request_Type = HTTP_Request_Type.ERROR;
-                        result = false;
                     }
                 }
             }
             return result;
         }
 
-        public static string CreateRequest (string request) {
+        public static string CreateNewRequest (string oldRequest) {
             string newReq = "";
-            string[] lines = request.Replace ("\r\n", "\n").Split ('\n');
+            string[] lines = oldRequest.Replace ("\r\n", "\n").Split ('\n');
             string[] args = lines[0].Split (' ');
             if (args.Length >= 2) {
                 string des = args[1];
