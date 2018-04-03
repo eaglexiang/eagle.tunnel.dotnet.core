@@ -1,5 +1,3 @@
-using System.Threading;
-
 namespace eagle.tunnel.dotnet.core {
     public class EagleTunnelUser {
         public string ID { get; }
@@ -47,7 +45,7 @@ namespace eagle.tunnel.dotnet.core {
                 lock (lockSignal) {
                     SpeedSignal += count;
                     while (SpeedSignal > SpeedLimit) {
-                        Thread.Sleep (1000);
+                        System.Threading.Thread.Sleep (1000);
                         SpeedSignal -= SpeedLimit;
                     }
                 }

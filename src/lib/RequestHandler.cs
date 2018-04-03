@@ -25,21 +25,26 @@ namespace eagle.tunnel.dotnet.core {
                 switch (reqType) {
                     case RequestType.Eagle_Tunnel:
                         if (Conf.EnableEagleTunnel) {
-                            tunnel = EagleTunnelHandler.Handle (firstMsg_Str, socket2Client);
+                            tunnel = EagleTunnelHandler.Handle (
+                                firstMsg_Str, socket2Client);
                         }
                         break;
                     case RequestType.HTTP_Proxy:
                         if (Conf.EnableHTTP) {
-                            tunnel = HTTPHandler.Handle (firstMsg_Str, socket2Client);
+                            tunnel = HTTPHandler.Handle (
+                                firstMsg_Str, socket2Client);
                         }
                         break;
                     case RequestType.SOCKS5:
                         if (Conf.EnableSOCKS) {
-                            tunnel = SocksHandler.Handle (firstMsg, socket2Client);
+                            tunnel = SocksHandler.Handle (
+                                firstMsg, socket2Client);
                         }
                         break;
                 }
-                if (tunnel == null) {
+                if (tunnel != null) {
+                    result = tunnel;
+                } else {
                     if (socket2Client.Connected) {
                         try {
                             socket2Client.Shutdown (SocketShutdown.Both);
@@ -47,8 +52,6 @@ namespace eagle.tunnel.dotnet.core {
                             socket2Client.Close ();
                         } catch {; }
                     }
-                } else {
-                    result = tunnel;
                 }
             }
             return result;
@@ -59,10 +62,10 @@ namespace eagle.tunnel.dotnet.core {
             if (msg[0] == 5) {
                 result = RequestType.SOCKS5;
             } else {
-                string msgStr = Encoding.ASCII.GetString (msg);
+                string msgStr = Encoding.UTF8.GetString (msg);
                 string[] args = msgStr.Split (' ');
-                if (args.Length >= 1) {
-                    if (Enum.TryParse (args[0], out HTTP_Request_Type type)) {
+                if (args.Length >= 2) {
+                    if (Enum.TryParse (args[0], out HTTPRequestType type)) {
                         result = RequestType.HTTP_Proxy;
                     } else if (args[0] == "eagle_tunnel") {
                         result = RequestType.Eagle_Tunnel;

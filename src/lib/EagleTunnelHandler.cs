@@ -1,8 +1,5 @@
-using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace eagle.tunnel.dotnet.core {
     public class EagleTunnelHandler {
@@ -61,7 +58,7 @@ namespace eagle.tunnel.dotnet.core {
                 valid &= valid1;
                 reply += valid1 ? " valid" : " invalid";
                 if (valid) {
-                    byte[] buffer = Encoding.ASCII.GetBytes (reply);
+                    byte[] buffer = System.Text.Encoding.ASCII.GetBytes (reply);
                     int written = socket2Client.Send (buffer);
                     if (written > 0) {
                         result = new Tunnel (socket2Client);
@@ -95,7 +92,7 @@ namespace eagle.tunnel.dotnet.core {
         private static EagleTunnelRequestType GetType (string msg) {
             EagleTunnelRequestType result = EagleTunnelRequestType.Unknown;
             string[] args = msg.Split (' ');
-            if (!Enum.TryParse (args[0], out result)) {
+            if (!System.Enum.TryParse (args[0], out result)) {
                 result = EagleTunnelRequestType.Unknown;
             }
             return result;

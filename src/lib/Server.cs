@@ -63,7 +63,7 @@ namespace eagle.tunnel.dotnet.core {
 
         private static void _handleClient (object socket2ClientObj) {
             Socket socket2Client = socket2ClientObj as Socket;
-            byte[] buffer = new byte[100];
+            byte[] buffer = new byte[1024];
             int read;
             try {
                 read = socket2Client.Receive (buffer);
