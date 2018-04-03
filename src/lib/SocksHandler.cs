@@ -53,7 +53,8 @@ namespace eagle.tunnel.dotnet.core {
                     string reply;
                     EagleTunnelArgs e = new EagleTunnelArgs ();
                     e.EndPoint = reqIPEP;
-                    result = EagleTunnelSender.Handle (EagleTunnelHandler.EagleTunnelRequestType.TCP, e);
+                    result = EagleTunnelSender.Handle (
+                        EagleTunnelHandler.EagleTunnelRequestType.TCP, e);
                     if (result != null) {
                         reply = "\u0005\u0000\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0000";
                     } else {
@@ -105,7 +106,8 @@ namespace eagle.tunnel.dotnet.core {
                         } else {
                             EagleTunnelArgs e = new EagleTunnelArgs ();
                             e.Domain = host;
-                            EagleTunnelSender.Handle (EagleTunnelHandler.EagleTunnelRequestType.DNS, e);
+                            EagleTunnelSender.Handle (
+                                EagleTunnelHandler.EagleTunnelRequestType.DNS, e);
                             ip = e.IP;
                         }
                         break;
