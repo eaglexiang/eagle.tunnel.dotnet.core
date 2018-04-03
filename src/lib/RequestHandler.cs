@@ -20,27 +20,26 @@ namespace eagle.tunnel.dotnet.core {
             Tunnel result = null;
             if (firstMsg != null && socket2Client != null) {
                 RequestType reqType = GetType (firstMsg);
-                string msgStr = Encoding.ASCII.GetString (firstMsg);
+                string msgStr = Encoding.UTF8.GetString (firstMsg);
+                Tunnel tunnel = null;
                 switch (reqType) {
                     case RequestType.Eagle_Tunnel:
                         if (Conf.EnableEagleTunnel) {
-                            result = EagleTunnelHandler.Handle (msgStr, socket2Client);
+                            tunnel = EagleTunnelHandler.Handle (msgStr, socket2Client);
                         }
                         break;
                     case RequestType.HTTP_Proxy:
                         if (Conf.EnableHTTP) {
-                            result = HTTPHandler.Handle (msgStr, socket2Client);
+                            tunnel = HTTPHandler.Handle (msgStr, socket2Client);
                         }
                         break;
                     case RequestType.SOCKS5:
                         if (Conf.EnableSOCKS) {
-                            result = SocksHandler.Handle (firstMsg, socket2Client);
+                            tunnel = SocksHandler.Handle (firstMsg, socket2Client);
                         }
                         break;
                 }
-                if (result != null) {
-                    result.Flow ();
-                } else {
+                if (tunnel == null) {
                     if (socket2Client.Connected) {
                         try {
                             socket2Client.Shutdown (SocketShutdown.Both);
@@ -48,6 +47,8 @@ namespace eagle.tunnel.dotnet.core {
                             socket2Client.Close ();
                         } catch {; }
                     }
+                } else {
+                    result = tunnel;
                 }
             }
             return result;

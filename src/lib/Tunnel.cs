@@ -49,12 +49,12 @@ namespace eagle.tunnel.dotnet.core
         {
             get
             {
-                return pipes[1].EncryptFrom;
+                return pipes[0].EncryptTo;
             }
             set
             {
-                pipes[1].EncryptFrom = value;
                 pipes[0].EncryptTo = value;
+                pipes[1].EncryptFrom = value;
             }
         }
 

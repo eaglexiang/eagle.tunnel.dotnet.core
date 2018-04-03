@@ -74,6 +74,7 @@ namespace eagle.tunnel.dotnet.core {
                 Array.Copy (buffer, req, read);
                 tunnel = RequestHandler.Handle (req, socket2Client);
                 if (tunnel != null) {
+                    tunnel.Flow();
                     lock (clients) {
                         clients.Enqueue (tunnel);
                     }

@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace eagle.tunnel.dotnet.core {
     public class Pipe {
-        public string userFrom;
+        public string UserFrom { get; set; }
         private int speedSignal;
         private const int speedCheckThreshold = 1048576; // 1024 x 1024 = 1M (B)
         public Socket SocketFrom { get; set; }
@@ -15,22 +15,6 @@ namespace eagle.tunnel.dotnet.core {
         public bool EncryptTo { get; set; }
         private static byte EncryptionKey = 0x22;
         private byte[] bufferRead;
-        private int BufferSize {
-            get {
-                if (bufferRead == null) {
-                    return 0;
-                } else {
-                    return bufferRead.Length;
-                }
-            }
-            set {
-                if (value > 0) {
-                    bufferRead = new byte[value];
-                } else {
-                    bufferRead = null;
-                }
-            }
-        }
         public bool IsRunning { get; private set; }
 
         public Pipe (Socket from = null, Socket to = null, string user = null) {
@@ -39,9 +23,9 @@ namespace eagle.tunnel.dotnet.core {
             EncryptFrom = false;
             EncryptTo = false;
 
-            userFrom = user;
+            UserFrom = user;
             speedSignal = 0;
-            BufferSize = 128;
+            bufferRead = new byte[128];
             IsRunning = false;
         }
 
@@ -49,7 +33,7 @@ namespace eagle.tunnel.dotnet.core {
             bool result = false;
             if (buffer != null) {
                 byte[] tmpBuffer = new byte[count];
-                Array.Copy (buffer, tmpBuffer, count);
+                Array.Copy (buffer, offset, tmpBuffer, 0,count);
                 if (EncryptTo) {
                     tmpBuffer = Encrypt (tmpBuffer);
                 }
@@ -93,7 +77,7 @@ namespace eagle.tunnel.dotnet.core {
         public byte[] ReadByte () {
             byte[] result = null;
             if (SocketFrom != null && SocketFrom.Connected) {
-                int count = 0;
+                int count;
                 try {
                     count = SocketFrom.Receive (bufferRead);
                 } catch {
@@ -106,12 +90,12 @@ namespace eagle.tunnel.dotnet.core {
                         tmpBuffer = Decrypt (tmpBuffer);
                     }
                     result = tmpBuffer;
-                    if (userFrom != null) {
+                    if (UserFrom != null) {
                         // check speed limit
                         speedSignal += result.Length;
                         // reduce use of lock (Conf.Users.CheckSpeed().lock)
                         if (speedSignal > speedCheckThreshold) {
-                            Conf.Users[userFrom].CheckSpeed (speedSignal);
+                            Conf.Users[UserFrom].CheckSpeed (speedSignal);
                             speedSignal = 0;
                         }
                     }

@@ -9,34 +9,28 @@ namespace eagle.tunnel.dotnet.core {
         public static Tunnel Handle (string firstMsg, Socket socket2Client) {
             Tunnel result = null;
             if (firstMsg != null && socket2Client != null) {
-                HTTPReqArgs e0 = HTTPReqArgs.Create (firstMsg);
-                if (e0.HTTP_Request_Type != HTTP_Request_Type.ERROR) {
+                if (HTTPReqArgs.TryParse (firstMsg, out HTTPReqArgs e0)) {
                     IPEndPoint reqEP = HTTPReqArgs.GetIPEndPoint (e0);
                     EagleTunnelArgs e1 = new EagleTunnelArgs ();
                     e1.EndPoint = reqEP;
-                    result = EagleTunnelSender.Handle (EagleTunnelHandler.EagleTunnelRequestType.TCP, e1);
-                    if (result != null) {
+                    Tunnel tunnel = EagleTunnelSender.Handle (EagleTunnelHandler.EagleTunnelRequestType.TCP, e1);
+                    if (tunnel != null) {
+                        tunnel.SocketL = socket2Client;
                         bool done;
                         if (e0.HTTP_Request_Type == HTTP_Request_Type.CONNECT) {
                             // HTTPS: reply web client;
                             // string re443 = "HTTP/1.1 200 Connection Established\r\n\r\n";
                             string re443 = "HTTP/1.1 OK\r\n\r\n";
-                            byte[] buffer = Encoding.UTF8.GetBytes (re443);
-                            int written;
-                            try {
-                                written = socket2Client.Send (buffer);
-                            } catch { written = 0; }
-                            done = written > 0;
+                            done = tunnel.WriteL (re443);
                         } else {
                             // HTTP: relay new request to web server
                             string newReq = HTTPReqArgs.CreateRequest (firstMsg);
-                            done = result.WriteR (newReq);
+                            done = tunnel.WriteR (newReq);
                         }
-                        if (!done) {
-                            result.Close ();
-                            result = null;
+                        if (done) {
+                            result = tunnel;
                         } else {
-                            result.SocketL = socket2Client;
+                            tunnel.Close ();
                         }
                     }
                 }

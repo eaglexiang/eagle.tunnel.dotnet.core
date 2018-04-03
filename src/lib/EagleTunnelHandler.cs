@@ -19,25 +19,26 @@ namespace eagle.tunnel.dotnet.core {
             Tunnel result = null;
             if (!string.IsNullOrEmpty (firstMsg) &&
                 socket2Client != null) {
-                result = CheckVersion (firstMsg, socket2Client);
-                if (result != null) {
-                    if (CheckAuthen (result)) {
-                        string req = result.ReadStringL ();
+                Tunnel tunnel = CheckVersion (firstMsg, socket2Client);
+                if (tunnel != null) {
+                    if (CheckAuthen (tunnel)) {
+                        string req = tunnel.ReadStringL ();
                         if (!string.IsNullOrEmpty (req)) {
                             EagleTunnelRequestType type = GetType (req);
                             bool done = false;
                             switch (type) {
                                 case EagleTunnelRequestType.DNS:
-                                    HandleDNSReq (req, result);
+                                    HandleDNSReq (req, tunnel);
                                     // no need to continue;
                                     break;
                                 case EagleTunnelRequestType.TCP:
-                                    done = TCPReqHandle (req, result);
+                                    done = TCPReqHandle (req, tunnel);
                                     break;
                             }
-                            if (!done) {
-                                result.Close ();
-                                result = null;
+                            if (done) {
+                                result = tunnel;
+                            } else {
+                                tunnel.Close ();
                             }
                         }
                     }

@@ -27,20 +27,32 @@ namespace eagle.tunnel.dotnet.core {
             Port = 0;
         }
 
-        public static HTTPReqArgs Create (string request) {
-            HTTPReqArgs e = new HTTPReqArgs ();
+        public static bool TryParse (string request, out HTTPReqArgs e) {
+            bool result = false;
+            e = new HTTPReqArgs ();
             if (request != null) {
-                if (request.Contains (" ")) {
-                    string typeStr = request.Substring (0, request.IndexOf (' '));
-                    if (!Enum.TryParse (typeStr, out e.HTTP_Request_Type)) {
-                        e.HTTP_Request_Type = HTTP_Request_Type.ERROR;
+                string[] args = request.Split (' ');
+                if (args.Length >= 2) {
+                    if (Enum.TryParse (args[0], out HTTP_Request_Type type)) {
+                        string host = GetHost (request);
+                        int port = GetPort (request);
+                        if (host != null && port != 0) {
+                            e.HTTP_Request_Type = type;
+                            e.Host = host;
+                            e.Port = port;
+                            result = true;
+                        } else {
+                            e.HTTP_Request_Type = HTTP_Request_Type.ERROR;
+                            result = false;
+                        }
                     } else {
-                        e.Host = GetHost (request);
-                        e.Port = GetPort (request);
+                        // can not resolv the type
+                        e.HTTP_Request_Type = HTTP_Request_Type.ERROR;
+                        result = false;
                     }
                 }
             }
-            return e;
+            return result;
         }
 
         public static string CreateRequest (string request) {
@@ -69,14 +81,14 @@ namespace eagle.tunnel.dotnet.core {
         public static IPEndPoint GetIPEndPoint (HTTPReqArgs e0) {
             IPEndPoint result = null;
             if (e0 != null) {
-                string host = e0.Host;
-                int port = e0.Port;
-                if (host != null & port != 0) {
+                if (e0.Host != null & e0.Port != 0) {
+                    // resolv ip of domain name by EagleTunnel Sender
                     EagleTunnelArgs e1 = new EagleTunnelArgs ();
-                    e1.Domain = host;
+                    e1.Domain = e0.Host;
                     EagleTunnelSender.Handle (EagleTunnelHandler.EagleTunnelRequestType.DNS, e1);
+                    // resolv successfully
                     if (e1.IP != null) {
-                        result = new IPEndPoint (e1.IP, port);
+                        result = new IPEndPoint (e1.IP, e0.Port);
                     }
                 }
             }
