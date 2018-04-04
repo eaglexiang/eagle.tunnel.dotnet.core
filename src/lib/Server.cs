@@ -8,19 +8,25 @@ using System.Threading;
 namespace eagle.tunnel.dotnet.core {
     public class Server {
         private static Queue<Tunnel> clients;
+        private static List<Socket> servers;
+        private static bool IsRunning { get; set; }
 
         public static void Start (IPEndPoint[] localAddress) {
-            if (localAddress != null) {
-                clients = new Queue<Tunnel> ();
-                Socket server;
-                for (int i = 1; i < localAddress.Length; ++i) {
-                    server = CreateServer (localAddress[i]);
-                    Thread thread = new Thread (Listen);
-                    thread.IsBackground = true;
-                    thread.Start (server);
+            if (!IsRunning) {
+                if (localAddress != null) {
+                    clients = new Queue<Tunnel> ();
+                    servers = new List<Socket> ();
+                    IsRunning = true;
+                    Socket server;
+                    for (int i = 1; i < localAddress.Length; ++i) {
+                        server = CreateServer (localAddress[i]);
+                        Thread thread = new Thread (Listen);
+                        thread.IsBackground = true;
+                        thread.Start (server);
+                    }
+                    server = CreateServer (localAddress[0]);
+                    Listen (server);
                 }
-                server = CreateServer (localAddress[0]);
-                Listen (server);
             }
         }
 
@@ -36,6 +42,9 @@ namespace eagle.tunnel.dotnet.core {
                 }
                 break;
             } while (done);
+            lock (servers) {
+                servers.Add (server);
+            }
             Console.WriteLine ("Server Started: {0}", ipep.ToString ());
             return server;
         }
@@ -43,9 +52,11 @@ namespace eagle.tunnel.dotnet.core {
         private static void Listen (object socket2Listen) {
             Socket server = socket2Listen as Socket;
             server.Listen (100);
-            while (true) {
-                Socket client = server.Accept ();
-                HandleClient (client);
+            while (IsRunning) {
+                try {
+                    Socket client = server.Accept ();
+                    HandleClient (client);
+                } catch { break; }
             }
         }
 
@@ -76,6 +87,33 @@ namespace eagle.tunnel.dotnet.core {
                     tunnel.Flow ();
                     lock (clients) {
                         clients.Enqueue (tunnel);
+                    }
+                }
+            }
+        }
+
+        public static void Close () {
+            if (IsRunning) {
+                IsRunning = false;
+                Thread.Sleep (1000);
+                // stop listening
+                lock (servers) {
+                    foreach (Socket item in servers) {
+                        try {
+                            item.Close ();
+                        } catch {; }
+                    }
+                }
+                // shut down all connections
+                lock(clients)
+                {
+                    while(clients.Count>0)
+                    {
+                        Tunnel tunnel2Close = clients.Dequeue();
+                        if (tunnel2Close.IsWorking)
+                        {
+                            tunnel2Close.Close();
+                        }
                     }
                 }
             }

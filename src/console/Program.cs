@@ -9,7 +9,7 @@ namespace eagle.tunnel.dotnet.core {
             } else {
                 Conf.Init ();
             }
-            Server.Start (Conf.localAddresses);
+            Server.Start (Conf.LocalAddresses);
         }
     }
 }

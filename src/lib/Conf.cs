@@ -6,26 +6,116 @@ using System.Net;
 
 namespace eagle.tunnel.dotnet.core {
     public class Conf {
-        public static EagleTunnelUser LocalUser { get; set; }
-        public static bool EnableSOCKS { get; set; }
-        public static bool EnableHTTP { get; set; }
-        public static bool EnableEagleTunnel { get; set; }
+        private static string confFilePath;
+        private static EagleTunnelUser localUser;
+        public static EagleTunnelUser LocalUser {
+            get {
+                return localUser;
+            }
+            set {
+                localUser = value;
+                Dirty = true;
+            }
+        }
+        private static bool enableSOCKS;
+        public static bool EnableSOCKS {
+            get {
+                return enableSOCKS;
+            }
+            set {
+                enableSOCKS = value;
+                Dirty = true;
+            }
+        }
+        private static bool enableHTTP;
+        public static bool EnableHTTP {
+            get {
+                return enableHTTP;
+            }
+            set {
+                enableHTTP = value;
+                Dirty = true;
+            }
+        }
+        private static bool enableEagleTunnel;
+        public static bool EnableEagleTunnel {
+            get {
+                return enableEagleTunnel;
+            }
+            set {
+                enableEagleTunnel = value;
+                Dirty = true;
+            }
+        }
         public static Dictionary<string, List<string>> allConf;
         public static Dictionary<string, EagleTunnelUser> Users;
         public static int maxClientsCount;
-        public static IPEndPoint[] localAddresses;
+        private static IPEndPoint[] localAddresses;
+        public static IPEndPoint[] LocalAddresses {
+            get {
+                return localAddresses;
+            }
+            set {
+                localAddresses = value;
+                Dirty = true;
+            }
+        }
         private static IPEndPoint[] remoteAddresses;
+        public static IPEndPoint[] RemoteAddresses {
+            get {
+                return remoteAddresses;
+            }
+            set {
+                remoteAddresses = value;
+                Dirty = true;
+            }
+        }
 
         private static object lockOfIndex;
+        private static bool Dirty { get; set; }
+
+        public static bool LocalAddress_Set (string address) {
+            bool result = false;
+            if (address != null) {
+                string[] args = address.Split (':');
+                if (args.Length == 2) {
+                    if (IPAddress.TryParse (args[0], out IPAddress ipa)) {
+                        if (int.TryParse (args[1], out int port)) {
+                            LocalAddresses = new IPEndPoint[1];
+                            LocalAddresses[0] = new IPEndPoint (ipa, port);
+                            result = true;
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+        public static bool RemoteAddress_Set (string address) {
+            bool result = false;
+            if (!string.IsNullOrEmpty (address)) {
+                string[] args = address.Split (':');
+                if (args.Length == 2) {
+                    if (IPAddress.TryParse (args[0], out IPAddress ipa)) {
+                        if (int.TryParse (args[1], out int port)) {
+                            RemoteAddresses = new IPEndPoint[1];
+                            RemoteAddresses[0] = new IPEndPoint (ipa, port);
+                            result = true;
+                        }
+                    }
+                }
+            }
+            return result;
+        }
 
         private static int indexOfRemoteAddresses;
         private static int GetIndexOfRemoteAddresses () {
             int result = 0;
-            if (remoteAddresses != null) {
-                if (remoteAddresses.Length > 1) {
+            if (RemoteAddresses != null) {
+                if (RemoteAddresses.Length > 1) {
                     lock (lockOfIndex) {
                         indexOfRemoteAddresses += 1;
-                        indexOfRemoteAddresses %= remoteAddresses.Length;
+                        indexOfRemoteAddresses %= RemoteAddresses.Length;
                     }
                     result = indexOfRemoteAddresses;
                 }
@@ -35,15 +125,17 @@ namespace eagle.tunnel.dotnet.core {
 
         public static IPEndPoint GetRemoteIPEndPoint () {
             IPEndPoint result = null;
-            if (remoteAddresses != null) {
-                result = remoteAddresses[GetIndexOfRemoteAddresses ()];
+            if (RemoteAddresses != null) {
+                result = RemoteAddresses[GetIndexOfRemoteAddresses ()];
             }
             return result;
         }
 
         public static void Init (string confPath = "/etc/eagle-tunnel.conf") {
+            Dirty = false;
             allConf = new Dictionary<string, List<string>> (StringComparer.OrdinalIgnoreCase);
-            ReadAll (confPath);
+            confFilePath = confPath;
+            ReadAll ();
 
             if (allConf.ContainsKey ("user-conf")) {
                 Users =
@@ -52,10 +144,9 @@ namespace eagle.tunnel.dotnet.core {
                 Console.WriteLine ("find user(s): {0}", Users.Count);
             }
 
-            LocalUser = null;
             if (allConf.ContainsKey ("user")) {
                 if (EagleTunnelUser.TryParse (allConf["user"][0], out EagleTunnelUser user)) {
-                    LocalUser = user;
+                    localUser = user;
                 }
             }
             if (LocalUser != null) {
@@ -70,17 +161,16 @@ namespace eagle.tunnel.dotnet.core {
             }
             Console.WriteLine ("worker: {0}", maxClientsCount);
 
-            remoteAddresses = null;
             try {
                 List<string> remoteAddressStrs = Conf.allConf["relayer"];
                 remoteAddresses = CreateEndPoints (remoteAddressStrs);
             } catch (KeyNotFoundException) {
                 Console.WriteLine ("`Relayer` not found.");
             }
-            if (remoteAddresses != null) {
-                Console.WriteLine ("Count of `Relayer`: {0}", remoteAddresses.Length);
+            if (RemoteAddresses != null) {
+                Console.WriteLine ("Count of `Relayer`: {0}", RemoteAddresses.Length);
             }
-            localAddresses = null;
+
             try {
                 List<string> localAddressStrs = Conf.allConf["listen"];
                 localAddresses = CreateEndPoints (localAddressStrs);
@@ -92,21 +182,21 @@ namespace eagle.tunnel.dotnet.core {
 
             if (allConf.ContainsKey ("socks")) {
                 if (allConf["socks"][0] == "on") {
-                    EnableSOCKS = true;
+                    enableSOCKS = true;
                 }
             }
             Console.WriteLine ("SOCKS Switch: {0}", EnableSOCKS.ToString ());
 
             if (allConf.ContainsKey ("http")) {
                 if (allConf["http"][0] == "on") {
-                    EnableHTTP = true;
+                    enableHTTP = true;
                 }
             }
             Console.WriteLine ("HTTP Switch: {0}", EnableHTTP.ToString ());
 
             if (allConf.ContainsKey ("eagle tunnel")) {
                 if (allConf["eagle tunnel"][0] == "on") {
-                    EnableEagleTunnel = true;
+                    enableEagleTunnel = true;
                 }
             }
             Console.WriteLine ("Eagle Tunnel Switch: {0}", EnableEagleTunnel.ToString ());
@@ -161,7 +251,8 @@ namespace eagle.tunnel.dotnet.core {
         /// Read all configurations from file
         /// </summary>
         /// <param name="confPath">path of conf file</param>
-        private static void ReadAll (string confPath) {
+        private static void ReadAll () {
+            string confPath = confFilePath;
             if (File.Exists (confPath)) {
                 string allConfText = File.ReadAllText (confPath);
                 allConfText = allConfText.Replace ("\r\n", "\n");
@@ -193,12 +284,44 @@ namespace eagle.tunnel.dotnet.core {
         }
 
         private static void AddValue (string key, string value) {
-            key = key.Trim();
-            value = value.Trim();
+            key = key.Trim ();
+            value = value.Trim ();
             if (!allConf.ContainsKey (key)) {
                 allConf.Add (key, new List<string> ());
             }
             allConf[key].Add (value);
+        }
+
+        public static void Save () {
+            if (Dirty) {
+                if (confFilePath != null) {
+                    string allConf = ToString ();
+                    File.WriteAllText (confFilePath, allConf);
+                }
+            }
+        }
+
+        public static new string ToString () {
+            string result = "";
+            if (remoteAddresses != null) {
+                result += "Relayer=" + remoteAddresses[0].ToString () + "\n";
+            }
+            if (localAddresses != null) {
+                result += "Listen=" + localAddresses[0].ToString () + "\n";
+            }
+            if (enableSOCKS) {
+                result += "socks=on\n";
+            }
+            if (enableHTTP) {
+                result += "http=on\n";
+            }
+            if (enableEagleTunnel) {
+                result += "eagle tunnel=on\n";
+            }
+            if (localUser != null) {
+                result += "user=" + localUser.ToString () + "\n";
+            }
+            return result;
         }
     }
 }
