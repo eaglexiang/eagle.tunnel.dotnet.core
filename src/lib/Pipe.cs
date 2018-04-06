@@ -7,8 +7,7 @@ using System.Threading;
 namespace eagle.tunnel.dotnet.core {
     public class Pipe {
         public string UserFrom { get; set; }
-        private int speedSignal;
-        private const int speedCheckThreshold = 1048576; // 1024 x 1024 = 1M (B)
+        public long BytesTransferred {get; private set;}
         public Socket SocketFrom { get; set; }
         public Socket SocketTo { get; set; }
         public bool EncryptFrom { get; set; }
@@ -16,6 +15,7 @@ namespace eagle.tunnel.dotnet.core {
         private static byte EncryptionKey = 0x22;
         private byte[] bufferRead;
         public bool IsRunning { get; private set; }
+        public bool IsWaiting { get; set; }
 
         public Pipe (Socket from = null, Socket to = null, string user = null) {
             SocketFrom = from;
@@ -24,7 +24,7 @@ namespace eagle.tunnel.dotnet.core {
             EncryptTo = false;
 
             UserFrom = user;
-            speedSignal = 0;
+            BytesTransferred = 0;
             bufferRead = new byte[128];
             IsRunning = false;
         }
@@ -88,18 +88,19 @@ namespace eagle.tunnel.dotnet.core {
                         tmpBuffer = Decrypt (tmpBuffer);
                     }
                     result = tmpBuffer;
-                    if (UserFrom != null) {
-                        // check speed limit
-                        speedSignal += result.Length;
-                        // reduce use of lock (Conf.Users.CheckSpeed().lock)
-                        if (speedSignal > speedCheckThreshold) {
-                            Conf.Users[UserFrom].CheckSpeed (speedSignal);
-                            speedSignal = 0;
-                        }
-                    }
+                    BytesTransferred += count;
+                    Wait ();
                 }
             }
             return result;
+        }
+
+        // wait for speed limit
+        private void Wait () {
+            if (IsWaiting) {
+                Thread.Sleep (5000);
+                IsWaiting = false;
+            }
         }
 
         public void Flow () {

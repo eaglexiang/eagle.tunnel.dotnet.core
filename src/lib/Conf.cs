@@ -218,6 +218,7 @@ namespace eagle.tunnel.dotnet.core {
             return list.ToArray (typeof (IPEndPoint)) as IPEndPoint[];
         }
         private static void ImportUsers () {
+            Users.Add ("anonymous", new EagleTunnelUser ("anonymous", "anonymous"));
             if (allConf["user-conf"].Count >= 1) {
                 string pathOfUsersConf = allConf["user-conf"][0];
                 if (File.Exists (pathOfUsersConf)) {

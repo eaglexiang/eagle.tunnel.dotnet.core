@@ -4,6 +4,30 @@ namespace eagle.tunnel.dotnet.core {
     public class Tunnel {
         private Pipe pipeL2R; // pipe from Left socket to Right socket
         private Pipe pipeR2L; // pipe from Right socket to Left socket
+        private System.DateTime timeCreated;
+
+        public bool IsWaiting {
+            get {
+                return pipeL2R.IsWaiting;
+            }
+            set {
+                pipeL2R.IsWaiting = value;
+                pipeR2L.IsWaiting = value;
+            }
+        }
+
+        private long BytesTransferred {
+            get {
+                long result = pipeL2R.BytesTransferred + pipeR2L.BytesTransferred;
+                return result;
+            }
+        }
+
+        public double Speed () {
+            double seconds = (System.DateTime.Now - timeCreated).TotalSeconds;
+            double speed = BytesTransferred / seconds;
+            return speed;
+        }
 
         public string UserL {
             get {
@@ -79,18 +103,19 @@ namespace eagle.tunnel.dotnet.core {
         }
 
         public Tunnel (Socket socketl = null, Socket socketr = null) {
-            pipeL2R = new Pipe(socketl, socketr);
-            pipeR2L = new Pipe(socketr, socketl);
+            pipeL2R = new Pipe (socketl, socketr);
+            pipeR2L = new Pipe (socketr, socketl);
+            timeCreated = System.DateTime.Now;
         }
 
         public void Flow () {
-            pipeL2R.Flow();
-            pipeR2L.Flow();
+            pipeL2R.Flow ();
+            pipeR2L.Flow ();
         }
 
         public void Close () {
-            pipeL2R.Close();
-            pipeR2L.Close();
+            pipeL2R.Close ();
+            pipeR2L.Close ();
         }
 
         public string ReadStringL () {

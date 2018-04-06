@@ -17,6 +17,11 @@ namespace eagle.tunnel.dotnet.core {
                     clients = new Queue<Tunnel> ();
                     servers = new List<Socket> ();
                     IsRunning = true;
+
+                    Thread threadLimitCheck = new Thread (LimitSpeed);
+                    threadLimitCheck.IsBackground = true;
+                    threadLimitCheck.Start ();
+
                     Socket server;
                     for (int i = 1; i < localAddress.Length; ++i) {
                         server = CreateServer (localAddress[i]);
@@ -92,6 +97,27 @@ namespace eagle.tunnel.dotnet.core {
             }
         }
 
+        public static double Speed () {
+            double speed = 0;
+            if (Conf.Users != null) {
+                foreach (EagleTunnelUser item in Conf.Users.Values) {
+                    speed += item.Speed ();
+                }
+            }
+            return speed;
+        }
+
+        private static void LimitSpeed () {
+            if (Conf.allConf.ContainsKey ("user-conf")) {
+                while (IsRunning) {
+                    foreach (EagleTunnelUser item in Conf.Users.Values) {
+                        item.LimitSpeed ();
+                    }
+                    Thread.Sleep (5000);
+                }
+            }
+        }
+
         public static void Close () {
             if (IsRunning) {
                 IsRunning = false;
@@ -105,14 +131,11 @@ namespace eagle.tunnel.dotnet.core {
                     }
                 }
                 // shut down all connections
-                lock(clients)
-                {
-                    while(clients.Count>0)
-                    {
-                        Tunnel tunnel2Close = clients.Dequeue();
-                        if (tunnel2Close.IsWorking)
-                        {
-                            tunnel2Close.Close();
+                lock (clients) {
+                    while (clients.Count > 0) {
+                        Tunnel tunnel2Close = clients.Dequeue ();
+                        if (tunnel2Close.IsWorking) {
+                            tunnel2Close.Close ();
                         }
                     }
                 }

@@ -72,6 +72,7 @@ namespace eagle.tunnel.dotnet.core {
         private static bool CheckAuthen (Tunnel tunnel) {
             bool result = false;
             if (!Conf.allConf.ContainsKey ("user-conf")) {
+                Conf.Users["anonymous"].AddTunnel(tunnel);
                 result = true;
             } else {
                 byte[] buffer = new byte[100];
@@ -80,6 +81,9 @@ namespace eagle.tunnel.dotnet.core {
                     if (EagleTunnelUser.TryParse (req, out EagleTunnelUser user)) {
                         if (Conf.Users.ContainsKey (user.ID)) {
                             result = Conf.Users[user.ID].CheckAuthen (user.Password);
+                            if (result) {
+                                Conf.Users[user.ID].AddTunnel (tunnel);
+                            }
                         }
                     }
                 }

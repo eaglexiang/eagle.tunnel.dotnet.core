@@ -1,28 +1,20 @@
+using System.Collections;
+
 namespace eagle.tunnel.dotnet.core {
     public class EagleTunnelUser {
         public string ID { get; }
         public string Password { get; set; }
-        private int _SpeedLimit;
-        private System.DateTime lastCheck;
-        public int SpeedLimit //speed limit = [value set]KB/s
-        {
-            get {
-                return _SpeedLimit * 1024;
-            }
-            set {
-                _SpeedLimit = value;
-            }
-        }
-        private object lockSignal;
-        public int TransferdCount { get; set; }
+        public int SpeedLimit { get; set; } // KB/s
+
+        private ArrayList tunnels;
+        private object lockOfTunnels;
 
         public EagleTunnelUser (string id, string password) {
             ID = id;
             Password = password;
             SpeedLimit = 0;
-            TransferdCount = 0;
-            lockSignal = new object ();
-            lastCheck = System.DateTime.Now;
+            tunnels = new ArrayList ();
+            lockOfTunnels = new object ();
         }
 
         public static bool TryParse (string parameter, out EagleTunnelUser user) {
@@ -42,17 +34,36 @@ namespace eagle.tunnel.dotnet.core {
             return false;
         }
 
-        public void CheckSpeed (int count) {
+        public void AddTunnel (Tunnel tunnel2Add) {
+            lock (lockOfTunnels) {
+                tunnels.Add (tunnel2Add);
+            }
+        }
+
+        public double Speed () {
+            double speed = 0; // KB/s
+            lock (lockOfTunnels) {
+                ArrayList newTunnels = new ArrayList ();
+                foreach (Tunnel item in tunnels) {
+                    if (item.IsWorking) {
+                        speed += item.Speed () / 1024;
+                        newTunnels.Add (item);
+                    }
+                }
+                tunnels = newTunnels;
+            }
+            return speed;
+        }
+
+        public void LimitSpeed () {
             if (SpeedLimit > 0) {
-                lock (lockSignal) {
-                    TransferdCount += count;
-                    System.DateTime now;
-                    int speed;
-                    do {
-                        now = System.DateTime.Now;
-                        speed = (int) (TransferdCount / (now - lastCheck).TotalSeconds);
-                    } while (speed > SpeedLimit);
-                    lastCheck = now;
+                double speed = Speed();
+                if (speed > SpeedLimit) {
+                    lock (lockOfTunnels) {
+                        foreach (Tunnel item in tunnels) {
+                            item.IsWaiting = true;
+                        }
+                    }
                 }
             }
         }
@@ -62,7 +73,11 @@ namespace eagle.tunnel.dotnet.core {
         }
 
         public bool CheckAuthen (string pswd) {
-            return pswd == Password;
+            if (ID == "anonymous") {
+                return false;
+            } else {
+                return pswd == Password;
+            }
         }
     }
 }
