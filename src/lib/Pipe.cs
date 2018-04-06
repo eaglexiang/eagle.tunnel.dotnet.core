@@ -25,7 +25,7 @@ namespace eagle.tunnel.dotnet.core {
 
             UserFrom = user;
             BytesTransferred = 0;
-            bufferRead = new byte[128];
+            bufferRead = new byte[1024];
             IsRunning = false;
         }
 

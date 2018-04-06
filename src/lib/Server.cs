@@ -108,12 +108,14 @@ namespace eagle.tunnel.dotnet.core {
         }
 
         private static void LimitSpeed () {
-            if (Conf.allConf.ContainsKey ("user-conf")) {
-                while (IsRunning) {
-                    foreach (EagleTunnelUser item in Conf.Users.Values) {
-                        item.LimitSpeed ();
+            if (Conf.allConf.ContainsKey ("speed-check")) {
+                if (Conf.allConf["speed-check"][0] == "on") {
+                    while (IsRunning) {
+                        foreach (EagleTunnelUser item in Conf.Users.Values) {
+                            item.LimitSpeed ();
+                        }
+                        Thread.Sleep (5000);
                     }
-                    Thread.Sleep (5000);
                 }
             }
         }

@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 
@@ -9,6 +10,9 @@ namespace eagle.tunnel.dotnet.core {
             DNS,
             Unknown
         }
+
+        private static ConcurrentDictionary<string, string> dnsCache =
+            new ConcurrentDictionary<string, string> ();
 
         public static Tunnel Handle (string firstMsg, Socket socket2Client) {
             Tunnel result = null;
@@ -70,7 +74,7 @@ namespace eagle.tunnel.dotnet.core {
         private static bool CheckAuthen (Tunnel tunnel) {
             bool result = false;
             if (!Conf.allConf.ContainsKey ("user-conf")) {
-                Conf.Users["anonymous"].AddTunnel(tunnel);
+                Conf.Users["anonymous"].AddTunnel (tunnel);
                 result = true;
             } else {
                 byte[] buffer = new byte[100];
@@ -105,8 +109,16 @@ namespace eagle.tunnel.dotnet.core {
                 string[] args = msg.Split (' ');
                 if (args.Length >= 2) {
                     string domain = args[1];
-                    string ip = ResolvDNS (domain);
-                    tunnel.WriteL (ip);
+                    string ip;
+                    if (dnsCache.ContainsKey (domain)) {
+                        ip = dnsCache[domain];
+                    } else {
+                        ip = ResolvDNS (domain);
+                        tunnel.WriteL (ip);
+                        try {
+                            dnsCache.TryAdd (domain, ip);
+                        } catch {; }
+                    }
                 }
             }
         }
