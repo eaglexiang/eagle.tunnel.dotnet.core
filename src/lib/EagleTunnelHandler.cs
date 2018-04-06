@@ -114,11 +114,11 @@ namespace eagle.tunnel.dotnet.core {
                         ip = dnsCache[domain];
                     } else {
                         ip = ResolvDNS (domain);
-                        tunnel.WriteL (ip);
                         try {
                             dnsCache.TryAdd (domain, ip);
                         } catch {; }
                     }
+                    tunnel.WriteL (ip);
                 }
             }
         }
