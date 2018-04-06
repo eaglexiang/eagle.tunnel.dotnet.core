@@ -1,9 +1,13 @@
+using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
 namespace eagle.tunnel.dotnet.core {
     public class EagleTunnelSender {
+        private static ConcurrentDictionary<string, IPAddress> dnsCache =
+            new ConcurrentDictionary<string, IPAddress> ();
+
         public static Tunnel Handle (EagleTunnelHandler.EagleTunnelRequestType type, EagleTunnelArgs e) {
             Tunnel result = null;
             if (type != EagleTunnelHandler.EagleTunnelRequestType.Unknown &&
@@ -84,21 +88,28 @@ namespace eagle.tunnel.dotnet.core {
             if (tunnel != null && e != null) {
                 e.IP = null;
                 if (e.Domain != null) {
-                    if (IPAddress.TryParse (e.Domain, out IPAddress ip0)) {;
-                        // e.Domain is IP but not domain
-                        e.IP = ip0;
+                    if (dnsCache.ContainsKey (e.Domain)) {
+                        e.IP = dnsCache[e.Domain];
                     } else {
-                        string req = EagleTunnelHandler.EagleTunnelRequestType.DNS.ToString ();
-                        req += " " + e.Domain;
-                        bool done = tunnel.WriteR (req);
-                        if (done) {
-                            string reply = tunnel.ReadStringR ();
-                            if (!string.IsNullOrEmpty (reply) && reply != "nok") {
-                                if (IPAddress.TryParse (reply, out IPAddress ip1)) {
-                                    e.IP = ip1;
+                        if (IPAddress.TryParse (e.Domain, out IPAddress ip0)) {;
+                            // e.Domain is IP but not domain
+                            e.IP = ip0;
+                        } else {
+                            string req = EagleTunnelHandler.EagleTunnelRequestType.DNS.ToString ();
+                            req += " " + e.Domain;
+                            bool done = tunnel.WriteR (req);
+                            if (done) {
+                                string reply = tunnel.ReadStringR ();
+                                if (!string.IsNullOrEmpty (reply) && reply != "nok") {
+                                    if (IPAddress.TryParse (reply, out IPAddress ip1)) {
+                                        e.IP = ip1;
+                                    }
                                 }
                             }
                         }
+                        try {
+                            dnsCache.TryAdd (e.Domain, e.IP);
+                        } catch {; }
                     }
                 }
             }

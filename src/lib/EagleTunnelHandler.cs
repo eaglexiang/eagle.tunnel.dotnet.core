@@ -10,8 +10,6 @@ namespace eagle.tunnel.dotnet.core {
             Unknown
         }
 
-        EagleTunnelRequestType RequestType { get; set; }
-
         public static Tunnel Handle (string firstMsg, Socket socket2Client) {
             Tunnel result = null;
             if (!string.IsNullOrEmpty (firstMsg) &&
