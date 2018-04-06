@@ -81,6 +81,10 @@ namespace eagle.tunnel.dotnet.core {
             } else {
                 result = true;
             }
+            if(result)
+            {
+                Conf.LocalUser.AddTunnel(tunnel);
+            }
             return result;
         }
 

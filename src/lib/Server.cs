@@ -9,7 +9,8 @@ namespace eagle.tunnel.dotnet.core {
     public class Server {
         private static Queue<Tunnel> clients;
         private static List<Socket> servers;
-        private static bool IsRunning { get; set; }
+        private static bool IsRunning { get; set; } // Server will keep running.
+        public static bool IsWorking {get; private set;} // Server has started working.
 
         public static void Start (IPEndPoint[] localAddress) {
             if (!IsRunning) {
@@ -30,6 +31,7 @@ namespace eagle.tunnel.dotnet.core {
                         thread.Start (server);
                     }
                     server = CreateServer (localAddress[0]);
+                    IsWorking = true;
                     Listen (server);
                 }
             }
@@ -103,6 +105,10 @@ namespace eagle.tunnel.dotnet.core {
                 foreach (EagleTunnelUser item in Conf.Users.Values) {
                     speed += item.Speed ();
                 }
+            }
+            if(Conf.LocalUser!=null)
+            {
+                speed += Conf.LocalUser.Speed();
             }
             return speed;
         }

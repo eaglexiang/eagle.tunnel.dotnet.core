@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -47,8 +48,8 @@ namespace eagle.tunnel.dotnet.core {
                 Dirty = true;
             }
         }
-        public static Dictionary<string, List<string>> allConf;
-        public static Dictionary<string, EagleTunnelUser> Users;
+        public static ConcurrentDictionary<string, List<string>> allConf;
+        public static ConcurrentDictionary<string, EagleTunnelUser> Users;
         public static int maxClientsCount;
         private static IPEndPoint[] localAddresses;
         public static IPEndPoint[] LocalAddresses {
@@ -133,16 +134,12 @@ namespace eagle.tunnel.dotnet.core {
 
         public static void Init (string confPath = "/etc/eagle-tunnel.conf") {
             Dirty = false;
-            allConf = new Dictionary<string, List<string>> (StringComparer.OrdinalIgnoreCase);
+            allConf = new ConcurrentDictionary<string, List<string>> (StringComparer.OrdinalIgnoreCase);
             confFilePath = confPath;
             ReadAll ();
 
-            if (allConf.ContainsKey ("user-conf")) {
-                Users =
-                    new Dictionary<string, EagleTunnelUser> ();
-                ImportUsers ();
-                Console.WriteLine ("find user(s): {0}", Users.Count);
-            }
+            ImportUsers ();
+            Console.WriteLine ("find user(s): {0}", Users.Count);
 
             if (allConf.ContainsKey ("user")) {
                 if (EagleTunnelUser.TryParse (allConf["user"][0], out EagleTunnelUser user)) {
@@ -217,9 +214,11 @@ namespace eagle.tunnel.dotnet.core {
             }
             return list.ToArray (typeof (IPEndPoint)) as IPEndPoint[];
         }
+        
         private static void ImportUsers () {
-            Users.Add ("anonymous", new EagleTunnelUser ("anonymous", "anonymous"));
-            if (allConf["user-conf"].Count >= 1) {
+            Users = new ConcurrentDictionary<string, EagleTunnelUser> ();
+            Users.TryAdd ("anonymous", new EagleTunnelUser ("anonymous", "anonymous"));
+            if (allConf.ContainsKey ("user-conf")) {
                 string pathOfUsersConf = allConf["user-conf"][0];
                 if (File.Exists (pathOfUsersConf)) {
                     string usersText = File.ReadAllText (pathOfUsersConf);
@@ -229,7 +228,7 @@ namespace eagle.tunnel.dotnet.core {
                     foreach (string line in usersArray) {
                         if (EagleTunnelUser.TryParse (line, out EagleTunnelUser user)) {
                             if (!Users.ContainsKey (user.ID)) {
-                                Users.Add (user.ID, user);
+                                Users.TryAdd (user.ID, user);
                             }
                         }
                     }
@@ -288,7 +287,7 @@ namespace eagle.tunnel.dotnet.core {
             key = key.Trim ();
             value = value.Trim ();
             if (!allConf.ContainsKey (key)) {
-                allConf.Add (key, new List<string> ());
+                allConf.TryAdd (key, new List<string> ());
             }
             allConf[key].Add (value);
         }
