@@ -3,6 +3,7 @@ namespace eagle.tunnel.dotnet.core {
         public string ID { get; }
         public string Password { get; set; }
         private int _SpeedLimit;
+        private System.DateTime lastCheck;
         public int SpeedLimit //speed limit = [value set]KB/s
         {
             get {
@@ -13,14 +14,15 @@ namespace eagle.tunnel.dotnet.core {
             }
         }
         private object lockSignal;
-        public int SpeedSignal { get; set; }
+        public int TransferdCount { get; set; }
 
         public EagleTunnelUser (string id, string password) {
             ID = id;
             Password = password;
             SpeedLimit = 0;
-            SpeedSignal = 0;
+            TransferdCount = 0;
             lockSignal = new object ();
+            lastCheck = System.DateTime.Now;
         }
 
         public static bool TryParse (string parameter, out EagleTunnelUser user) {
@@ -43,11 +45,14 @@ namespace eagle.tunnel.dotnet.core {
         public void CheckSpeed (int count) {
             if (SpeedLimit > 0) {
                 lock (lockSignal) {
-                    SpeedSignal += count;
-                    while (SpeedSignal > SpeedLimit) {
-                        System.Threading.Thread.Sleep (1000);
-                        SpeedSignal -= SpeedLimit;
-                    }
+                    TransferdCount += count;
+                    System.DateTime now;
+                    int speed;
+                    do {
+                        now = System.DateTime.Now;
+                        speed = (int) (TransferdCount / (now - lastCheck).TotalSeconds);
+                    } while (speed > SpeedLimit);
+                    lastCheck = now;
                 }
             }
         }
