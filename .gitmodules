@@ -1,3 +1,3 @@
 [submodule "src/lib"]
 	path = src/lib
-	url = git@github.com:eaglexiang/eagle.tunnel.dotnet.core.lib.git
+	url = https://github.com/eaglexiang/eagle.tunnel.dotnet.core.lib.git

@@ -4,4 +4,10 @@ dist: trusty
 sudo: required
 dotnet: 2.0.2
 mono: none
-script: ./build.sh
+
+before_script:
+  - git submodule init
+  - git submodule update
+
+script:
+  - ./build.sh
