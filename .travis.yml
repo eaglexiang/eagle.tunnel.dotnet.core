@@ -5,3 +5,4 @@ sudo: required
 dotnet: 2.0.2
 mono: none
 script: ./build.sh
+git: 2.17.0

@@ -28,6 +28,10 @@ fi
 if [ ! -d ${ConfDIR} ]; then
     mkdir -p ${ConfDIR}
 fi
+
+git submodule init
+git submodule update
+
 cd ${Workspace}/src/console && dotnet publish -c Release -o ${LibDIR}
 cp -rf ${Workspace}/src/scripts/run.sh ${LibDIR}
 cp -rf ${Workspace}/src/service/eagle-tunnel.service ${ServiceDIR}
