@@ -1,8 +1,10 @@
 # Eagle Tunnel
 
-![csharp](https://img.shields.io/badge/language-csharp-blue.svg) [![eagle tunnel](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core.svg?branch=dev)](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core)
+![csharp](https://img.shields.io/badge/language-csharp-blue.svg) [![eagle tunnel](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core.svg?branch=master)](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core)
 
-代理工具，SSR的替代品。
+代理工具。
+
+基于 [eagle.tunnel.dotnet.core.lib](https://github.com/eaglexiang/eagle.tunnel.dotnet.core.lib) 开发
 
 [食用方法](https://www.eaglexiang.org/eagle-tunnel)
 
@@ -12,7 +14,7 @@
 
 ### 平台
 
-- [x] Windows
+- [x] [Windows](https://github.com/eaglexiang/eagle.tunnel.dotnet)
 - [x] Linux
 - [x] macOS
 
