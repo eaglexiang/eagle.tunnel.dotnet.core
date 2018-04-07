@@ -1,7 +1,7 @@
 src/console/bin
 src/console/obj
-src/lib/bin
-src/lib/obj
+src/lib/src/bin
+src/lib/src/obj
 publish
 tmp
 bin
