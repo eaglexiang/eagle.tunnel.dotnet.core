@@ -6,16 +6,20 @@ namespace eagle.tunnel.dotnet.core {
         private static string version = "2.1.0";
         public static void Main (string[] args) {
             if (args.Length >= 1) {
-                if (args[0] == "-v") {
+                switch(args[0]) {
+                    case "-v":
                     PrintVersion();
-                }
-                else
-                {
-                    Conf.Init (args[0]);
-                    Server.Start (Conf.LocalAddresses);
+                    break;
+                    case "-h":
+                    PrintGuide();
+                    break;
+                    default:
+                    Conf.Init(args[0]);
+                    Server.Start(Conf.LocalAddresses);
+                    break;
                 }
             } else {
-                PrintGuide();
+                PrintGuide ();
             }
         }
 
@@ -24,19 +28,19 @@ namespace eagle.tunnel.dotnet.core {
         }
 
         private static void PrintVersion () {
-            Console.WriteLine("Eagle Tunnel\n");
+            Console.WriteLine ("Eagle Tunnel\n");
             Console.WriteLine ("UI Version: {0}", Version ());
             Console.WriteLine ("Lib Version: {0}\n", Server.Version ());
         }
 
         private static void PrintGuide () {
-            PrintVersion();
-            Console.WriteLine("usage: ");
-            Console.WriteLine("dotnet eagle.tunnel.dotnet.dll [option]\n");
-            Console.WriteLine("options:");
-            Console.WriteLine("[file path]\trun eagle tunnel with specific configuration file.");
-            Console.WriteLine("-h\tshow this guide.");
-            Console.WriteLine("-v\tshow version.");
+            PrintVersion ();
+            Console.WriteLine ("usage: ");
+            Console.WriteLine ("dotnet eagle.tunnel.dotnet.dll [option]\n");
+            Console.WriteLine ("options:");
+            Console.WriteLine ("[file path]\trun eagle tunnel with specific configuration file.");
+            Console.WriteLine ("-h\tshow this guide.");
+            Console.WriteLine ("-v\tshow version.");
         }
     }
 }
