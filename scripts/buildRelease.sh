@@ -32,5 +32,5 @@ fi
 cd ${Workspace}/src/console && dotnet publish -c Release -o ${LibDIR}
 cp -rf ${Workspace}/src/scripts/run.sh ${LibDIR}
 cp -rf ${Workspace}/src/service/eagle-tunnel.service ${ServiceDIR}
-cp -rf ${Workspace}/src/config/eagle-tunnel.conf ${EtcDIR}
-cp -rf ${Workspace}/src/config/users.list ${ConfDIR}
+cp -rf ${Workspace}/src/config/* ${ConfDIR}
+mv ${ConfDIR}/eagle-tunnel.conf ${EtcDIR}
