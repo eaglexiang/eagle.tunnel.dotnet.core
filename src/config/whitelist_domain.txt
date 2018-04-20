@@ -1,0 +1,10 @@
+google.com
+co.jp
+youtube.com
+gstatic.com
+googlevideo.com
+twitter.com
+twimg.com
+facebook.com
+fbcdn.net
+fbsbx.com
