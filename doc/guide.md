@@ -138,10 +138,9 @@ sudo systemctl start eagle-tunnel.service # 立即启动
 sudo systemctl enable eagle-tunnel.service # 开机自启
 ```
 
-此时，如果不出意外，服务端已经搭建完成。可用下面命令查看服务状态，正常情况应该会显示`Active: active (running)`
+此时，如果不出意外，服务端已经搭建完成。可用下面命令查看服务状态，正常情况应该会显示`Active: active (running)`。如果你的系统不支持systemd，也可以考虑使用[supervisor](https://www.baidu.com/s?wd=supervisor+dotnet+core)来实现服务的后台运行。
 
 ```shell
-# 如果你的系统不支持systemd，也可以考虑使用[supervisor](https://www.baidu.com/s?wd=supervisor+dotnet+core)来实现服务的后台运行。
 sudo systemctl status eagle-tunnel.service
 ```
 
@@ -175,7 +174,7 @@ sudo vim /etc/eagle-tunnel.conf
 
 ```shell
 Relayer=VPS的IP:8080 # 与前文中的Listen=相同
-Listen=127.0.0.1 # 注意此处，即为本地代理服务的地址，也就是应用程序里填写的代理地址
+Listen=127.0.0.1:8080 # 注意此处，即为本地代理服务的地址，也就是应用程序里填写的代理地址
 http=on
 socks=on
 ```
