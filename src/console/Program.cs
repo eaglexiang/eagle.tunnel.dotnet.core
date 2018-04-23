@@ -3,34 +3,30 @@ using System.Threading;
 
 namespace eagle.tunnel.dotnet.core {
     class Program {
-        private static string version = "2.1.0";
+        public static string Version { get; } = "2.1.0";
         public static void Main (string[] args) {
             if (args.Length >= 1) {
-                switch(args[0]) {
+                switch (args[0]) {
                     case "-v":
-                    PrintVersion();
-                    break;
+                        PrintVersion ();
+                        break;
                     case "-h":
-                    PrintGuide();
-                    break;
+                        PrintGuide ();
+                        break;
                     default:
-                    Conf.Init(args[0]);
-                    Server.Start(Conf.LocalAddresses);
-                    break;
+                        Conf.Init (args[0]);
+                        Server.Start (Conf.LocalAddresses);
+                        break;
                 }
             } else {
                 PrintGuide ();
             }
         }
 
-        public static string Version () {
-            return version;
-        }
-
         private static void PrintVersion () {
             Console.WriteLine ("Eagle Tunnel\n");
-            Console.WriteLine ("UI Version: {0}", Version ());
-            Console.WriteLine ("Lib Version: {0}\n", Server.Version ());
+            Console.WriteLine ("UI Version: {0}", Version);
+            Console.WriteLine ("Lib Version: {0}\n", Server.Version);
         }
 
         private static void PrintGuide () {
