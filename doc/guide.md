@@ -295,10 +295,6 @@ User | | 本地服务的账户密码，凭此与远端进行认证交互，注�
 User-Conf | /etc/eagle-tunnel.d/users.list | 远端服务用到的用户列表，用于用户认证与用户限速，注释状态表示关闭认证
 speed-check | off | 基于帐号系统的帐号限速功能开关
 
-## 源码
-
-[repo owner="eaglexiang" name="eagle.tunnel.dotnet.core"]
-
 ## 许可证
 
 [LICENSE](https://github.com/eaglexiang/eagle.tunnel.dotnet.core/blob/master/LICENSE)
