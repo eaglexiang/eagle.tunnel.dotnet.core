@@ -22,11 +22,11 @@
 
 简单来说，这就是个代理工具。起初，Eagle Tunnel是一个HTTP代理协议的简单实现。但经过结构的演变，现在它的确更符合`隧道`这个名字。在生活学习工作中，我们时不时会用到各种网络代理协议，Eagle Tunnel 想要做到的，是一个透明的隧道，Web客户端在左边，Web服务器在右边。
 
-![tunnel](/wp-content/uploads/2018/01/tunnel.png)
+![tunnel](https://github.com/eaglexiang/eagle.tunnel.dotnet.core.lib/blob/master/doc/tunnel.png)
 
 Eagle Tunnel 接收各种代理协议，过滤成统一的 Eagle Tunnel 协议格式，再进行加密的流量转发。
 
-![arch](/wp-content/uploads/2018/01/arch-1.png)
+![arch](https://github.com/eaglexiang/eagle.tunnel.dotnet.core.lib/blob/master/doc/arch.png)
 
 Eagle Tunnel还在迭代中，它的目标是，部署简单，工作稳定，轻量化。
 
