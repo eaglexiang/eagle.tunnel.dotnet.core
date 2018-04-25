@@ -4,19 +4,19 @@
 
 ### 特性
 
-* HTTP(S) 代理
-* SOCKS 5 代理
-* 负载均衡
-* systemd 系统服务
-* 用户登录
-* 用户限速
-* 智能分流
+- [x] HTTP(S) 代理
+- [x] SOCKS 5 代理
+- [x] 负载均衡
+- [x] systemd 系统服务
+- [x] 用户登录
+- [x] 用户限速
+- [x] 智能分流
 
 ### 平台
 
-* [Windows](https://github.com/eaglexiang/eagle.tunnel.dotnet)
-* Linux
-* macOS
+- [x] [Windows](https://github.com/eaglexiang/eagle.tunnel.dotnet)
+- [x] Linux
+- [x] macOS
 
 ## 什么是 Eagle Tunnel
 
