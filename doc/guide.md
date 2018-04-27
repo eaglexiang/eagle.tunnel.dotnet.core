@@ -93,12 +93,12 @@ sudo ./install.sh
 sudo vim /etc/eagle-tunnel.conf
 ```
 
-在任意位置添上以下内容：
+添上以下内容：
 
 ```shell
 # 如果你不清楚VPS的IP为多少，可通过ifconfig命令进行查询。
-Listen=VPS的IP:8080
-eagle tunnel=on
+Listen = VPS的IP
+eagle tunnel = on
 ```
 
 ### 启动服务
@@ -143,8 +143,8 @@ sudo vim /etc/eagle-tunnel.conf
 并添上以下选项：
 
 ```shell
-Relayer=VPS的IP:8080 # 与前文中的Listen=相同
-Listen=127.0.0.1:8080 # 注意此处，即为本地代理服务的地址，也就是应用程序里填写的代理地址
+Relayer=VPS的IP # 与前文中的Listen=相同
+Listen=127.0.0.1 # 注意此处，即为本地代理服务的地址，也就是应用程序里填写的代理地址
 http=on
 socks=on
 ```
@@ -170,7 +170,7 @@ sudo firewall-cmd --reload
 1. 编辑配置文件
 2. 运行脚本
 
-配置文件的规则请参考上一小节。文件为`eagle-tunnel.conf`，位于`publish/etc/`文件夹中。
+配置文件的规则请参考上一小节。文件为`eagle-tunnel.conf`，位于`publish/etc/`文件夹中。稍有不同的是，我们此时还需要更改`config dir`属性为`./publish/etc/`。
 
 操作系统 | 脚本名
 --- | ---
@@ -179,7 +179,7 @@ Windows | run.bat
 
 ## 系统配置
 
-本程序只提供代理服务本身的功能，并不会自动配置您的系统代理，也就是说这需要您手动进行设置。系统的自动配置在带图形界面的版本（即[Windows版本](https://github.com/eaglexiang/eagle.tunnel.dotnet)）中提供支持。假如你是萌新，不知道怎么给系统用上刚刚搭建好的代理，建议百度类似`Windows设置HTTP代理`的关键词。在我们设置系统代理的时候，常会用到`代理地址`和`端口号`这两个东西，可从配置文件中找到。例如在本文示例配置中的`127.0.0.1:8080`中，`127.0.0.1`就是代理地址，`8080`就是端口号。
+本程序只提供代理服务本身的功能，并不会自动配置您的系统代理，也就是说这需要您手动进行设置。系统的自动配置在带图形界面的版本（即[Windows版本](https://github.com/eaglexiang/eagle.tunnel.dotnet)）中提供支持。假如你是萌新，不知道怎么给系统用上刚刚搭建好的代理，建议百度类似`Windows设置HTTP代理`的关键词。在我们设置系统代理的时候，常会用到`代理地址`和`端口号`这两个东西，代理地址可从配置文件中找到。例如在本文示例配置中的`127.0.0.1`中，`127.0.0.1`就是代理地址；端口号则默认为`8080`。
 
 如果手机端想使用 Eagle Tunnel 提供的服务，可参照下文将服务共享到内网，然后手动设置手机WIFI的HTTP代理。如果 Android 平台一定要使用 SOCKS 代理，可考虑使用[Postern](https://play.google.com/store/apps/details?id=com.tunnelworkshop.postern)这款APP。
 
@@ -189,13 +189,27 @@ Windows | run.bat
 
 按照上文示例，代理服务只会被提供给本机。分享服务到内网的方法是有的，只需要简单地将`Listen`参数设置为内网IP（例如192.168.0.2）即可。
 
+### 自定义端口号
+
+ET 的默认端口号为8080，如果你有特殊原因（例如8080端口已被占用），可以通过修改Listen参数的方法修改 ET 的监听端口。例如上文的`Listen`如下：
+
+```shell
+Listen = 127.0.0.1
+```
+
+我们可以为其添加`:端口号`后缀，来手动设置端口。如下：
+
+```shell
+Listen = 127.0.0.1:8080
+```
+
 ### 负载均衡
 
 如果你拥有多台VPS，想充分利用它们的流量，提高上网的速度，可以考虑开启Eagle-Tunnel的负载均衡功能。开启方法很简单，只需要在上文提到的配置文件中，按照格式换行添加额外的`Relayer`，然后重启服务即可。例如：
 
 ```shell
-Relayer=1.2.4.8:8080
-Relayer=8.8.8.8:8080
+Relayer=1.2.4.8
+Relayer=8.8.8.8
 ```
 
 > 需要注意的是：
@@ -209,7 +223,7 @@ Relayer=8.8.8.8:8080
 
 在服务端中开启用户认证的步骤为：
 
-1. 编辑`/etc/eagle-tunnel.conf`文件，取消`User-Conf`的注释。
+1. 编辑`/etc/eagle-tunnel.conf`文件，添加参数：`user-check = on`。
 2. 编辑`/etc/eagle-tunnel.d/users.list`文件，在其中按照下述规则添加用户：
 3. 重启服务
 
@@ -247,7 +261,7 @@ Proxy Status 的赋值 | 效果
 --- | ---
 enable | 这是默认值。效果为所有流量都会被代理
 disable | 禁用代理。所有流量都不会被代理
-smart | 智能分流。在DNS解析过程中，`whitelist_domain.txt`中填写的域名，会被强制代理，其余域名会使用本地解析；在接受代理请求后，境外IP会被强制代理，境内IP会由本地进行直连。
+smart | 智能分流。在DNS解析过程中，`whitelist_domain.txt`中填写的域名，会使用代理解析，其余域名会使用本地解析；在接正式流量转发中，境外IP或`whitelist_ip.txt`中填写的IP会使用代理，境内IP或`blacklist_ip.txt`中填写的IP会使用本地直连。
 
 ### 可用参数一览表
 
@@ -260,9 +274,11 @@ socks | off | SOCKS代理开关
 eagle tunnel | off | Eagle Tunnel协议开关
 proxy status | enable | 代理服务的分流状态
 worker | 200 | 受理请求的并发数（值越大，并发能力越强，可能的资源消耗越高）
-User | | 本地服务的账户密码，凭此与远端进行认证交互，注释状态表示关闭认证
-User-Conf | /etc/eagle-tunnel.d/users.list | 远端服务用到的用户列表，用于用户认证与用户限速，注释状态表示关闭认证
+User | | 本地服务使用的账户密码，凭此与远端进行认证交互，注释状态表示关闭认证功能
+User-Check | off | 是否开启用户认证功能
+User-Conf | /etc/eagle-tunnel.d/users.list | 远端服务用到的用户列表文件，用于用户认证与用户限速
 speed-check | off | 基于帐号系统的帐号限速功能开关
+config dir | /etc/eagle-tunnel.d/ | 配置文件目录路径
 
 ## 许可证
 
