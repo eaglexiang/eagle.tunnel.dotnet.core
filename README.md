@@ -7,7 +7,7 @@
 基于 [Eagle Tunnel Lib](https://github.com/eaglexiang/eagle.tunnel.dotnet.core.lib) 开发
 
 - [什么是 Eagle Tunnel](https://www.eaglexiang.org/eagle-tunnel)
-- [食用方法](./doc/guide.md)
+- [怎么使用 Eagle Tunnel](./doc/guide.md)
 
 ## 支持
 
