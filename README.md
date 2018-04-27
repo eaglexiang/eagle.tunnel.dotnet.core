@@ -2,11 +2,12 @@
 
 ![csharp](https://img.shields.io/badge/language-csharp-blue.svg) [![eagle tunnel](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core.svg?branch=master)](https://travis-ci.org/eaglexiang/eagle.tunnel.dotnet.core)
 
-代理工具。
+稳定易用的代理工具。
 
-基于 [eagle.tunnel.dotnet.core.lib](https://github.com/eaglexiang/eagle.tunnel.dotnet.core.lib) 开发
+基于 [Eagle Tunnel Lib](https://github.com/eaglexiang/eagle.tunnel.dotnet.core.lib) 开发
 
-[食用方法](./doc/guide.md)
+- [什么是 Eagle Tunnel](https://www.eaglexiang.org/eagle-tunnel)
+- [食用方法](./doc/guide.md)
 
 ## 支持
 
