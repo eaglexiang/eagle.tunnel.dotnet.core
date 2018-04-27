@@ -1,35 +1,5 @@
 # 使用方法
 
-## 支持
-
-### 特性
-
-- [x] HTTP(S) 代理
-- [x] SOCKS 5 代理
-- [x] 负载均衡
-- [x] systemd 系统服务
-- [x] 用户登录
-- [x] 用户限速
-- [x] 智能分流
-
-### 平台
-
-- [x] [Windows](https://github.com/eaglexiang/eagle.tunnel.dotnet)
-- [x] Linux
-- [x] macOS
-
-## 什么是 Eagle Tunnel
-
-简单来说，这就是个代理工具。起初，Eagle Tunnel是一个HTTP代理协议的简单实现。但经过结构的演变，现在它的确更符合`隧道`这个名字。在生活学习工作中，我们时不时会用到各种网络代理协议，Eagle Tunnel 想要做到的，是一个透明的隧道，Web客户端在左边，Web服务器在右边。
-
-![tunnel](https://github.com/eaglexiang/eagle.tunnel.dotnet.core.lib/blob/master/doc/tunnel.png)
-
-Eagle Tunnel 接收各种代理协议，过滤成统一的 Eagle Tunnel 协议格式，再进行加密的流量转发。
-
-![arch](https://github.com/eaglexiang/eagle.tunnel.dotnet.core.lib/blob/master/doc/arch.png)
-
-Eagle Tunnel还在迭代中，它的目标是，部署简单，工作稳定，轻量化。
-
 ## 准备工作
 
 1. 首先您需要一台防火墙外的计算机，我使用的是[vultr](https://www.vultr.com/?ref=7357306)的VPS，月付5刀，部分地区有2.5刀的货源。不过安装系统后最好先在国内ping一下是否畅通，最近屏蔽了很多IP。如果不是很熟练Linux的使用，建议给VPS安装CentOS 7，因为下文会以CentOS 7为标准。当然，你也可以使用任意你喜欢的操作系统。
