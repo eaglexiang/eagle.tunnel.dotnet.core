@@ -8,3 +8,5 @@ twimg.com
 facebook.com
 fbcdn.net
 fbsbx.com
+wikipedia.org
+rfa.org
