@@ -34,7 +34,7 @@ namespace eagle.tunnel.dotnet.core {
             Console.WriteLine ("usage: ");
             Console.WriteLine ("dotnet eagle.tunnel.dotnet.dll [option]\n");
             Console.WriteLine ("options:");
-            Console.WriteLine ("[file path]\trun eagle tunnel with specific configuration file.");
+            Console.WriteLine ("[file path]\trun eagle-tunnel with specific configuration file.");
             Console.WriteLine ("-h\tshow this guide.");
             Console.WriteLine ("-v\tshow version.");
         }

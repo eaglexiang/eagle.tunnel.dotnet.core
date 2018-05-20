@@ -98,7 +98,7 @@ sudo vim /etc/eagle-tunnel.conf
 ```shell
 # 如果你不清楚VPS的IP为多少，可通过ifconfig命令进行查询。
 Listen = VPS的IP
-eagle tunnel = on
+et = on
 ```
 
 ### 启动服务
@@ -271,8 +271,8 @@ Relayer | | 远端服务地址
 Listen | | 本地服务监听地址
 http | off | HTTP代理开关
 socks | off | SOCKS代理开关
-eagle tunnel | off | Eagle Tunnel协议开关
-proxy status | enable | 代理服务的分流状态
+et | off | Eagle Tunnel协议开关
+proxy-status | enable | 代理服务的分流状态
 worker | 200 | 受理请求的并发数（值越大，并发能力越强，可能的资源消耗越高）
 User | | 本地服务使用的账户密码，凭此与远端进行认证交互，注释状态表示关闭认证功能
 User-Check | off | 是否开启用户认证功能
