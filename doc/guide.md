@@ -170,7 +170,7 @@ sudo firewall-cmd --reload
 1. 编辑配置文件
 2. 运行脚本
 
-配置文件的规则请参考上一小节。文件为`eagle-tunnel.conf`，位于`publish/etc/`文件夹中。稍有不同的是，我们此时还需要更改`config dir`属性为`./publish/etc/`。
+配置文件的规则请参考上一小节。文件为`eagle-tunnel.conf`，位于`publish/etc/`文件夹中。稍有不同的是，我们此时还需要更改`config-dir`属性为`./publish/etc/`。
 
 操作系统 | 脚本名
 --- | ---
@@ -255,30 +255,31 @@ id:key:500
 
 ### 智能分流
 
-为了保证国内网站的正常使用与高速连接，Eagle Tunnel 提供了一个可选的智能分流功能，它由参数`Proxy Status`控制：
+为了保证国内网站的正常使用与高速连接，Eagle Tunnel 提供了一个可选的智能分流功能，它由参数`Proxy-Status`控制：
 
-Proxy Status 的赋值 | 效果
+Proxy-Status 的赋值 | 含义
 --- | ---
-enable | 这是默认值。效果为所有流量都会被代理
-disable | 禁用代理。所有流量都不会被代理
-smart | 智能分流。在DNS解析过程中，`whitelist_domain.txt`中填写的域名，会使用代理解析，其余域名会使用本地解析；在接正式流量转发中，境外IP或`whitelist_ip.txt`中填写的IP会使用代理，境内IP或`blacklist_ip.txt`中填写的IP会使用本地直连。
+enable | （默认）全部代理
+disable | 禁用代理
+smart | 智能代理
+
+智能在DNS解析过程中，`whitelist_domain.txt`中填写的域名，会使用代理解析，其余域名会使用本地解析；在接正式流量转发中，境外IP或`whitelist_ip.txt`中填写的IP会使用代理，境内IP或`blacklist_ip.txt`中填写的IP会使用本地直连。由于智能模式存在学习过程，每个网站第一次打开都会默认使用代理模式，学习完成后，将根据IP所在地智能选择是否使用代理。
 
 ### 可用参数一览表
 
-参数名 | 默认值 | 作用
+参数名（大小写不敏感） | 默认值 | 作用
 --- | --- | ---
 Relayer | | 远端服务地址
 Listen | | 本地服务监听地址
-http | off | HTTP代理开关
-socks | off | SOCKS代理开关
-et | off | Eagle Tunnel协议开关
-proxy-status | enable | 代理服务的分流状态
-worker | 200 | 受理请求的并发数（值越大，并发能力越强，可能的资源消耗越高）
+HTTP | off | HTTP代理开关
+SOCKS | off | SOCKS代理开关
+ET | off | Eagle Tunnel协议开关
+Proxy-Status | enable | 代理服务的分流状态
+Worker | 500 | 受理请求的并发数（值越大，并发能力越强，可能的资源消耗越高）
 User | | 本地服务使用的账户密码，凭此与远端进行认证交互，注释状态表示关闭认证功能
 User-Check | off | 是否开启用户认证功能
-User-Conf | /etc/eagle-tunnel.d/users.list | 远端服务用到的用户列表文件，用于用户认证与用户限速
-speed-check | off | 基于帐号系统的帐号限速功能开关
-config dir | /etc/eagle-tunnel.d/ | 配置文件目录路径
+Speed-Check | off | 基于帐号系统的帐号限速功能开关
+Config-Dir | /etc/eagle-tunnel.d/ | 配置文件目录路径
 
 ## 许可证
 
