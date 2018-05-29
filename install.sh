@@ -9,6 +9,7 @@ if [ $(whoami) = "root" ]; then
     cp -rf ${WorkSpace}/publish/etc/* /etc/
     ln -sf /usr/lib/eagle-tunnel/run.sh /usr/bin/eagle-tunnel
     systemctl daemon-reload
+    mkdir -p /var/log/eagle-tunnel
 else
     echo "you must install Eagle-Tunnel with root permission."
 fi
