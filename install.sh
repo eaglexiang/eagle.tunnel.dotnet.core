@@ -6,6 +6,7 @@ if [ $(whoami) = "root" ]; then
     #     $(${Workspace}/scripts/dotnet_install.sh)
     # fi
     cp -rf ${WorkSpace}/publish/usr/* /usr/
+    rm -rf /etc/eagle-tunnel.d/
     cp -rf ${WorkSpace}/publish/etc/* /etc/
     ln -sf /usr/lib/eagle-tunnel/run.sh /usr/bin/eagle-tunnel
     systemctl daemon-reload
