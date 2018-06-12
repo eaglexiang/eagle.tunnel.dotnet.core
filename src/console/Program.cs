@@ -3,14 +3,16 @@ using System.Threading;
 
 namespace eagle.tunnel.dotnet.core {
     class Program {
-        public static string Version { get; } = "2.1.0";
+        public static string Version { get; } = "2.1.1";
         public static void Main (string[] args) {
             if (args.Length >= 1) {
                 switch (args[0]) {
                     case "-v":
+                    case "--version":
                         PrintVersion ();
                         break;
                     case "-h":
+                    case "--help":
                         PrintGuide ();
                         break;
                     default:
@@ -35,8 +37,8 @@ namespace eagle.tunnel.dotnet.core {
             Console.WriteLine ("dotnet eagle.tunnel.dotnet.dll [option]\n");
             Console.WriteLine ("options:");
             Console.WriteLine ("[file path]\trun eagle-tunnel with specific configuration file.");
-            Console.WriteLine ("-h\tshow this guide.");
-            Console.WriteLine ("-v\tshow version.");
+            Console.WriteLine ("-h\t--help\tshow this guide.");
+            Console.WriteLine ("-v\t--version\tshow version.");
         }
     }
 }
