@@ -44,7 +44,7 @@ sudo apt-get install dotnet-sdk-2.1.4
 
 ### 其它系统
 
-如果是其它操作系统可到[.NET Core 官网](https://www.microsoft.com/net/download/dotnet-core/runtime-2.0.5)自行下载安装。
+如果是其它操作系统可到[.NET Core 官网](https://www.microsoft.com/net/download/dotnet-core/runtime-2.1.1)自行下载安装。
 
 ## 下载 Eagle Tunnel
 
