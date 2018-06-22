@@ -54,12 +54,12 @@ sudo apt-get install dotnet-sdk-2.1.4
 
 简单来说，配置过程为：
 
-1. 安装dotnet和git
+1. 安装dotnet
 2. 下载并安装 Eagle Tunnel
 3. 基本设置
 4. 启动服务
 
-此小节默认服务器环境为CentOS 7，并且会使用最新的master分支（而非编译好的二进制文件）。其它环境的朋友也可参考。
+此小节默认服务器环境为CentOS 7，并且会使用最新的master分支（而非编译好的字节码文件，因此会用到git，这样便于用上最新的特性及Bug修复）。其它环境的朋友也可参考。
 
 ### 安装dotnet
 
@@ -81,7 +81,7 @@ sudo yum install -y git
 ```shell
 git clone --recursive https://github.com/eaglexiang/eagle.tunnel.dotnet.core.git
 cd ./eagle.tunnel.dotnet.core
-./build
+./build.sh
 sudo ./install.sh
 ```
 
@@ -89,15 +89,17 @@ sudo ./install.sh
 
 ### 基本设置
 
+ET的配置是非常简单的。
+
 ```shell
-sudo vim /etc/eagle-tunnel.conf
+sudo vim /etc/eagle-tunnel.conf # 用你喜欢的编辑器打开配置文件
 ```
 
-添上以下内容：
+添上或修改以下内容：
 
 ```shell
 # 如果你不清楚VPS的IP为多少，可通过ifconfig命令进行查询。
-Listen = VPS的IP
+Listen = VPS的IP # 例如 8.8.8.8
 et = on
 ```
 
@@ -123,27 +125,45 @@ sudo firewall-cmd --reload
 
 ## 客户端配置
 
+### Windows用户
+
+对于Windows用户，推荐直接使用[Windows版](https://github.com/eaglexiang/eagle.tunnel.dotnet)的Eagle Tunnel。
+
 ### 支持systemd的Linux定制版
 
 首先仍然是安装 Eagle Tunnel 及其依赖项（dotnet runtime 和 git）。
 
 ```shell
+# 安装dotnet
+sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+sudo sh -c 'echo -e "[packages-microsoft-com-prod]\nname=packages-microsoft-com-prod \nbaseurl= https://packages.microsoft.com/yumrepos/microsoft-rhel7.3-prod\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/dotnetdev.repo'
+sudo yum update -y
+sudo yum install -y libunwind libicu
+sudo yum install -y dotnet-sdk-2.1.105
+# 安装git
+sudo yum install -y git
+# 安装ET
 git clone --recursive https://github.com/eaglexiang/eagle.tunnel.dotnet.core.git
 cd ./eagle.tunnel.dotnet.core
-./build
+./build.sh
 sudo ./install.sh
 ```
 
-然后同样是编辑配置文件`/etc/eagle-tunnel.conf`。
+然后同样是编辑配置文件。经历了服务端配置，也许会有细心的朋友发现，`/etc`目录下一共存在两个配置文件：
+
+* `/etc/eagle-tunnel.conf` 供普通模式默认调用
+* `/etc/eagle-tunnel.smart.conf` 供智能模式默认调用
+
+在这里先介绍最简单的普通模式。
 
 ```shell
-sudo vim /etc/eagle-tunnel.conf
+sudo vim /etc/eagle-tunnel.conf # 用你喜欢的编辑器打开配置文件
 ```
 
-并添上以下选项：
+并添上或修改以下选项：
 
 ```shell
-Relayer=VPS的IP # 与前文中的Listen=相同
+Relayer=VPS的IP # 与前文中的Listen=相同 如8.8.8.8
 Listen=127.0.0.1 # 注意此处，即为本地代理服务的地址，也就是应用程序里填写的代理地址
 http=on
 socks=on
@@ -162,6 +182,8 @@ sudo systemctl enable eagle-tunnel.service # 开机自启
 sudo firewall-cmd --add-port=8080/tcp --permanent
 sudo firewall-cmd --reload
 ```
+
+智能模式的介绍会放在后文，您可以使用浏览器的页内搜索功能快速找到它。
 
 ### 通用使用方法
 
@@ -214,7 +236,7 @@ Relayer=8.8.8.8
 
 > 需要注意的是：
 >
-> 1. 负载均衡只可能提高多个TCP连接并行传输的总速度，并不能提高单个TCP连接的速度。但同一网页通常拥有多个连接，因此是会因为启用负载均衡而受益的。
+> 1. 负载均衡只可能提高多个TCP连接并行传输的总速度，并不能提高单个TCP连接的速度。但同一网页经常拥有多个连接，因此启用负载仍然是有好处的。
 > 2. 如果你的多台VPS位于不同的国家或地区，可能会造成反效果。这是因为同一网页的不同服务请求了位于不同地区的服务器，这可能导致冲突。
 
 ### 用户认证
@@ -227,15 +249,19 @@ Relayer=8.8.8.8
 2. 编辑`/etc/eagle-tunnel.d/users.list`文件，在其中按照下述规则添加用户：
 3. 重启服务
 
+添加规则：
+
 ```shell
 用户名1:用户密码1
 用户名2:用户密码2
 ```
 
-在本地服务（客户端）中开启用户认证的方法为，编辑`etc/eagle-tunnel.conf`文件，取消`User`的注释，并为其按照下述格式填上帐号和密码：
+每一行代表一组用户名和密码，例如一行`abc:def`便代表一个用户名为abc的账户，密码为def。
+
+在本地服务（客户端）中开启用户认证的方法为，编辑`etc/eagle-tunnel.conf`文件，添加或修改`user`参数，为其按照同样的格式填上帐号和密码：
 
 ```shell
-User=账户名:密码
+User = 账户名:密码
 ```
 
 ### 用户限速
@@ -243,8 +269,8 @@ User=账户名:密码
 如果你需要将代理临时共享给朋友，又担心他的滥用，可以为他分配一个访客账户，并将其限速。限速功能依赖于上一小节的用户认证功能。开启方法为，在`/etc/eagle-tunnel.conf`文件中添加：
 
 ```shell
-speed-check=on
-speed-limit=on
+speed-check = on # 打开速度检测
+speed-limit = on # 打开速度限制
 ```
 
 然后在用户列表文件`/etc/eagle-tunnel.d/users.list`中，为对应[用户民:密码]组添加限速后缀[:数值]（单位为KB/s），如下：
@@ -254,17 +280,25 @@ id:key:500
 # 这一行的含义是，一个ID为id的账户，密码为key，限速为500KB/s。
 ```
 
-### 智能分流
+### 智能分流（智能模式）
 
-为了保证国内网站的正常使用与高速连接，Eagle Tunnel 提供了一个可选的智能分流功能，它由参数`Proxy-Status`控制：
+为了保证国内网站的正常使用与高速连接，Eagle Tunnel 提供了一个可选的智能分流功能，它由参数`proxy-status`控制：
 
 Proxy-Status 的赋值 | 含义
 --- | ---
-enable | （默认）全部代理
-disable | 禁用代理
-smart | 智能代理
+enable | （默认）普通模式
+disable | 禁用模式
+smart | 智能模式
 
-智能在DNS解析过程中，`whitelist_domain.txt`中填写的域名，会使用代理解析，其余域名会使用本地解析；在接正式流量转发中，境外IP或`whitelist_ip.txt`中填写的IP会使用代理，境内IP或`blacklist_ip.txt`中填写的IP会使用本地直连。由于智能模式存在学习过程，每个网站第一次打开都会默认使用代理模式，学习完成后，将根据IP所在地智能选择是否使用代理。
+ET在三种模式下的表现分别是这样的：
+
+模式 | DNS解析的表现 | IP转发的表现
+--- | --- | ---
+普通模式 | 全部使用代理加密通道 | 全部使用代理加密通道
+禁用模式 | 全部使用本地DNS解析 | 全部使用本地直连
+智能模式 | `whitelist_domain.txt`文件中声明的域名使用代理，其余使用本地解析 | `whitelist_ip.txt`文件中声明的IP使用代理，`blacklist_ip.txt`文件中声明的IP使用本地直连，两个文件中均未涉及的IP，将使用[ip2c](https://ip2c.org/)提供的公开服务，在线判断IP所在地是否为中国大陆，并缓存在`whitelist_ip.txt`与`blacklist_ip.txt`两个缓存文件中。
+
+> 请注意，为避免对ip2c服务的浪费，IP所在地判断操作被放置在指定队列统一操作，这可能会造成延迟。也就是说，当你安装或更新ET后（为避免在线IP库更新造成的问题，缓存文件会被重置），在智能模式下首次访问某个IP，它会仍然使用普通模式，直到在线判断操作完成，便可正常启用智能判断。因此，如果您没有备份缓存文件，建议在安装或更新后，一次性大量打开常用网站，ET会在后台慢慢完成常用IP库的缓存，这通常会花费几分钟的时间。
 
 ### 可用参数一览表
 
@@ -275,12 +309,12 @@ Listen | | 本地服务监听地址
 HTTP | off | HTTP代理开关
 SOCKS | off | SOCKS代理开关
 ET | off | Eagle Tunnel协议开关
-Proxy-Status | enable | 代理服务的分流状态
+Proxy-Status | enable | 代理服务的模式
 Worker | 500 | 受理请求的并发数（值越大，并发能力越强，可能的资源消耗越高）
 User | | 本地服务使用的账户密码，凭此与远端进行认证交互，注释状态表示关闭认证功能
 User-Check | off | 是否开启用户认证功能
 Speed-Check | off | 是否开启速度检测特性
-Speed-Limit | off | 基于帐号系统和速度检测的帐号限速功能开关
+Speed-Limit | off | 基于帐号系统和速度检测的帐号限速功能开关，打开它的前提是`speed-check`也必须打开
 Config-Dir | /etc/eagle-tunnel.d/ | 配置文件目录路径
 
 ## 许可证
