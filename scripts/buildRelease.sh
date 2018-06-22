@@ -36,3 +36,4 @@ cp -f ${Workspace}/src/service/eagle-tunnel.service ${ServiceDIR}
 cp -f ${Workspace}/src/service/eagle-tunnel-smart.service ${ServiceDIR}
 cp -rf ${Workspace}/src/lib/config/* ${ConfDIR}
 mv ${ConfDIR}/eagle-tunnel.conf ${EtcDIR}
+mv ${ConfDIR}/eagle-tunnel.smart.conf ${EtcDIR}
