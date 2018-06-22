@@ -1,0 +1,14 @@
+[Unit]
+Description=Eagle Tunnel Server Service
+
+[Service]
+Type=simple
+User=root
+Environment=TERM='xterm'
+ExecStart=/usr/bin/dotnet /usr/lib/eagle-tunnel/eagle.tunnel.dotnet.core.dll /etc/eagle-tunnel.smart.conf
+Restart=on-abort
+StandardOutput=file:/var/log/eagle-tunnel/output.smart.log
+StandardError=file:/var/log/eagle-tunnel/error.smart.log
+
+[Install]
+WantedBy=multi-user.target
