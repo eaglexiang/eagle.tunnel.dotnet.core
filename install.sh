@@ -5,9 +5,8 @@ if [ $(whoami) = "root" ]; then
     # if command -v dotnet >/dev/null 2>&1; then
     #     $(${Workspace}/scripts/dotnet_install.sh)
     # fi
-    cp -rf ${WorkSpace}/publish/usr/* /usr/
     rm -rf /etc/eagle-tunnel.d/
-    cp -rf ${WorkSpace}/publish/etc/* /etc/
+    cp -rf ${WorkSpace}/publish/* /
     ln -sf /usr/lib/eagle-tunnel/run.sh /usr/bin/eagle-tunnel
     systemctl daemon-reload
     mkdir -p /var/log/eagle-tunnel

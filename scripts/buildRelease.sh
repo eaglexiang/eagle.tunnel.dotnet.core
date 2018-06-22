@@ -30,8 +30,9 @@ if [ ! -d ${ConfDIR} ]; then
 fi
 
 cd ${Workspace}/src/console && dotnet publish -c Release -o ${LibDIR}
-cp -rf ${Workspace}/src/scripts/run.sh ${LibDIR}
-cp -rf ${Workspace}/src/service/eagle-tunnel.service ${ServiceDIR}
-cp -rf ${Workspace}/src/service/eagle-tunnel-smart.service ${ServiceDIR}
+unaslias cp
+cp -f ${Workspace}/src/scripts/run.sh ${LibDIR}
+cp -f ${Workspace}/src/service/eagle-tunnel.service ${ServiceDIR}
+cp -f ${Workspace}/src/service/eagle-tunnel-smart.service ${ServiceDIR}
 cp -rf ${Workspace}/src/lib/config/* ${ConfDIR}
 mv ${ConfDIR}/eagle-tunnel.conf ${EtcDIR}
