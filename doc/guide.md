@@ -265,6 +265,15 @@ ET在三种模式下的表现分别是这样的：
 > 请注意，为避免对ip2c服务的浪费，IP所在地判断操作被放置在指定队列统一操作，这可能会造成延迟。也就是说，当你安装或更新ET后（为避免在线IP库更新造成的问题，缓存文件会被重置），在智能模式下首次访问某个IP，它会仍然使用普通模式，直到在线判断操作完成，便可正常启用智能判断。因此，如果您没有备份缓存文件，  
 > **建议**在安装或更新后，一次性大量打开常用网站，ET会在后台慢慢完成常用IP库的缓存，这通常会花费几分钟的时间。
 
+ET自带一个配置文件为`eagle-tunnel.smart.conf`，本质和格式上它和`eagle-tunnel.conf`没有任何却别，仅仅默认多了`proxy-status = smart`参数。该文件供智能模式的systemd服务（`eagle-tunnel-smart.service`）默认调用，如果该文件得到配置，就能很方便地启动独立的、启用智能模式的`eagle-tunnel-smart`服务。
+
+```shell
+sudo systemctl enable eagle-tunnel-smart.service
+sudo systemctl start eagle-tunnel-smart.service
+```
+
+> **警告** 如果同时启用`eagle-tunnel.service`与`eagle-tunnel-smart.service`，需要手动配置至少其中一个的监听端口不为8080，否则会产生监听冲突，导致两个服务只能正常启用一个。
+
 ### 可用参数一览表
 
 参数名（大小写不敏感） | 默认值 | 作用
