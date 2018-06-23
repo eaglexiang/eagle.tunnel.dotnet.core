@@ -10,6 +10,8 @@ if [ $# -ge 1 ];then
         rm -rf ./src/lib/bin
         rm -rf ./src/lib/obj
         echo "done"
+    else
+        echo "invalid parameter(s)"
     fi
 else
     echo "building"
