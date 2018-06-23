@@ -21,22 +21,31 @@
 
 此小节默认服务器环境为CentOS 7，并且会使用最新的master分支（而非编译好的字节码文件，因此会用到git，这样便于用上最新的特性及Bug修复）。其它环境的朋友也可参考。
 
-### 安装dotnet
+### 安装git（如果已安装可跳过）
 
 打开终端（shell）并执行以下指令
 
 ```shell
-# 安装dotnet core sdk
-sudo ./scripts/dotnet/centos.sh
-# 安装git
 sudo yum install -y git
 ```
 
-### 下载并安装 Eagle Tunnel
+### 下载Eagle Tunnel
 
 ```shell
 git clone --recursive https://github.com/eaglexiang/eagle.tunnel.dotnet.core.git
 cd ./eagle.tunnel.dotnet.core
+```
+
+### 安装dotnet sdk（如果已安装可跳过）
+
+```shell
+# 安装dotnet core sdk
+sudo ./scripts/dotnet/centos.sh
+```
+
+### 编译安装Eagle Tunnel
+
+```shell
 ./build.sh
 sudo ./install.sh
 ```
