@@ -8,7 +8,7 @@
 
 - [什么是 Eagle Tunnel](https://www.eaglexiang.org/eagle-tunnel)
 - [怎么使用 Eagle Tunnel](./doc/guide.md)
-- 如果使用中遇到问题，欢迎到[issues](https://github.com/eaglexiang/eagle.tunnel.dotnet.core/issues)提问，也可发邮件到[我的邮箱](mailto:eagle.xiang@outlook.com)
+- 如果使用中遇到问题，欢迎到[issues](https://github.com/eaglexiang/eagle.tunnel.dotnet.core/issues)提问
 
 ## 支持
 
