@@ -4,47 +4,7 @@
 
 1. 首先您需要一台防火墙外的计算机，我使用的是[vultr](https://www.vultr.com/?ref=7357306)的VPS，月付5刀，部分地区有2.5刀的货源。不过安装系统后最好先在国内ping一下是否畅通，最近屏蔽了很多IP。如果不是很熟练Linux的使用，建议给VPS安装CentOS 7，因为下文会以CentOS 7为标准。当然，你也可以使用任意你喜欢的操作系统。
 
-2. 由于Eagle Tunnel基于.NET Core开发，因此需要安装.NET Core的运行库。**VPS和本机都需要安装**。下面列举一些常见的系统对应的安装方式。
-
-### Windows
-
-* [Windows x86_64](https://www.microsoft.com/net/download/thank-you/dotnet-runtime-2.0.5-windows-x64-installer)
-* [Windows x86](https://www.microsoft.com/net/download/thank-you/dotnet-runtime-2.0.5-windows-x86-installer)
-
-### macOS
-
-* [macOS](https://www.microsoft.com/net/download/thank-you/dotnet-runtime-2.0.5-macos-x64-installer)
-
-### Archlinux
-
-```shell
-yaourt -S dotnet-runtime
-```
-
-### CentOS
-
-```shell
-sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-sudo sh -c 'echo -e "[packages-microsoft-com-prod]nname=packages-microsoft-com-prod nbaseurl= https://packages.microsoft.com/yumrepos/microsoft-rhel7.3-prodnenabled=1ngpgcheck=1ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/dotnetdev.repo'
-sudo yum -y update
-sudo yum -y install libunwind libicu
-sudo yum install dotnet-sdk-2.1.4
-```
-
-### Ubuntu 17.10
-
-```shell
-curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
-sudo mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
-sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-artful-prod artful main" > /etc/apt/sources.list.d/dotnetdev.list'
-sudo apt-get install apt-transport-https
-sudo apt-get update
-sudo apt-get install dotnet-sdk-2.1.4
-```
-
-### 其它系统
-
-如果是其它操作系统可到[.NET Core 官网](https://www.microsoft.com/net/download/dotnet-core/runtime-2.1.1)自行下载安装。
+2. 由于Eagle Tunnel基于.NET Core开发，因此需要安装.NET Core的运行库。**VPS和本机都需要安装**。可到[.NET Core 官网](https://www.microsoft.com/net/download/dotnet-core/runtime-2.1.1)自行下载安装。
 
 ## 下载 Eagle Tunnel
 
