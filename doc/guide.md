@@ -99,17 +99,14 @@ sudo firewall-cmd --reload
 首先仍然是安装 Eagle Tunnel 及其依赖项（dotnet runtime 和 git）。
 
 ```shell
-# 安装dotnet
-sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-sudo sh -c 'echo -e "[packages-microsoft-com-prod]\nname=packages-microsoft-com-prod \nbaseurl= https://packages.microsoft.com/yumrepos/microsoft-rhel7.3-prod\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/dotnetdev.repo'
-sudo yum update -y
-sudo yum install -y libunwind libicu
-sudo yum install -y dotnet-sdk-2.1.105
 # 安装git
 sudo yum install -y git
-# 安装ET
+# 下载ET
 git clone --recursive https://github.com/eaglexiang/eagle.tunnel.dotnet.core.git
 cd ./eagle.tunnel.dotnet.core
+# 安装dotnet
+sudo ./scripts/dotnet.centos.sh
+# 安装ET
 ./build.sh
 sudo ./install.sh
 ```
