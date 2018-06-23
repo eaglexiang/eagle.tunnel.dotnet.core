@@ -1,15 +1,22 @@
 #!/usr/bin/env bash
 
 if [ $(whoami) = "root" ]; then
+    echo "begin to install"
     WorkSpace=$(pwd)
     # if command -v dotnet >/dev/null 2>&1; then
     #     $(${Workspace}/scripts/dotnet_install.sh)
     # fi
+    echo "clean cache"
     rm -rf /etc/eagle-tunnel.d/
+    echo "cp files"
     cp -rf ${WorkSpace}/publish/* /
+    echo "create bin link"
     ln -sf /usr/lib/eagle-tunnel/run.sh /usr/bin/eagle-tunnel
+    echo "systemd daemon reload"
     systemctl daemon-reload
-    mkdir -p /var/log/eagle-tunnel
+    echo "create log dir"
+    mkdir -pv /var/log/eagle-tunnel
+    echo "the installation is complete"
 else
     echo "you must install Eagle-Tunnel with root permission."
 fi
