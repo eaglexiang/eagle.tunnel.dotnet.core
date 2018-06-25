@@ -94,6 +94,8 @@ sudo firewall-cmd --reload
 
 对于Windows用户，推荐直接使用[Windows版](https://github.com/eaglexiang/eagle.tunnel.dotnet)的Eagle Tunnel。
 
+> **注意：**Windows用户也需要先到[官网](https://www.microsoft.com/net/download/windows)自行下载安装dotnet core运行时。
+
 ### 支持systemd的Linux定制版
 
 首先仍然是安装 Eagle Tunnel 及其依赖项（dotnet runtime 和 git）。
