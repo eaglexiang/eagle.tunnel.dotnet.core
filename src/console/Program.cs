@@ -53,6 +53,7 @@ namespace eagle.tunnel.dotnet.core {
             Console.WriteLine ("[file path]\trun eagle-tunnel with specific configuration file.");
             Console.WriteLine ("-h\t--help\tshow this guide.");
             Console.WriteLine ("-v\t--version\tshow version.");
+            Console.WriteLine ("--check\tcheck config file.");
         }
 
         private static void CheckConfig (string confPath) {
@@ -66,14 +67,14 @@ namespace eagle.tunnel.dotnet.core {
                 Console.WriteLine ("error:\tno listen");
                 return;
             } else {
-                string[] listen = Conf.allConf["listen"][0].Split(':');
+                string[] listen = Conf.allConf["listen"][0].Split (':');
                 if (!IPAddress.TryParse (listen[0], out IPAddress ipa)) {
                     Console.WriteLine ("error:\tip for listen is invalid ip address");
                     return;
                 }
-                if(listen.Length>=2){
-                    if(!int.TryParse(listen[1], out int port)){
-                        Console.WriteLine("error:\tport for listen is not an integer");
+                if (listen.Length >= 2) {
+                    if (!int.TryParse (listen[1], out int port)) {
+                        Console.WriteLine ("error:\tport for listen is not an integer");
                         return;
                     }
                 }
@@ -85,15 +86,15 @@ namespace eagle.tunnel.dotnet.core {
                     Console.WriteLine ("error:\tno relayer for http or socks");
                     return;
                 }
-            } else{
-                string[] relayer = Conf.allConf["relayer"][0].Split(':');
+            } else {
+                string[] relayer = Conf.allConf["relayer"][0].Split (':');
                 if (!IPAddress.TryParse (relayer[0], out IPAddress ipa)) {
                     Console.WriteLine ("error:\tip for relayer is invalid ip address");
                     return;
                 }
-                if(relayer.Length>=2){
-                    if(!int.TryParse(relayer[1], out int port)){
-                        Console.WriteLine("error:\tport for relayer is not an integer");
+                if (relayer.Length >= 2) {
+                    if (!int.TryParse (relayer[1], out int port)) {
+                        Console.WriteLine ("error:\tport for relayer is not an integer");
                         return;
                     }
                 }
@@ -111,7 +112,7 @@ namespace eagle.tunnel.dotnet.core {
                 }
             }
 
-            Console.WriteLine("finished:\tno error!");
+            Console.WriteLine ("finished:\tno error!");
         }
     }
 }
