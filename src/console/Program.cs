@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace eagle.tunnel.dotnet.core {
     class Program {
-        public static string Version { get; } = "2.1.1";
+        public static string Version { get; } = "2.2.0";
         public static void Main (string[] args) {
             if (args.Length >= 1) {
                 switch (args[0]) {
