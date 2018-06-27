@@ -66,9 +66,16 @@ namespace eagle.tunnel.dotnet.core {
                 Console.WriteLine ("error:\tno listen");
                 return;
             } else {
-                if (!IPAddress.TryParse (Conf.allConf["listen"][0], out IPAddress ipa)) {
+                string[] listen = Conf.allConf["listen"][0].Split(':');
+                if (!IPAddress.TryParse (listen[0], out IPAddress ipa)) {
                     Console.WriteLine ("error:\tip for listen is invalid ip address");
                     return;
+                }
+                if(listen.Length>=2){
+                    if(!int.TryParse(listen[1], out int port)){
+                        Console.WriteLine("error:\tport for listen is not an integer");
+                        return;
+                    }
                 }
             }
 
@@ -77,6 +84,18 @@ namespace eagle.tunnel.dotnet.core {
                     (Conf.allConf.ContainsKey ("socks") && Conf.allConf["socks"][0] == "on")) {
                     Console.WriteLine ("error:\tno relayer for http or socks");
                     return;
+                }
+            } else{
+                string[] relayer = Conf.allConf["relayer"][0].Split(':');
+                if (!IPAddress.TryParse (relayer[0], out IPAddress ipa)) {
+                    Console.WriteLine ("error:\tip for relayer is invalid ip address");
+                    return;
+                }
+                if(relayer.Length>=2){
+                    if(!int.TryParse(relayer[1], out int port)){
+                        Console.WriteLine("error:\tport for relayer is not an integer");
+                        return;
+                    }
                 }
             }
 
