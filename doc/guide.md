@@ -85,6 +85,8 @@ sudo systemctl enable eagle-tunnel.service # 开机自启
 sudo systemctl status eagle-tunnel.service
 ```
 
+你也可以尝试执行命令`eagle-tunnel --check`来进行自动的配置检查（测试功能），能帮助你排除一些常见配置错误。
+
 > 如果你的系统存在防火墙，一定要将`Listen`对应的端口打开。你可能需要执行以下指令：
 
 ```shell
