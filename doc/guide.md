@@ -34,6 +34,8 @@ sudo yum install -y git
 ### 下载Eagle Tunnel
 
 ```shell
+mkdir ~/git
+cd ~/git
 git clone --recursive https://github.com/eaglexiang/eagle.tunnel.dotnet.core.git
 cd ./eagle.tunnel.dotnet.core
 ```
@@ -120,7 +122,7 @@ sudo ./install.sh
 * `/etc/eagle-tunnel.conf` 供普通模式默认调用
 * `/etc/eagle-tunnel.smart.conf` 供智能模式默认调用
 
-在这里先介绍最简单的普通模式。
+在这里先介绍最简单的普通模式。智能模式的介绍会放在后文，您可以使用浏览器的页内搜索功能快速找到它。
 
 ```shell
 sudo vim /etc/eagle-tunnel.conf # 用你喜欢的编辑器打开配置文件
@@ -149,8 +151,6 @@ sudo firewall-cmd --add-port=8080/tcp --permanent
 sudo firewall-cmd --reload
 ```
 
-智能模式的介绍会放在后文，您可以使用浏览器的页内搜索功能快速找到它。
-
 ### 通用使用方法
 
 并不是每个操作系统都支持systemd守护进程。所以有必要提供手动启动服务的方式。简单来说就是先编辑配置文件，再执行运行脚本。
@@ -172,6 +172,27 @@ Windows | run.bat
 如果手机端想使用 Eagle Tunnel 提供的服务，可参照下文将服务共享到内网，然后手动设置手机WIFI的HTTP代理。如果 Android 平台一定要使用 SOCKS 代理，可考虑使用[Postern](https://play.google.com/store/apps/details?id=com.tunnelworkshop.postern)这款APP。
 
 ## 高级
+
+### 更新
+
+ET并没有自带的更新功能，不过可以通过git来将你的ET更新到最新版本：
+
+```shell
+cd ~/git/eagle.tunnel.dotnet.core
+mkdir ./backup
+cp /etc/eagle-tunnel.conf ./backup # 备份配置文件
+cp /etc/eagle-tunnel.smart.conf ./backup
+cp /etc/eagle-tunnel.d/users.list ./backup
+
+git pull # 更新源码
+git submodule update # 更新子模块
+./build.sh # 编译
+sudo ./install # 安装
+
+sudo cp ./backup/eagle-tunnel.conf /etc/ # 还原配置文件
+sudo cp ./backup/eagle-tunnel.smart.conf /etc/
+sudo cp ./backup/eagle-tunnel.d/users.list /etc/
+```
 
 ### 共享服务
 
@@ -267,7 +288,7 @@ ET在三种模式下的表现分别是这样的：
 智能模式 | `whitelist_domain.txt`文件中声明的域名使用代理，其余使用本地解析 | `whitelist_ip.txt`文件中声明的IP使用代理，`blacklist_ip.txt`文件中声明的IP使用本地直连，两个文件中均未涉及的IP，将使用[ip2c](https://ip2c.org/)提供的公开服务，在线判断IP所在地是否为中国大陆，并缓存在`whitelist_ip.txt`与`blacklist_ip.txt`两个缓存文件中。
 
 > 请注意，为避免对ip2c服务的浪费，IP所在地判断操作被放置在指定队列统一操作，这可能会造成延迟。也就是说，当你安装或更新ET后（为避免在线IP库更新造成的问题，缓存文件会被重置），在智能模式下首次访问某个IP，它会仍然使用普通模式，直到在线判断操作完成，便可正常启用智能判断。因此，如果您没有备份缓存文件，  
-> **建议**在安装或更新后，一次性大量打开常用网站，ET会在后台慢慢完成常用IP库的缓存，这通常会花费几分钟的时间。
+> 建议：在安装或更新后，一次性大量打开常用网站，ET会在后台慢慢完成常用IP库的缓存，这通常会花费几分钟的时间。
 
 ET自带一个配置文件为`eagle-tunnel.smart.conf`，本质和格式上它和`eagle-tunnel.conf`没有任何却别，仅仅默认多了`proxy-status = smart`参数。该文件供智能模式的systemd服务（`eagle-tunnel-smart.service`）默认调用，如果该文件得到配置，就能很方便地启动独立的、启用智能模式的`eagle-tunnel-smart`服务。
 
@@ -275,6 +296,8 @@ ET自带一个配置文件为`eagle-tunnel.smart.conf`，本质和格式上它�
 sudo systemctl enable eagle-tunnel-smart.service
 sudo systemctl start eagle-tunnel-smart.service
 ```
+
+启动智能模式后，可百度关键词`IP`，首先应该会显示VPS的IP，等待十秒到一分钟之后刷新网页，应该会显示本机IP，此时智能模式启用成功。
 
 > **警告** 如果同时启用`eagle-tunnel.service`与`eagle-tunnel-smart.service`，需要手动配置至少其中一个的监听端口不为8080，否则会产生监听冲突，导致两个服务只能正常启用一个。
 
