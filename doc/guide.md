@@ -100,7 +100,7 @@ sudo firewall-cmd --reload
 
 对于Windows用户，推荐直接使用[Windows版](https://github.com/eaglexiang/eagle.tunnel.dotnet)的Eagle Tunnel。
 
-> **注意：**Windows用户也需要先到[官网](https://www.microsoft.com/net/download/windows)自行下载安装dotnet core运行时。
+> **注意：** Windows用户也需要先到[官网](https://www.microsoft.com/net/download/windows)自行下载安装dotnet core运行时。
 
 ### 支持systemd的Linux定制版
 
@@ -290,7 +290,7 @@ ET在三种模式下的表现分别是这样的：
 智能模式 | `whitelist_domain.txt`文件中声明的域名使用代理，其余使用本地解析 | `whitelist_ip.txt`文件中声明的IP使用代理，`blacklist_ip.txt`文件中声明的IP使用本地直连，两个文件中均未涉及的IP，将使用[ip2c](https://ip2c.org/)提供的公开服务，在线判断IP所在地是否为中国大陆，并缓存在`whitelist_ip.txt`与`blacklist_ip.txt`两个缓存文件中。
 
 > 请注意，为避免对ip2c服务的浪费，IP所在地判断操作被放置在指定队列统一操作，这可能会造成延迟。也就是说，当你安装或更新ET后（为避免在线IP库更新造成的问题，缓存文件会被重置），在智能模式下首次访问某个IP，它会仍然使用普通模式，直到在线判断操作完成，便可正常启用智能判断。因此，如果您没有备份缓存文件，  
-> 建议：在安装或更新后，一次性大量打开常用网站，ET会在后台慢慢完成常用IP库的缓存，这通常会花费几分钟的时间。
+> **建议：** 在安装或更新后，一次性大量打开常用网站，ET会在后台慢慢完成常用IP库的缓存，这通常会花费几分钟的时间。
 
 ET自带一个配置文件为`eagle-tunnel.smart.conf`，本质和格式上它和`eagle-tunnel.conf`没有任何却别，仅仅默认多了`proxy-status = smart`参数。该文件供智能模式的systemd服务（`eagle-tunnel-smart.service`）默认调用，如果该文件得到配置，就能很方便地启动独立的、启用智能模式的`eagle-tunnel-smart`服务。
 
