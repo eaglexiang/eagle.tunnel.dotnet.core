@@ -303,7 +303,7 @@ sudo systemctl start eagle-tunnel-smart.service
 
 > **警告** 如果同时启用`eagle-tunnel.service`与`eagle-tunnel-smart.service`，需要手动配置至少其中一个的监听端口不为8080，否则会产生监听冲突，导致两个服务只能正常启用一个。
 
-### 可用参数一览表
+### 配置文件可用参数一览表
 
 参数名（大小写不敏感） | 默认值 | 作用
 --- | --- | ---
@@ -319,6 +319,20 @@ User-Check | off | 是否开启用户认证功能
 Speed-Check | off | 是否开启速度检测特性
 Speed-Limit | off | 基于帐号系统和速度检测的帐号限速功能开关，打开它的前提是`speed-check`也必须打开
 Config-Dir | /etc/eagle-tunnel.d/ | 配置文件目录路径
+
+### 帮助
+
+除了systemd服务和启动脚本，配合正确的参数，你也可以通过命令手动控制ET的运行，它通常是这样的：
+
+```shell
+dotnet eagle.tunnel.dotnet.core.dll [options...]
+# 如果执行过安装，可以直接使用 eagle-tunnel 替代 dotnet eagle.tunnel.dotnet.core.dll
+# 此时它长这样：
+eagle-tunnel [options...]
+# 一个典型的例子是帮助指令
+eagle-tunnel --help
+# 你可以通过它获取其它受支持的参数及其提供的功能
+```
 
 ## 许可证
 
