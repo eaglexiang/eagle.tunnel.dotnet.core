@@ -2,13 +2,9 @@
 
 ## 准备工作
 
-1. 首先您需要一台防火墙外的计算机，我使用的是[vultr](https://www.vultr.com/?ref=7357306)的VPS，月付5刀，部分地区有2.5刀的货源。不过安装系统后最好先在国内ping一下是否畅通，最近屏蔽了很多IP。如果不是很熟练Linux的使用，建议给VPS安装CentOS 7，因为下文会以CentOS 7为标准。当然，你也可以使用任意你喜欢的操作系统。
+1. 首先您需要一台防火墙外的计算机，我使用的是[vultr](https://www.vultr.com/?ref=7357306)的VPS，月付5刀，部分地区有2.5刀的货源。不过安装系统后最好先在国内ping一下是否畅通，最近屏蔽了很多IP。如果不是很熟练Linux的使用，建议给VPS安装CentOS 7，因为下文会以CentOS 7为标准。当然，作为老鸟你也可以使用任意你喜欢的操作系统,推荐 **ArchLinux**。
 
 2. 由于Eagle Tunnel基于.NET Core开发，因此需要安装.NET Core的运行库。**VPS和本机都需要安装**。可到[.NET Core 官网](https://www.microsoft.com/net/download/dotnet-core/runtime-2.1.1)自行下载安装。
-
-## 下载 Eagle Tunnel
-
-[稳定版下载地址](https://github.com/eaglexiang/eagle.tunnel.dotnet.core/releases)
 
 ## 服务器端配置
 
@@ -20,6 +16,12 @@
 4. 启动服务
 
 此小节默认服务器环境为CentOS 7，并且会使用最新的master分支（而非编译好的字节码文件，因此会用到git，这样便于用上最新的特性及Bug修复）。其它环境的朋友也可参考。
+
+> Archlinux用户可直接执行下列指令一键安装:
+
+```shell
+yaourt -S eagle-tunnel
+```
 
 > **提示：**以下的步骤中，提供安装dotnet、git的命令和脚本只是为了方便部分朋友，情况很可能由于其官方的更新而发生改变。如果安装失败，也许是因为教程未跟上官方的节奏，建议自行搜索安装方法替代。当然，发信让我修复也是欢迎的。
 
@@ -278,6 +280,12 @@ sudo systemctl start eagle-tunnel-smart.service
 
 > **警告** 如果同时启用`eagle-tunnel.service`与`eagle-tunnel-smart.service`，需要手动配置至少其中一个的监听端口不为8080，否则会产生监听冲突，导致两个服务只能正常启用一个。
 
+### 超时
+
+为了防止异常连接长时间占用资源,ET提供了可选的超时参数。单位为ms（毫秒），默认值为0（表示不开启超时检测）。
+
+超时参数是有副作用的，对于一些保持长连接却低网络活跃度的网站（例如斗鱼），它是不友好的，极有可能由于误杀连接造成视频中断。所以只建议在relayer（服务器）处使用TimeOut参数，在本地则不需要。并配合智能模式使用。
+
 ### 可用参数一览表
 
 参数名（大小写不敏感） | 默认值 | 作用
@@ -293,6 +301,7 @@ User | | 本地服务使用的账户密码，凭此与远端进行认证交互�
 User-Check | off | 是否开启用户认证功能
 Speed-Check | off | 是否开启速度检测特性
 Speed-Limit | off | 基于帐号系统和速度检测的帐号限速功能开关，打开它的前提是`speed-check`也必须打开
+TimeOut | 0 | 超时时间（/ms）
 Config-Dir | /etc/eagle-tunnel.d/ | 配置文件目录路径
 
 ## 许可证
