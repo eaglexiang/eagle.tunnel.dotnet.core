@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
-
+if [ $# -ge 1 ];then
+    WorkSpace=$1
+else
+    WorkSpace=$(pwd)
+fi
+echo "des_dir: ${WorkSpace}"
 if [ $(whoami) = "root" ]; then
     echo "begin to install"
     WorkSpace=$(pwd)
