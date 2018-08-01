@@ -16,6 +16,7 @@ if [ $(whoami) = "root" ]; then
     echo "cp files"
     cp -rf ${WorkSpace}/publish/* ${Des_Dir}/
     echo "create bin link"
+    mkdir -pv ${Des_Dir}/usr/bin
     ln -sf ${Des_Dir}/usr/lib/eagle-tunnel/run.sh ${Des_Dir}/usr/bin/eagle-tunnel
     echo "systemd daemon reload"
     systemctl daemon-reload
