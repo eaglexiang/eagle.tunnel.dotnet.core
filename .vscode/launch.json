@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/console/bin/Debug/netcoreapp2.0/eagle.tunnel.dotnet.core.dll",
+            "program": "${workspaceFolder}/src/console/bin/Debug/netcoreapp2.1/eagle.tunnel.dotnet.core.dll",
             "args": [
                 "${workspaceFolder}/tmp/t.conf"
             ],
