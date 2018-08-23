@@ -11,10 +11,11 @@ if [ $(whoami) = "root" ]; then
     # if command -v dotnet >/dev/null 2>&1; then
     #     $(${Workspace}/scripts/dotnet_install.sh)
     # fi
-    echo "clean cache"
-    rm -rf ${Des_Dir}/etc/eagle-tunnel.d/
+    # echo "clean cache"
+    # rm -rf ${Des_Dir}/etc/eagle-tunnel.d/
     echo "cp files"
-    cp -rf ${WorkSpace}/publish/* ${Des_Dir}/
+    cp -ri ${WorkSpace}/publish/etc/* ${Des_Dir}/etc/
+    cp -rf ${WorkSpace}/publish/usr/* ${Des_Dir}/usr/
     echo "create bin link"
     mkdir -pv ${Des_Dir}/usr/bin
     ln -sf ${Des_Dir}/usr/lib/eagle-tunnel/run.sh ${Des_Dir}/usr/bin/eagle-tunnel
