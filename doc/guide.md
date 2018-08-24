@@ -287,7 +287,7 @@ ET在三种模式下的表现分别是这样的：
 
 > 请注意，为避免对ip2c服务的浪费，IP所在地判断操作被放置在指定队列统一操作，这可能会造成延迟(通常为5~10秒）。所以如果在智能模式下发现国内网站打开缓慢，不妨等待十秒再刷新试试。
 
-ET自带一个配置文件为`eagle-tunnel.smart.conf`，本质和格式上它和`eagle-tunnel.conf`没有任何却别，仅仅默认多了`proxy-status = smart`参数。该文件供智能模式的systemd服务（`eagle-tunnel-smart.service`）默认调用，如果该文件得到配置，就能很方便地启动独立的、智能的`eagle-tunnel-smart`服务。
+ET自带一个配置文件为`eagle-tunnel.smart.conf`，本质和格式上它和`eagle-tunnel.conf`没有任何区别，仅仅默认多了`proxy-status = smart`参数。该文件供智能模式的systemd服务（`eagle-tunnel-smart.service`）默认调用，如果该文件得到配置，就能很方便地启动独立的、智能的`eagle-tunnel-smart`服务。
 
 ```shell
 sudo systemctl enable eagle-tunnel-smart.service
