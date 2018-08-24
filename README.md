@@ -4,7 +4,7 @@
 
 稳定易用的代理工具。
 
-## 支持
+## 介绍
 
 ### 特性
 
@@ -22,6 +22,27 @@
 - [x] [Windows](https://github.com/eaglexiang/eagle.tunnel.dotnet)
 - [x] Linux
 - [x] macOS
+
+### 依赖
+
+[dotnet core](https://github.com/dotnet/core)
+
+### 安装
+
+Linux/macOS
+
+```shell
+mkdir ~/git
+cd ~/git
+git clone --recursive https://github.com/eaglexiang/eagle.tunnel.dotnet.core.git
+cd ./eagle.tunnel.dotnet.core
+./build.sh
+sudo ./install.sh
+```
+
+Windows/Linux/macOS
+
+[下载](https://github.com/eaglexiang/eagle.tunnel.dotnet.core/releases)
 
 ## 其它
 
