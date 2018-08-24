@@ -183,19 +183,11 @@ ET并没有自带的更新功能，不过可以通过git来将你的ET更新到�
 
 ```shell
 cd ~/git/eagle.tunnel.dotnet.core
-mkdir ./backup
-cp /etc/eagle-tunnel.conf ./backup # 备份配置文件
-cp /etc/eagle-tunnel.smart.conf ./backup
-cp /etc/eagle-tunnel.d/users.list ./backup
 
 git pull # 更新源码
 git submodule update # 更新子模块
 ./build.sh # 编译
 sudo ./install # 安装
-
-sudo cp ./backup/eagle-tunnel.conf /etc/ # 还原配置文件
-sudo cp ./backup/eagle-tunnel.smart.conf /etc/
-sudo cp ./backup/eagle-tunnel.d/users.list /etc/
 ```
 
 ### 共享服务
@@ -227,8 +219,8 @@ Relayer=8.8.8.8
 
 > 需要注意的是：
 >
-> 1. 负载均衡只可能提高多个TCP连接并行传输的总速度，并不能提高单个TCP连接的速度。但同一网页经常拥有多个连接，因此启用负载仍然是有好处的。
-> 2. 如果你的多台VPS位于不同的国家或地区，可能会造成反效果。这是因为同一网页的不同服务请求了位于不同地区的服务器，这可能导致冲突。
+> 1. 负载均衡只可能提高多个TCP连接并行传输的总速度，并不能提高单个TCP连接的速度。但同一网页经常拥有多个连接，因此启用负载仍然是有好处的。但并不能额外增加在线流媒体（如YouTube）的流畅度。
+> 2. 如果你的多台VPS位于不同的国家或地区，可能会造成反效果。这是因为浏览器有可能通过VPS1访问了VPS2所在地区的网站节点，这可能导致性能低下。因此仅建议为同地区的不同VPS启用负载均衡。
 
 ### 用户认证
 
@@ -255,9 +247,11 @@ Relayer=8.8.8.8
 User = 账户名:密码
 ```
 
+**服务端与客户端必须同时打开或关闭用户认证功能**，单方面开启或关闭都会造成连接失败。
+
 ### 用户限速
 
-如果你需要将代理临时共享给朋友，又担心他的滥用，可以为他分配一个访客账户，并将其限速。限速功能依赖于上一小节的用户认证功能。开启方法为，在`/etc/eagle-tunnel.conf`文件中添加：
+如果你需要将代理临时共享给朋友，又担心他的滥用，可以为他分配一个访客账户，并将其限速。限速功能依赖于上一小节的用户认证功能。开启方法为，在`/etc/eagle-tunnel.conf`文件中添加或修改：
 
 ```shell
 speed-check = on # 打开速度检测
@@ -273,7 +267,7 @@ id:key:500
 
 ### 智能分流（智能模式）
 
-普通模式下，ET的所有网络操作都是通过Relayer间接完成的，这样做有好处（不然你也就不会使用ET了），坏处是通过代理连接到国内的网络服务（如爱奇艺，B站等），往往会增大网络的延迟，降低上下行的网络速度，还可能被告知类似“您所处的地区无法观看该版权作品”的信息。通过代理进行DNS解析，好处是防止DNS污染，坏处是解析到的服务器是离VPS最近的，却不是离本地最近的，当使用本地直连时，本地DNS解析更为配套。
+普通模式下，ET的所有网络操作都是通过Relayer间接完成的，这样做的好处是稳定的服务，坏处是通过代理连接到国内的网络服务（如爱奇艺，B站等），往往会增大网络的延迟，降低上下行的网络速度，还可能被告知类似“您所处的地区无法观看该版权作品”的信息。
 
 因此ET提供了一个可选的智能分流功能，它由参数`proxy-status`控制：
 
@@ -289,12 +283,11 @@ ET在三种模式下的表现分别是这样的：
 --- | --- | ---
 普通模式 | 全部使用代理加密通道 | 全部使用代理加密通道
 禁用模式 | 全部使用本地DNS解析 | 全部使用本地直连
-智能模式 | `whitelist_domain.txt`文件中声明的域名使用代理，其余使用本地解析 | `whitelist_ip.txt`文件中声明的IP使用代理，`blacklist_ip.txt`文件中声明的IP使用本地直连，两个文件中均未涉及的IP，将使用[ip2c](https://ip2c.org/)提供的公开服务，在线判断IP所在地是否为中国大陆，并缓存在`whitelist_ip.txt`与`blacklist_ip.txt`两个缓存文件中。
+智能模式 | `whitelist_domain.txt`文件中声明的域名使用代理，其余使用本地解析 | 使用[ip2c](https://ip2c.org/)提供的公开服务，在线判断IP所在地是否为中国大陆。
 
-> 请注意，为避免对ip2c服务的浪费，IP所在地判断操作被放置在指定队列统一操作，这可能会造成延迟。也就是说，当你安装或更新ET后（为避免在线IP库更新造成的问题，缓存文件会被重置），在智能模式下首次访问某个IP，它会仍然使用普通模式，直到在线判断操作完成，便可正常启用智能判断。因此，如果您没有备份缓存文件，  
-> **建议：** 在安装或更新后，一次性大量打开常用网站，ET会在后台慢慢完成常用IP库的缓存，这通常会花费几分钟的时间。
+> 请注意，为避免对ip2c服务的浪费，IP所在地判断操作被放置在指定队列统一操作，这可能会造成延迟(通常为5~10秒）。所以如果在智能模式下发现国内网站打开缓慢，不妨等待十秒再刷新试试。
 
-ET自带一个配置文件为`eagle-tunnel.smart.conf`，本质和格式上它和`eagle-tunnel.conf`没有任何却别，仅仅默认多了`proxy-status = smart`参数。该文件供智能模式的systemd服务（`eagle-tunnel-smart.service`）默认调用，如果该文件得到配置，就能很方便地启动独立的、启用智能模式的`eagle-tunnel-smart`服务。
+ET自带一个配置文件为`eagle-tunnel.smart.conf`，本质和格式上它和`eagle-tunnel.conf`没有任何却别，仅仅默认多了`proxy-status = smart`参数。该文件供智能模式的systemd服务（`eagle-tunnel-smart.service`）默认调用，如果该文件得到配置，就能很方便地启动独立的、智能的`eagle-tunnel-smart`服务。
 
 ```shell
 sudo systemctl enable eagle-tunnel-smart.service
@@ -309,25 +302,33 @@ sudo systemctl start eagle-tunnel-smart.service
 
 为了防止异常连接长时间占用资源,ET提供了可选的超时参数。单位为ms（毫秒），默认值为0（表示不开启超时检测）。
 
-超时参数是有副作用的，对于一些保持长连接却低网络活跃度的网站（例如斗鱼），它是不友好的，极有可能由于误杀连接造成视频中断。所以只建议在relayer（服务器）处使用TimeOut参数，在本地则不需要。并配合智能模式使用。
+超时参数是有副作用的，对于一些保持长连接却低网络活跃度的网站（例如斗鱼），它是不友好的，极有可能由于误杀连接造成视频中断。所以即便需要开启，一般也只建议在relayer（服务器）处使用TimeOut参数，在本地则不需要。并配合智能模式使用。
 
 ### 可用参数一览表
 
-参数名（大小写不敏感） | 默认值 | 作用
---- | --- | ---
-Relayer | | 远端服务地址
-Listen | | 本地服务监听地址
-HTTP | off | HTTP代理开关
-SOCKS | off | SOCKS代理开关
-ET | off | Eagle Tunnel协议开关
-Proxy-Status | enable | 代理服务的模式
-Worker | 500 | 受理请求的并发数（值越大，并发能力越强，可能的资源消耗越高）
-User | | 本地服务使用的账户密码，凭此与远端进行认证交互，注释状态表示关闭认证功能
-User-Check | off | 是否开启用户认证功能
-Speed-Check | off | 是否开启速度检测特性
-Speed-Limit | off | 基于帐号系统和速度检测的帐号限速功能开关，打开它的前提是`speed-check`也必须打开
-TimeOut | 0 | 超时时间（/ms）
-Config-Dir | /etc/eagle-tunnel.d/ | 配置文件目录路径
+参数名（大小写不敏感） | 类型 | 默认值 | 作用
+--- | --- | --- | ---
+Relayer | 主机地址 | 无 | 远端服务地址
+Listen | 主机地址 | 无 | 本地服务监听地址
+HTTP | 布尔值 | off | HTTP代理开关
+SOCKS | 布尔值 | off | SOCKS代理开关
+ET | 布尔值 | off | Eagle Tunnel协议开关
+Proxy-Status | 可选参数（见后表） | enable | 代理服务的模式
+Worker | 整数 | 500 | 受理请求的并发数（值越大，并发能力越强，可能的资源消耗越高）
+User | 字符串 | 无 | 本地服务使用的账户密码，凭此与远端进行认证交互，注释状态表示关闭认证功能
+User-Check | 布尔值 | off | 是否开启用户认证功能
+Speed-Check | 布尔值 | off | 是否开启速度检测特性
+Speed-Limit | 布尔值 | off | 基于帐号系统和速度检测的帐号限速功能开关，打开它的前提是`speed-check`也必须打开
+TimeOut | 整数 | 0 | 超时时间（ms），0代表关闭超时检测
+Config-Dir | 字符串 | /etc/eagle-tunnel.d/ | 配置文件目录路径
+
+Proxy-Status可选的参数
+
+可选参数 | 含义
+--- | ---
+enable | 全局代理
+smart | 智能代理
+disable | 禁用代理
 
 ### 帮助
 
