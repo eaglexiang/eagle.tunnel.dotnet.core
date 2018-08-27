@@ -310,15 +310,15 @@ sudo systemctl start eagle-tunnel-smart.service
 --- | --- | --- | ---
 Relayer | 主机地址 | 无 | 远端服务地址
 Listen | 主机地址 | 无 | 本地服务监听地址
-HTTP | 布尔值 | off | HTTP代理开关
-SOCKS | 布尔值 | off | SOCKS代理开关
-ET | 布尔值 | off | Eagle Tunnel协议开关
+HTTP | on/off | off | HTTP代理开关
+SOCKS | on/off | off | SOCKS代理开关
+ET | on/off | off | Eagle Tunnel协议开关
 Proxy-Status | 可选参数（见后表） | enable | 代理服务的模式
 Worker | 整数 | 500 | 受理请求的并发数（值越大，并发能力越强，可能的资源消耗越高）
 User | 字符串 | 无 | 本地服务使用的账户密码，凭此与远端进行认证交互，注释状态表示关闭认证功能
-User-Check | 布尔值 | off | 是否开启用户认证功能
-Speed-Check | 布尔值 | off | 是否开启速度检测特性
-Speed-Limit | 布尔值 | off | 基于帐号系统和速度检测的帐号限速功能开关，打开它的前提是`speed-check`也必须打开
+User-Check | on/off | off | 是否开启用户认证功能
+Speed-Check | on/off | off | 是否开启速度检测特性
+Speed-Limit | on/off | off | 基于帐号系统和速度检测的帐号限速功能开关，打开它的前提是`speed-check`也必须打开
 TimeOut | 整数 | 0 | 超时时间（ms），0代表关闭超时检测
 Config-Dir | 字符串 | /etc/eagle-tunnel.d/ | 配置文件目录路径
 
