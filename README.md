@@ -4,7 +4,7 @@
 
 稳定易用的代理工具。
 
-> 出于性能和易于部署的因素，ET已经用Golang重新实现：[Eagle Tunnel Go](https://github.com/eaglexiang/eagle.tunnel.go)
+> 出于性能和易于部署的因素，ET已经用Golang重新实现，并且具有更优的体验。推荐移步使用：[Eagle Tunnel Go](https://github.com/eaglexiang/eagle.tunnel.go)
 
 ## 介绍
 
